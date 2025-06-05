@@ -129,7 +129,7 @@ export default async function SubjectPage({ params }: SubjectPageProps) {
           <section className="bg-white py-16">
             <div className="container mx-auto px-4">
               <div className="text-center max-w-4xl mx-auto">
-                <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+                <h1 className="font-serif font-bold mb-6" style={{fontSize: '55px', color: '#243b53', letterSpacing: '-0.01em', fontWeight: '600'}}>
                   {subjectPageData.pageTitle}
                 </h1>
                 <p className="text-lg md:text-xl text-gray-600 leading-relaxed">
