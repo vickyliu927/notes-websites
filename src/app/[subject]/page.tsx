@@ -6,8 +6,8 @@ import { HeaderData, FooterData, ContactFormSectionData } from '../../../types/s
 import { generateSEOMetadata } from '../../../components/SEOHead'
 import { SEOProvider } from '../../../contexts/SEOContext'
 
-// Revalidate every 10 seconds in development, 60 seconds in production for fresh content
-export const revalidate = process.env.NODE_ENV === 'development' ? 10 : 60;
+// Revalidate every 10 seconds for fresh content during development
+export const revalidate = 10;
 
 interface SubjectPageProps {
   params: Promise<{
