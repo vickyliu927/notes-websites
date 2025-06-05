@@ -10,9 +10,9 @@ import { SEOProvider } from '../../../contexts/SEOContext'
 export const revalidate = 60;
 
 interface SubjectPageProps {
-  params: {
+  params: Promise<{
     subject: string
-  }
+  }>
 }
 
 async function getHeaderData(): Promise<HeaderData | undefined> {
@@ -62,7 +62,7 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({ params }: SubjectPageProps): Promise<Metadata> {
   try {
-  const { subject } = params
+  const { subject } = await params
   const subjectPageData = await getSubjectPageData(subject)
   
   if (!subjectPageData) {
@@ -95,7 +95,7 @@ export async function generateMetadata({ params }: SubjectPageProps): Promise<Me
 }
 
 export default async function SubjectPage({ params }: SubjectPageProps) {
-  const { subject } = params
+  const { subject } = await params
   const headerData = await getHeaderData()
   const footerData = await getFooterData()
   const subjectPageData = await getSubjectPageData(subject)
