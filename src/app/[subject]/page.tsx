@@ -1,6 +1,6 @@
 import { Metadata } from 'next'
 import { notFound } from 'next/navigation'
-import { Header, Footer, SubjectTopicGrid, ContactForm } from '@/components'
+import { Header, Footer, SubjectTopicGrid, ContactForm, MoreResources } from '@/components'
 import { client, headerQuery, footerQuery, getSubjectPageData, getGlobalSEOSettings, allSubjectSlugsQuery, contactFormSectionQuery } from '../../../lib/sanity'
 import { HeaderData, FooterData, ContactFormSectionData } from '../../../types/sanity'
 import { generateSEOMetadata } from '../../../components/SEOHead'
@@ -149,6 +149,9 @@ export default async function SubjectPage({ params }: SubjectPageProps) {
             </div>
           </section>
         </main>
+        
+        {/* More Resources Section - only show if active */}
+        <MoreResources moreResourcesData={subjectPageData.moreResources} />
         
         {/* Contact Form Section - only show if active */}
         {shouldShowContactForm && (

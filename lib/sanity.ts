@@ -358,6 +358,14 @@ export const subjectPageBySlugQuery = (slug: string) => `*[_type == "subjectPage
   },
   isPublished,
   showContactForm,
+  moreResources{
+    isActive,
+    sectionTitle,
+    resources[]{
+      text,
+      url
+    }
+  },
   seo{
     metaTitle,
     metaDescription,
@@ -481,6 +489,14 @@ export async function getSubjectPageData(slug: string) {
       topicBlockBackgroundColor,
       isPublished,
       showContactForm,
+      moreResources{
+        isActive,
+        sectionTitle,
+        resources[]{
+          text,
+          url
+        }
+      },
       seo{
         metaTitle,
         metaDescription,

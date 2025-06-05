@@ -8,4 +8,5 @@ export { default as ContactForm } from './ContactForm';
 export { default as Footer } from './Footer';
 export { default as SubjectRequest } from './SubjectRequest';
 export { default as SubjectTopicGrid } from './SubjectTopicGrid';
-export { default as SubjectRequestBanner } from './SubjectRequestBanner'; 
+export { default as SubjectRequestBanner } from './SubjectRequestBanner';
+export { default as MoreResources } from './MoreResources'; 

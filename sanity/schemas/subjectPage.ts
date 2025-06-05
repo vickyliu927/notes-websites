@@ -257,6 +257,62 @@ export default defineType({
       description: 'Whether to display the contact form on this subject page (also requires global contact form to be active)',
       initialValue: true
     }),
+    defineField({
+      name: 'moreResources',
+      title: 'More Resources Section',
+      type: 'object',
+      description: 'Additional resources section displayed before the contact form',
+      fields: [
+        {
+          name: 'isActive',
+          title: 'Show More Resources Section',
+          type: 'boolean',
+          description: 'Whether to display the more resources section on this subject page',
+          initialValue: false
+        },
+        {
+          name: 'sectionTitle',
+          title: 'Section Title',
+          type: 'string',
+          description: 'Title for the more resources section',
+          initialValue: 'More Resources'
+        },
+        {
+          name: 'resources',
+          title: 'Resource Links',
+          type: 'array',
+          description: 'List of external resource links',
+          of: [
+            {
+              type: 'object',
+              title: 'Resource',
+              fields: [
+                {
+                  name: 'text',
+                  title: 'Link Text',
+                  type: 'string',
+                  description: 'Text to display for the resource link',
+                  validation: Rule => Rule.required()
+                },
+                {
+                  name: 'url',
+                  title: 'Resource URL',
+                  type: 'url',
+                  description: 'External URL for the resource',
+                  validation: Rule => Rule.required()
+                }
+              ],
+              preview: {
+                select: {
+                  title: 'text',
+                  subtitle: 'url'
+                }
+              }
+            }
+          ]
+        }
+      ]
+    }),
     ...seoFields,
   ],
   preview: {

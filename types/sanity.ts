@@ -262,6 +262,17 @@ export interface SubjectPageSEO {
   keywords?: string[]
 }
 
+export interface MoreResourceItem {
+  text: string
+  url: string
+}
+
+export interface MoreResourcesSection {
+  isActive: boolean
+  sectionTitle?: string
+  resources?: MoreResourceItem[]
+}
+
 export interface SubjectPageData {
   _id: string
   title: string
@@ -275,6 +286,7 @@ export interface SubjectPageData {
   topics: SubjectTopic[]
   isPublished: boolean
   showContactForm?: boolean
+  moreResources?: MoreResourcesSection
   seo?: SubjectPageSEO
 }
 
