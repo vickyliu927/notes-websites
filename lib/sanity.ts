@@ -108,7 +108,8 @@ export const heroQuery = `*[_type == "hero" && isActive == true][0]{
 export const subjectGridQuery = `*[_type == "subjectGrid" && isActive == true][0]{
   _id,
   title,
-  sectionTitle,
+  sectionTitleFirstPart,
+  sectionTitleSecondPart,
   sectionDescription,
   subjects[]{
     name,
@@ -140,7 +141,8 @@ export const subjectGridQuery = `*[_type == "subjectGrid" && isActive == true][0
 export const whyChooseUsQuery = `*[_type == "whyChooseUs" && isActive == true][0]{
   _id,
   title,
-  sectionTitle,
+  sectionTitleFirstPart,
+  sectionTitleSecondPart,
   sectionDescription,
   highlight1{
     title,
@@ -535,4 +537,4 @@ export async function getSubjectPageData(slug: string) {
     console.error('Error fetching subject page data:', error)
     return null
   }
-} 
+}

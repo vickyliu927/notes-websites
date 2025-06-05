@@ -13,10 +13,17 @@ export default defineType({
       validation: Rule => Rule.required()
     }),
     defineField({
-      name: 'sectionTitle',
-      title: 'Section Title',
+      name: 'sectionTitleFirstPart',
+      title: 'Section Title First Part (Dark Blue)',
       type: 'string',
-      description: 'Main title for the subject grid section (e.g., "Popular Subjects")',
+      description: 'First part of the section title that will be displayed in dark blue (#243b53)',
+      validation: Rule => Rule.required()
+    }),
+    defineField({
+      name: 'sectionTitleSecondPart',
+      title: 'Section Title Second Part (Orange)',
+      type: 'string',
+      description: 'Second part of the section title that will be displayed in orange (#e67e50)',
       validation: Rule => Rule.required()
     }),
     defineField({
@@ -167,14 +174,15 @@ export default defineType({
   preview: {
     select: {
       title: 'title',
-      sectionTitle: 'sectionTitle',
+      sectionTitleFirstPart: 'sectionTitleFirstPart',
+      sectionTitleSecondPart: 'sectionTitleSecondPart',
       isActive: 'isActive'
     },
     prepare(selection) {
-      const { title, sectionTitle, isActive } = selection
+      const { title, sectionTitleFirstPart, sectionTitleSecondPart, isActive } = selection
       return {
         title: title,
-        subtitle: `${sectionTitle}${isActive ? ' (Active)' : ''}`,
+        subtitle: `${sectionTitleFirstPart} ${sectionTitleSecondPart}${isActive ? ' (Active)' : ''}`,
         media: () => '📚'
       }
     }

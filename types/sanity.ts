@@ -90,7 +90,8 @@ export interface SubjectGridSubject {
 export interface SubjectGridData {
   _id: string
   title: string
-  sectionTitle: string
+  sectionTitleFirstPart: string
+  sectionTitleSecondPart: string
   sectionDescription: string
   subjects: SubjectGridSubject[]
   viewAllButton: CTAButton
@@ -114,7 +115,8 @@ export interface WhyChooseUsHighlight {
 export interface WhyChooseUsData {
   _id: string
   title: string
-  sectionTitle: string
+  sectionTitleFirstPart: string
+  sectionTitleSecondPart: string
   sectionDescription: string
   highlight1: WhyChooseUsHighlight
   highlight2: WhyChooseUsHighlight

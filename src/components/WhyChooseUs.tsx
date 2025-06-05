@@ -9,7 +9,8 @@ export default function WhyChooseUs({ whyChooseUsData }: WhyChooseUsProps) {
   const fallbackData: WhyChooseUsData = {
     _id: 'fallback',
     title: 'Default Why Choose Us',
-    sectionTitle: 'Why Choose Our Study Notes',
+    sectionTitleFirstPart: 'Why Choose',
+    sectionTitleSecondPart: 'Our Study Notes',
     sectionDescription: 'Our comprehensive resources are designed to help you excel in your CIE A-Level examinations',
     highlight1: {
       title: 'Exam-Focused',
@@ -68,8 +69,11 @@ export default function WhyChooseUs({ whyChooseUsData }: WhyChooseUsProps) {
       <div className="max-w-7xl mx-auto">
         {/* Section Header */}
         <div className="text-center mb-12">
-          <h2 className="leading-none mb-6 font-serif" style={{fontSize: '42px', color: '#243b53', letterSpacing: '-0.01em', fontWeight: '600'}}>
-            {data.sectionTitle}
+          <h2 className="leading-none mb-6 font-serif" style={{fontSize: '42px', letterSpacing: '-0.01em', fontWeight: '600'}}>
+            <span style={{color: '#243b53'}}>{data.sectionTitleFirstPart}</span>
+            {data.sectionTitleSecondPart && (
+              <span style={{color: '#e67e50'}}> {data.sectionTitleSecondPart}</span>
+            )}
           </h2>
           <p className="font-sans leading-relaxed max-w-3xl mx-auto" style={{fontSize: '20px', color: '#486581', fontWeight: '400'}}>
             {data.sectionDescription}

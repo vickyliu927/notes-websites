@@ -72,17 +72,17 @@ export default function FAQ({ faqData }: FAQProps) {
     <section className="py-12 px-4 sm:px-6 lg:px-8 bg-gray-50">
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-12">
-          <h3 
+          <h2 
             className="mb-4 font-serif"
             style={{
               fontSize: '42px',
-              color: '#e67e50',
+              color: '#243b53',
               letterSpacing: '-0.01em',
               fontWeight: 600
             }}
           >
             {data.sectionTitle}
-          </h3>
+          </h2>
           <p 
             className=""
             style={{

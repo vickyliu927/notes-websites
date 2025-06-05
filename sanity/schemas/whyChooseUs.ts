@@ -18,11 +18,18 @@ export default {
       initialValue: true
     },
     {
-      name: 'sectionTitle',
-      title: 'Section Title',
+      name: 'sectionTitleFirstPart',
+      title: 'Section Title First Part (Dark Blue)',
       type: 'string',
-      description: 'Main heading for the Why Choose Us section',
-      validation: (Rule: any) => Rule.required().max(100)
+      description: 'First part of the section title that will be displayed in dark blue (#243b53)',
+      validation: (Rule: any) => Rule.required().max(50)
+    },
+    {
+      name: 'sectionTitleSecondPart',
+      title: 'Section Title Second Part (Orange)',
+      type: 'string',
+      description: 'Second part of the section title that will be displayed in orange (#e67e50)',
+      validation: (Rule: any) => Rule.required().max(50)
     },
     {
       name: 'sectionDescription',
@@ -114,8 +121,8 @@ export default {
   ],
   preview: {
     select: {
-      title: 'sectionTitle',
-      subtitle: 'sectionDescription',
+      title: 'sectionTitleFirstPart',
+      subtitle: 'sectionTitleSecondPart',
       active: 'isActive'
     },
     prepare(selection: any) {

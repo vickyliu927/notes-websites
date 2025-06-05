@@ -19,7 +19,8 @@ export default function SubjectGrid({ subjectGridData, publishedSubjects }: Subj
   const fallbackData: SubjectGridData = {
     _id: 'fallback-subject-grid',
     title: 'Subject Grid',
-    sectionTitle: 'Popular Subjects',
+    sectionTitleFirstPart: 'Popular',
+    sectionTitleSecondPart: 'Subjects',
     sectionDescription: 'Explore our comprehensive collection of study materials for various subjects. Each subject contains detailed notes, practice questions, and revision guides.',
     subjects: [
       { 
@@ -214,9 +215,12 @@ export default function SubjectGrid({ subjectGridData, publishedSubjects }: Subj
       
       <div className="max-w-7xl mx-auto relative z-10">
         <div className="text-center mb-12">
-          <h3 className="leading-none mb-6 font-serif" style={{fontSize: '42px', color: '#e67e50', letterSpacing: '-0.01em', fontWeight: '600'}}>
-            {data.sectionTitle}
-          </h3>
+          <h2 className="leading-none mb-6 font-serif" style={{fontSize: '42px', letterSpacing: '-0.01em', fontWeight: '600'}}>
+            <span style={{color: '#243b53'}}>{data.sectionTitleFirstPart}</span>
+            {data.sectionTitleSecondPart && (
+              <span style={{color: '#e67e50'}}> {data.sectionTitleSecondPart}</span>
+            )}
+          </h2>
           <p className="font-sans leading-relaxed max-w-3xl mx-auto" style={{fontSize: '20px', color: '#486581', fontWeight: '400'}}>
             {data.sectionDescription}
           </p>
