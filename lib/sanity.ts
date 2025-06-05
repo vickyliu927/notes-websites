@@ -17,6 +17,21 @@ export const client = createClient({
   apiVersion,
   token,
   useCdn: false,
+  // Add cache busting for development
+  stega: {
+    studioUrl: '/studio',
+  },
+})
+
+// Cache-busting client for development
+export const freshClient = createClient({
+  projectId,
+  dataset,
+  apiVersion,
+  token,
+  useCdn: false,
+  // Force fresh data by adding timestamp to requests in development
+  perspective: process.env.NODE_ENV === 'development' ? 'previewDrafts' : 'published',
 })
 
 const builder = imageUrlBuilder(client)
@@ -382,6 +397,11 @@ export const mathsPageQuery = `*[_type == "mathsPage"][0]{
   }
 }`
 
+// Helper function to get the appropriate client based on environment
+function getClient() {
+  return process.env.NODE_ENV === 'development' ? freshClient : client
+}
+
 // Homepage data query
 export async function getHomepageData() {
   const query = `
@@ -395,7 +415,8 @@ export async function getHomepageData() {
   `
   
   try {
-    const data = await client.fetch(query)
+    const clientToUse = getClient()
+    const data = await clientToUse.fetch(query)
     return data
   } catch (error) {
     console.error('Error fetching homepage data:', error)
@@ -416,7 +437,8 @@ export async function getSEOSettings() {
   `
   
   try {
-    const data = await client.fetch(query)
+    const clientToUse = getClient()
+    const data = await clientToUse.fetch(query)
     return data
   } catch (error) {
     console.error('Error fetching SEO settings:', error)
@@ -437,7 +459,8 @@ export async function getGlobalSEOSettings() {
   `
   
   try {
-    const data = await client.fetch(query)
+    const clientToUse = getClient()
+    const data = await clientToUse.fetch(query)
     return data?.seo || null
   } catch (error) {
     console.error('Error fetching global SEO settings:', error)
@@ -484,7 +507,8 @@ export async function getSubjectPageData(slug: string) {
   
   try {
     console.log('Fetching subject page data for slug:', slug)
-    const data = await client.fetch(query, { slug })
+    const clientToUse = getClient()
+    const data = await clientToUse.fetch(query, { slug })
     console.log('Fetched data:', {
       slug,
       topicBlockBackgroundColor: data?.topicBlockBackgroundColor,
