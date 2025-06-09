@@ -61,7 +61,7 @@ const SubtopicItem: React.FC<SubtopicItemProps> = ({ subtopic }) => {
         {isSubDropdownOpen && (
           <div className="ml-4">
             {subtopic.subSubtopics?.map((subSubtopic, index) => (
-              <div key={index} className="border-b border-gray-200 last:border-b-0">
+              <div key={`${subtopic.subtopicName}-${index}-${subSubtopic.subSubtopicName}`} className="border-b border-gray-200 last:border-b-0">
                 {subSubtopic.isComingSoon ? (
                   <div className="p-2 pl-4 text-gray-400 cursor-not-allowed flex items-center justify-between text-sm bg-white">
                     <span className="font-semibold">{subSubtopic.subSubtopicName}</span>
@@ -109,7 +109,7 @@ const TopicCard: React.FC<TopicCardProps> = ({ topic, backgroundColorClass }) =>
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
 
   const toggleDropdown = () => {
-    setIsDropdownOpen(!isDropdownOpen)
+    setIsDropdownOpen(prev => !prev)
   }
 
   // Debug log to check the background color
@@ -161,7 +161,7 @@ const TopicCard: React.FC<TopicCardProps> = ({ topic, backgroundColorClass }) =>
       {hasValidSubtopics && isDropdownOpen && (
         <div className="bg-white border-t-2 border-gray-300">
           {(topic.subtopics || []).filter(subtopic => subtopic.subtopicName).map((subtopic, index) => (
-            <div key={index} className="border-b border-gray-200 last:border-b-0">
+            <div key={`${topic.topicName}-subtopic-${index}-${subtopic.subtopicName}`} className="border-b border-gray-200 last:border-b-0">
               <SubtopicItem subtopic={subtopic} />
             </div>
           ))}
@@ -184,9 +184,13 @@ const SubjectTopicGrid: React.FC<SubjectTopicGridProps> = ({ topics, topicBlockB
   const sortedTopics = [...topics].sort((a, b) => a.displayOrder - b.displayOrder)
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-      {sortedTopics.map((topic, index) => (
-        <TopicCard key={index} topic={topic} backgroundColorClass={topicBlockBackgroundColor} />
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 items-start">
+      {sortedTopics.map((topic) => (
+        <TopicCard 
+          key={`topic-${topic.displayOrder}-${topic.topicName}`} 
+          topic={topic} 
+          backgroundColorClass={topicBlockBackgroundColor} 
+        />
       ))}
     </div>
   )
