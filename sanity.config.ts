@@ -12,7 +12,7 @@ console.log('Sanity config - Dataset:', dataset)
 
 export default defineConfig({
   name: 'default',
-  title: 'Notes Website',
+  title: 'New Websites',
 
   projectId,
   dataset,
