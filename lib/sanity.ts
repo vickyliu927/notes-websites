@@ -371,7 +371,8 @@ export const subjectPageBySlugQuery = (slug: string) => `*[_type == "subjectPage
   seo{
     metaTitle,
     metaDescription,
-    keywords
+    keywords,
+    noFollowExternal
   }
 }`
 
@@ -403,7 +404,8 @@ export const mathsPageQuery = `*[_type == "mathsPage"][0]{
   seo{
     metaTitle,
     metaDescription,
-    keywords
+    keywords,
+    noFollowExternal
   }
 }`
 
@@ -502,7 +504,8 @@ export async function getSubjectPageData(slug: string) {
       seo{
         metaTitle,
         metaDescription,
-        keywords
+        keywords,
+        noFollowExternal
       },
       topics[] {
         topicName,
