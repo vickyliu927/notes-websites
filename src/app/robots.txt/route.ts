@@ -1,7 +1,8 @@
-const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://cie-igcse-notes.vercel.app'
-
 export async function GET() {
-  const robotsTxt = `Sitemap: ${baseUrl}/sitemap.xml`
+  const robotsTxt = `User-Agent: *
+Allow: /
+
+Sitemap: https://www.igcse-notes.com/sitemap.xml`
 
   return new Response(robotsTxt, {
     headers: {
