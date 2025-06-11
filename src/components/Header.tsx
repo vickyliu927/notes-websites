@@ -81,7 +81,7 @@ export default function Header({ headerData, isContactFormActive }: HeaderProps)
   const hasLogo = logoSrc !== null;
 
   return (
-    <header className="bg-white shadow-soft border-b sticky top-0 z-50">
+    <header className="bg-white shadow-soft sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center py-2">
           {/* Logo - Only display if uploaded via Sanity */}
