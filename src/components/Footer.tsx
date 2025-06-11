@@ -391,10 +391,12 @@ export default function Footer({ footerData, isContactFormActive }: FooterProps)
         {data.layoutSettings?.showCopyright && (
           <div className="border-t border-white/20 pt-8 animate-fade-in-up">
             <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-              <div className="flex items-center gap-2 text-white/70">
-                <span>© {currentYear} {data.websiteTitle || 'CIE IGCSE Study Notes'}. Made with</span>
-                <Icons.Heart />
-                <span>for students worldwide.</span>
+              <div className="flex items-center gap-2 text-white/70 text-center md:text-left">
+                <span className="flex items-center gap-2 flex-wrap justify-center md:justify-start">
+                  © {currentYear} {data.websiteTitle || 'CIE IGCSE Study Notes'}. Made with
+                  <Icons.Heart />
+                  for students worldwide.
+                </span>
               </div>
               <div className="flex flex-wrap gap-6 text-sm">
                 <a href="#" target="_blank" rel="noopener noreferrer" className="text-white/70 hover:text-coral-400 transition-colors">

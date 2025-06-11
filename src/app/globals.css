@@ -64,6 +64,14 @@
   scrollbar-color: #e67e50 #f1f5f9;
 }
 
+/* Ensure no background colors leak through on any browser */
+html, body {
+  margin: 0;
+  padding: 0;
+  background-color: white !important;
+  background: white !important;
+}
+
 body {
   color: hsl(var(--foreground));
   background: hsl(var(--background));
@@ -86,6 +94,53 @@ body {
 
 ::-webkit-scrollbar-thumb:hover {
   background: #d16941;
+}
+
+/* Webkit scroll progress indicator for mobile browsers */
+::-webkit-progress-bar {
+  background-color: #e67e50;
+}
+
+::-webkit-progress-value {
+  background-color: #e67e50;
+}
+
+/* CSS for various mobile browser scroll indicators */
+html {
+  --scroll-indicator-color: #e67e50;
+  scroll-behavior: smooth;
+  background-color: white !important;
+  background: white !important;
+}
+
+/* iOS Safari and WebKit scroll position indicator */
+body {
+  -webkit-progress-bar-value: #e67e50;
+  scrollbar-color: #e67e50 #f1f5f9;
+  background-color: white !important;
+  background: white !important;
+}
+
+/* Custom CSS property for scroll indicator color override */
+* {
+  scroll-snap-type: none;
+  scroll-indicator-color: #e67e50;
+}
+
+/* Windows Chrome/Edge specific fixes */
+@media screen and (-ms-high-contrast: active), (-ms-high-contrast: none) {
+  html, body {
+    background-color: white !important;
+    background: white !important;
+  }
+}
+
+/* Chrome on Windows specific fix */
+@supports (-webkit-appearance: none) {
+  html, body {
+    background-color: white !important;
+    background: white !important;
+  }
 }
 
 /* Utility classes */
