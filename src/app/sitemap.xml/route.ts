@@ -1,6 +1,6 @@
 import { client, allSubjectSlugsQuery } from '../../../lib/sanity'
 
-const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://cie-igcse-notes.vercel.app'
+const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://igcse-notes.com'
 
 export async function GET() {
   try {

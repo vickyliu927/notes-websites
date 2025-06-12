@@ -1,5 +1,5 @@
 export async function GET() {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://cie-igcse-notes.vercel.app'
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://igcse-notes.com'
   
   const robotsTxt = `User-Agent: *
 Allow: /
