@@ -1,6 +1,7 @@
 import { Metadata } from 'next'
 import { redirect } from 'next/navigation'
 import { validateCloneId, getCompleteCloneData } from '../../../../../lib/cloneUtils'
+import Link from 'next/link'
 
 // ===== TYPES =====
 
@@ -55,13 +56,19 @@ export default async function CloneHomepage({ params }: CloneHomepageProps) {
           <span className="mx-2">•</span>
           <strong>ID:</strong> {cloneId}
           <span className="mx-2">•</span>
-          <a href="/" className="underline hover:no-underline">
+          <Link 
+            href="/"
+            className="text-blue-600 hover:text-blue-800 underline"
+          >
             View Original Site
-          </a>
+          </Link>
           <span className="mx-2">•</span>
-          <a href="/admin/clones" className="underline hover:no-underline">
+          <Link 
+            href="/admin/clones/"
+            className="text-blue-600 hover:text-blue-800 underline"
+          >
             Admin Dashboard
-          </a>
+          </Link>
         </div>
       </div>
 
@@ -202,12 +209,12 @@ export default async function CloneHomepage({ params }: CloneHomepageProps) {
             <p className="text-gray-600 mb-4">
               View the original homepage without clone modifications
             </p>
-            <a 
-              href="/" 
-              className="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700 inline-block"
+            <Link 
+              href="/"
+              className="text-blue-600 hover:text-blue-800 underline"
             >
-              Go to Original
-            </a>
+              Main Website
+            </Link>
           </div>
           
           <div className="bg-white border rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow">
@@ -215,12 +222,12 @@ export default async function CloneHomepage({ params }: CloneHomepageProps) {
             <p className="text-gray-600 mb-4">
               Access comprehensive clone system testing tools
             </p>
-            <a 
-              href="/clone-system-test" 
-              className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 inline-block"
+            <Link 
+              href="/clone-system-test/"
+              className="text-blue-600 hover:text-blue-800 underline"
             >
-              Test Dashboard
-            </a>
+              System Tests
+            </Link>
           </div>
           
           <div className="bg-white border rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow">
@@ -228,12 +235,12 @@ export default async function CloneHomepage({ params }: CloneHomepageProps) {
             <p className="text-gray-600 mb-4">
               Manage clones and view system analytics
             </p>
-            <a 
-              href="/admin/clones" 
-              className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 inline-block"
+            <Link 
+              href="/admin/clones/"
+              className="text-blue-600 hover:text-blue-800 underline"
             >
               Admin Dashboard
-            </a>
+            </Link>
           </div>
         </div>
 

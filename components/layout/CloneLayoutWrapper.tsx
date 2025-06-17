@@ -1,12 +1,13 @@
 'use client'
 
+import React from 'react'
 import { CloneProvider, CloneDebugInfo } from '../../contexts/CloneContext'
-import { headers } from 'next/headers'
 import { usePathname } from 'next/navigation'
 import { ReactNode, useEffect, useState } from 'react'
 
 interface CloneLayoutWrapperProps {
   children: ReactNode
+  cloneId?: string
 }
 
 // Client component to handle clone detection
@@ -46,7 +47,10 @@ function CloneDetector({ children }: { children: ReactNode }) {
 }
 
 // Main wrapper component
-export default function CloneLayoutWrapper({ children }: CloneLayoutWrapperProps) {
+export default function CloneLayoutWrapper({
+  children,
+  cloneId
+}: CloneLayoutWrapperProps) {
   return (
     <CloneDetector>
       {children}

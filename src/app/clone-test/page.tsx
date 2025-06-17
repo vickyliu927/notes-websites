@@ -90,7 +90,7 @@ export default async function CloneTestPage() {
               <div>
                 <h3 className="text-lg font-medium mb-2">Component Summary</h3>
                 <div className="grid grid-cols-3 md:grid-cols-6 gap-4">
-                  {Object.entries(testCloneData.summary?.components || {}).map(([key, count]) => (
+                  {Object.entries(testCloneData.summary?.components || {} as unknown).map(([key, count]) => (
                     <div key={key} className="bg-gray-50 p-3 rounded text-center">
                       <div className="text-2xl font-bold text-blue-600">{count as number}</div>
                       <div className="text-sm capitalize">{key}</div>
@@ -119,9 +119,9 @@ export default async function CloneTestPage() {
                     </div>
                     {testCloneData.components.homepage.data ? (
                       <div className="text-sm text-gray-600">
-                        Title: {(testCloneData.components.homepage.data as any).pageTitle}
-                        {(testCloneData.components.homepage.data as any).cloneName && (
-                          <span className="ml-2">({(testCloneData.components.homepage.data as any).cloneName})</span>
+                        Title: {(testCloneData.components.homepage.data as unknown).pageTitle}
+                        {(testCloneData.components.homepage.data as unknown).cloneName && (
+                          <span className="ml-2">({(testCloneData.components.homepage.data as unknown).cloneName})</span>
                         )}
                       </div>
                     ) : (
@@ -144,9 +144,9 @@ export default async function CloneTestPage() {
                     </div>
                     {testCloneData.components.hero.data ? (
                       <div className="text-sm text-gray-600">
-                        Title: {(testCloneData.components.hero.data as any).sectionTitle}
-                        {(testCloneData.components.hero.data as any).cloneName && (
-                          <span className="ml-2">({(testCloneData.components.hero.data as any).cloneName})</span>
+                        Title: {(testCloneData.components.hero.data as unknown).sectionTitle}
+                        {(testCloneData.components.hero.data as unknown).cloneName && (
+                          <span className="ml-2">({(testCloneData.components.hero.data as unknown).cloneName})</span>
                         )}
                       </div>
                     ) : (
@@ -169,9 +169,9 @@ export default async function CloneTestPage() {
                     </div>
                     {testCloneData.components.subjectGrid.data ? (
                       <div className="text-sm text-gray-600">
-                        Title: {(testCloneData.components.subjectGrid.data as any).sectionTitleFirstPart} {(testCloneData.components.subjectGrid.data as any).sectionTitleSecondPart}
-                        {(testCloneData.components.subjectGrid.data as any).cloneName && (
-                          <span className="ml-2">({(testCloneData.components.subjectGrid.data as any).cloneName})</span>
+                        Title: {(testCloneData.components.subjectGrid.data as unknown).sectionTitleFirstPart} {(testCloneData.components.subjectGrid.data as unknown).sectionTitleSecondPart}
+                        {(testCloneData.components.subjectGrid.data as unknown).cloneName && (
+                          <span className="ml-2">({(testCloneData.components.subjectGrid.data as unknown).cloneName})</span>
                         )}
                       </div>
                     ) : (

@@ -1,21 +1,28 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useClone } from '../../contexts/CloneContext'
-import { CloneData } from '../../lib/cloneUtils'
+
+interface Clone {
+  cloneId: string
+  cloneName: string
+}
 
 interface CloneSwitcherProps {
   showInProduction?: boolean
   className?: string
+  currentCloneId?: string
+  onCloneSelect?: (cloneId: string) => void
 }
 
 export default function CloneSwitcher({ 
   showInProduction = false, 
-  className = '' 
+  className = '',
+  currentCloneId,
+  onCloneSelect
 }: CloneSwitcherProps) {
   const { 
     currentClone, 
-    currentCloneId, 
     availableClones, 
     baselineClone, 
     isLoading, 

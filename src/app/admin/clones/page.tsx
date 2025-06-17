@@ -1,6 +1,7 @@
 import React from 'react'
 import { Metadata } from 'next'
-import { getAllClones } from '../../../../lib/cloneUtils'
+import { getAllClones, CloneData } from '../../../../lib/cloneUtils'
+import Link from 'next/link'
 
 export const metadata: Metadata = {
   title: 'Clone Management - Admin Dashboard',
@@ -12,6 +13,11 @@ interface CloneStats {
   activeClones: number
   inactiveClones: number
   totalPageViews: number
+}
+
+interface CloneDebugData {
+  clones: CloneData[]
+  error?: string
 }
 
 export default async function CloneManagementPage() {
@@ -116,13 +122,13 @@ export default async function CloneManagementPage() {
             <span>📈</span>
             Analytics Report
           </button>
-          <a 
-            href="/studio" 
+          <Link 
+            href="/studio/"
             className="bg-gray-600 text-white px-6 py-2 rounded-lg hover:bg-gray-700 flex items-center gap-2"
           >
             <span>🛠️</span>
             Sanity Studio
-          </a>
+          </Link>
         </div>
 
         {/* Clone List */}
@@ -253,18 +259,30 @@ export default async function CloneManagementPage() {
           <div className="bg-white rounded-lg shadow p-6">
             <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick Links</h3>
             <div className="space-y-2">
-              <a href="/clone-system-test" className="block text-sm text-blue-600 hover:text-blue-900">
-                🧪 Test Dashboard
-              </a>
-              <a href="/studio" className="block text-sm text-blue-600 hover:text-blue-900">
-                🛠️ Sanity Studio
-              </a>
-              <a href="/admin/analytics" className="block text-sm text-blue-600 hover:text-blue-900">
-                📊 Analytics
-              </a>
-              <a href="/admin/settings" className="block text-sm text-blue-600 hover:text-blue-900">
-                ⚙️ Settings
-              </a>
+              <Link 
+                href="/clone-system-test/"
+                className="text-blue-600 hover:text-blue-800 underline"
+              >
+                System Tests
+              </Link>
+              <Link 
+                href="/studio/"
+                className="text-blue-600 hover:text-blue-800 underline"
+              >
+                Sanity Studio
+              </Link>
+              <Link 
+                href="/admin/analytics/"
+                className="text-blue-600 hover:text-blue-800 underline"
+              >
+                Analytics
+              </Link>
+              <Link 
+                href="/admin/settings/"
+                className="text-blue-600 hover:text-blue-800 underline"
+              >
+                Settings
+              </Link>
             </div>
           </div>
         </div>
@@ -274,3 +292,10 @@ export default async function CloneManagementPage() {
 }
 
 export const revalidate = 30 // Revalidate every 30 seconds for fresh data 
+
+function formatData(data: unknown): string {
+  if (typeof data === 'string') {
+    return data
+  }
+  return JSON.stringify(data, null, 2)
+} 

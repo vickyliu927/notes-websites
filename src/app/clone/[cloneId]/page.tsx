@@ -22,6 +22,7 @@ import {
 } from '../../../../types/sanity'
 import { generateSEOMetadata } from '../../../../components/SEOHead'
 import { SEOProvider } from '../../../../contexts/SEOContext'
+import Link from 'next/link'
 
 // ===== TYPES =====
 
@@ -75,13 +76,13 @@ export default async function CloneWebsite({ params }: CloneHomepageProps) {
   }
 
   // Extract clone-specific data or use fallbacks
-  const headerData = components.header?.data as any || undefined
-  const heroData = components.hero?.data as any || undefined
-  const subjectGridData = components.subjectGrid?.data as any || undefined
-  const whyChooseUsData = components.whyChooseUs?.data as any || undefined
-  const faqData = components.faq?.data as any || undefined
-  const contactFormData = components.contactForm?.data as any || undefined
-  const footerData = components.footer?.data as any || undefined
+  const headerData = components.header?.data as unknown
+  const heroData = components.hero?.data as unknown
+  const subjectGridData = components.subjectGrid?.data as unknown
+  const whyChooseUsData = components.whyChooseUs?.data as unknown
+  const faqData = components.faq?.data as unknown
+  const contactFormData = components.contactForm?.data as unknown
+  const footerData = components.footer?.data as unknown
 
   // Check if contact form is active
   const isContactFormActive = contactFormData?.isActive ?? false
@@ -94,9 +95,12 @@ export default async function CloneWebsite({ params }: CloneHomepageProps) {
           <div className="max-w-7xl mx-auto">
             🔄 <strong>Clone:</strong> {clone.cloneName} 
             <span className="mx-2">•</span>
-            <a href="/" className="underline hover:no-underline">
-              Original Site
-            </a>
+            <Link 
+              href="/"
+              className="text-blue-600 hover:text-blue-800 underline"
+            >
+              View Original
+            </Link>
             <span className="mx-2">•</span>
             <a href={`/clone/${cloneId}/homepage`} className="underline hover:no-underline">
               Dashboard

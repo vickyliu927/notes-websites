@@ -8,10 +8,6 @@ import {
   MoreResources 
 } from '@/components'
 import { validateCloneId, getCompleteCloneData, getSubjectPageForClone } from '../../../../../lib/cloneUtils'
-import { 
-  client, 
-  getGlobalSEOSettings
-} from '../../../../../lib/sanity'
 import { generateSEOMetadata } from '../../../../../components/SEOHead'
 import { SEOProvider } from '../../../../../contexts/SEOContext'
 import { HeaderData, FooterData, ContactFormSectionData, SubjectPageData } from '../../../../../types/sanity'
