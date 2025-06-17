@@ -41,7 +41,7 @@ export function urlFor(source: SanityImageSource) {
 }
 
 // Enhanced GROQ query to properly fetch logo data with asset URL
-export const headerQuery = `*[_type == "header" && isActive == true][0]{
+export const headerQuery = `*[_type == "header" && isActive == true && !defined(cloneReference)][0]{
   _id,
   title,
   logo{
@@ -65,7 +65,7 @@ export const headerQuery = `*[_type == "header" && isActive == true][0]{
 }`
 
 // GROQ query to fetch hero section data
-export const heroQuery = `*[_type == "hero" && isActive == true][0]{
+export const heroQuery = `*[_type == "hero" && isActive == true && !defined(cloneReference)][0]{
   _id,
   title,
   premiumTag,
@@ -105,7 +105,7 @@ export const heroQuery = `*[_type == "hero" && isActive == true][0]{
 }`
 
 // GROQ query to fetch subject grid data
-export const subjectGridQuery = `*[_type == "subjectGrid" && isActive == true][0]{
+export const subjectGridQuery = `*[_type == "subjectGrid" && isActive == true && !defined(cloneReference)][0]{
   _id,
   title,
   sectionTitleFirstPart,
@@ -138,7 +138,7 @@ export const subjectGridQuery = `*[_type == "subjectGrid" && isActive == true][0
 }`
 
 // GROQ query to fetch why choose us data
-export const whyChooseUsQuery = `*[_type == "whyChooseUs" && isActive == true][0]{
+export const whyChooseUsQuery = `*[_type == "whyChooseUs" && isActive == true && !defined(cloneReference)][0]{
   _id,
   title,
   sectionTitleFirstPart,
@@ -163,7 +163,7 @@ export const whyChooseUsQuery = `*[_type == "whyChooseUs" && isActive == true][0
 }`
 
 // GROQ query to fetch FAQ data
-export const faqQuery = `*[_type == "faq" && isActive == true][0]{
+export const faqQuery = `*[_type == "faq" && isActive == true && !defined(cloneReference)][0]{
   _id,
   title,
   sectionTitle,
@@ -180,7 +180,7 @@ export const faqQuery = `*[_type == "faq" && isActive == true][0]{
 }`
 
 // GROQ query to fetch contact form section data
-export const contactFormSectionQuery = `*[_type == "contactFormSection" && isActive == true][0]{
+export const contactFormSectionQuery = `*[_type == "contactFormSection" && isActive == true && !defined(cloneReference)][0]{
   _id,
   title,
   isActive,
@@ -201,7 +201,7 @@ export const contactFormSectionQuery = `*[_type == "contactFormSection" && isAct
 }`
 
 // GROQ query to fetch footer data
-export const footerQuery = `*[_type == "footer" && isActive == true][0]{
+export const footerQuery = `*[_type == "footer" && isActive == true && !defined(cloneReference)][0]{
   _id,
   title,
   isActive,

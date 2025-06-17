@@ -13,6 +13,14 @@ export default defineType({
       validation: Rule => Rule.required()
     }),
     defineField({
+      name: 'cloneReference',
+      title: 'Clone Version',
+      type: 'reference',
+      description: 'Select which clone version this homepage belongs to',
+      to: [{ type: 'clone' }],
+      validation: Rule => Rule.required()
+    }),
+    defineField({
       name: 'pageTitle',
       title: 'Page Title',
       type: 'string',
@@ -24,6 +32,42 @@ export default defineType({
       title: 'Page Description',
       type: 'text',
       description: 'Brief description of the homepage content'
+    }),
+    defineField({
+      name: 'cloneSpecificData',
+      title: 'Clone-Specific Content',
+      type: 'object',
+      description: 'Content specific to this clone version. If not set, will use default content.',
+      fields: [
+        {
+          name: 'customHero',
+          title: 'Custom Hero Section',
+          type: 'reference',
+          to: [{ type: 'hero' }],
+          description: 'Override the default hero section for this clone'
+        },
+        {
+          name: 'customSubjectGrid',
+          title: 'Custom Subject Grid',
+          type: 'reference',
+          to: [{ type: 'subjectGrid' }],
+          description: 'Override the default subject grid for this clone'
+        },
+        {
+          name: 'customWhyChooseUs',
+          title: 'Custom Why Choose Us',
+          type: 'reference',
+          to: [{ type: 'whyChooseUs' }],
+          description: 'Override the default why choose us section for this clone'
+        },
+        {
+          name: 'customFAQ',
+          title: 'Custom FAQ',
+          type: 'reference',
+          to: [{ type: 'faq' }],
+          description: 'Override the default FAQ section for this clone'
+        }
+      ]
     }),
     defineField({
       name: 'sections',
@@ -81,13 +125,14 @@ export default defineType({
     select: {
       title: 'title',
       pageTitle: 'pageTitle',
-      isActive: 'isActive'
+      isActive: 'isActive',
+      cloneName: 'cloneReference.cloneName'
     },
     prepare(selection) {
-      const { title, pageTitle, isActive } = selection
+      const { title, pageTitle, isActive, cloneName } = selection
       return {
         title: title,
-        subtitle: `${pageTitle}${isActive ? ' (Active)' : ''}`,
+        subtitle: `${pageTitle}${cloneName ? ` (${cloneName})` : ''}${isActive ? ' (Active)' : ''}`,
         media: () => '🏠'
       }
     }

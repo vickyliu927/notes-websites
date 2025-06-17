@@ -18,6 +18,17 @@ export default {
       initialValue: true
     },
     {
+      name: 'cloneReference',
+      title: 'Clone Reference',
+      type: 'reference',
+      to: [{type: 'clone'}],
+      description: 'Select which clone this contact form belongs to (leave empty for main website)',
+      validation: (Rule: any) => Rule.custom((cloneRef: any, context: any) => {
+        // Allow empty for main website content
+        return true
+      })
+    },
+    {
       name: 'sectionTitle',
       title: 'Section Title',
       type: 'string',
@@ -96,6 +107,66 @@ export default {
           type: 'string',
           description: 'Text displayed on the submit button',
           initialValue: 'SUBMIT'
+        }
+      ]
+    },
+    {
+      name: 'cloneSpecificData',
+      title: 'Clone-Specific Customizations',
+      type: 'object',
+      description: 'Clone-specific styling and content options (only used when Clone Reference is set)',
+      hidden: ({document}: any) => !document?.cloneReference,
+      fields: [
+        {
+          name: 'customBackgroundStyle',
+          title: 'Custom Background Style',
+          type: 'object',
+          description: 'Override background colors for this clone',
+          fields: [
+            {
+              name: 'gradientFrom',
+              title: 'Custom Gradient From Color',
+              type: 'string',
+              description: 'Override starting color (Tailwind class)'
+            },
+            {
+              name: 'gradientTo',
+              title: 'Custom Gradient To Color', 
+              type: 'string',
+              description: 'Override ending color (Tailwind class)'
+            }
+          ]
+        },
+        {
+          name: 'customFormSettings',
+          title: 'Custom Form Settings',
+          type: 'object',
+          description: 'Override form settings for this clone',
+          fields: [
+            {
+              name: 'customSuccessMessage',
+              title: 'Custom Success Message',
+              type: 'object',
+              fields: [
+                {
+                  name: 'title',
+                  title: 'Custom Success Title',
+                  type: 'string'
+                },
+                {
+                  name: 'description',
+                  title: 'Custom Success Description',
+                  type: 'text'
+                }
+              ]
+            },
+            {
+              name: 'customSubmitButtonText',
+              title: 'Custom Submit Button Text',
+              type: 'string',
+              description: 'Override submit button text for this clone'
+            }
+          ]
         }
       ]
     }

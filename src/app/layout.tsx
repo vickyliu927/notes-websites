@@ -20,7 +20,11 @@ export const metadata: Metadata = {
   description: "Access comprehensive CIE IGCSE study notes, revision materials, and exam preparation resources for all subjects. Expert-curated content to help you excel in your IGCSE examinations.",
   keywords: "CIE IGCSE, study notes, revision, exam preparation, IGCSE subjects, Cambridge International",
   authors: [{ name: "CIE IGCSE Study Notes Team" }],
-  viewport: "width=device-width, initial-scale=1",
+};
+
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
 };
 
 export default function RootLayout({

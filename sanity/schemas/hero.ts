@@ -7,64 +7,72 @@ export default defineType({
   fields: [
     defineField({
       name: 'title',
-      title: 'Title',
+      title: 'Internal Title',
       type: 'string',
-      description: 'Internal title for this hero section configuration',
+      description: 'Internal title for this hero configuration',
       validation: Rule => Rule.required()
     }),
     defineField({
+      name: 'cloneReference',
+      title: 'Clone Version',
+      type: 'reference',
+      description: 'Select which clone version this hero belongs to (leave empty for default)',
+      to: [{ type: 'clone' }]
+    }),
+    defineField({
       name: 'premiumTag',
-      title: 'Premium Tag Text',
+      title: 'Premium Tag',
       type: 'string',
-      description: 'Text for the premium badge (e.g., "Premium IGCSE Tutoring")',
-      validation: Rule => Rule.required()
+      description: 'Text to display in the premium tag (e.g., "Premium", "Pro")'
     }),
     defineField({
       name: 'sectionTitle',
       title: 'Section Title',
       type: 'string',
-      description: 'Main title text (e.g., "Master Your")'
+      description: 'Main title of the hero section',
+      validation: Rule => Rule.required()
     }),
     defineField({
       name: 'sectionTitleHighlighted',
-      title: 'Section Title (Highlighted Part)',
+      title: 'Highlighted Title Part',
       type: 'string',
-      description: 'Highlighted part of the title (e.g., "IGCSE Journey")'
+      description: 'Part of the title to be highlighted (if any)'
     }),
     defineField({
       name: 'sectionTitleNoHighlight',
-      title: 'Section Title (No Highlights)',
+      title: 'Non-Highlighted Title Part',
       type: 'string',
-      description: 'Text displayed after the highlighted part (e.g., "with Confidence")'
+      description: 'Part of the title without highlight (if any)'
     }),
     defineField({
       name: 'description',
       title: 'Description',
       type: 'text',
-      description: 'Hero section description text',
+      description: 'Main description text below the title',
       validation: Rule => Rule.required()
     }),
     defineField({
       name: 'ctaButtons',
-      title: 'CTA Buttons',
+      title: 'Call-to-Action Buttons',
       type: 'object',
-      description: 'Call-to-action buttons in the hero section (optional)',
+      description: 'Configure the primary and secondary CTA buttons',
       fields: [
         {
           name: 'primaryButton',
           title: 'Primary Button',
           type: 'object',
-          description: 'Primary call-to-action button (optional)',
           fields: [
             {
               name: 'text',
               title: 'Button Text',
-              type: 'string'
+              type: 'string',
+              validation: Rule => Rule.required()
             },
             {
               name: 'href',
-              title: 'Button URL',
-              type: 'string'
+              title: 'Button Link',
+              type: 'string',
+              validation: Rule => Rule.required()
             }
           ]
         },
@@ -72,7 +80,6 @@ export default defineType({
           name: 'secondaryButton',
           title: 'Secondary Button',
           type: 'object',
-          description: 'Secondary call-to-action button (optional)',
           fields: [
             {
               name: 'text',
@@ -81,7 +88,7 @@ export default defineType({
             },
             {
               name: 'href',
-              title: 'Button URL',
+              title: 'Button Link',
               type: 'string'
             }
           ]
@@ -92,7 +99,7 @@ export default defineType({
       name: 'statistics',
       title: 'Statistics',
       type: 'object',
-      description: 'Statistics displayed in the hero section',
+      description: 'Configure the statistics displayed in the hero section',
       fields: [
         {
           name: 'studentsHelped',
@@ -101,20 +108,17 @@ export default defineType({
           fields: [
             {
               name: 'text',
-              title: 'Label Text',
+              title: 'Text',
               type: 'string',
-              description: 'e.g., "Students Helped"',
               validation: Rule => Rule.required()
             },
             {
               name: 'stats',
-              title: 'Statistics Number',
+              title: 'Statistics',
               type: 'string',
-              description: 'e.g., "500+"',
               validation: Rule => Rule.required()
             }
-          ],
-          validation: Rule => Rule.required()
+          ]
         },
         {
           name: 'subjectsCovered',
@@ -123,20 +127,17 @@ export default defineType({
           fields: [
             {
               name: 'text',
-              title: 'Label Text',
+              title: 'Text',
               type: 'string',
-              description: 'e.g., "Subjects Covered"',
               validation: Rule => Rule.required()
             },
             {
               name: 'stats',
-              title: 'Statistics Number',
+              title: 'Statistics',
               type: 'string',
-              description: 'e.g., "15+"',
               validation: Rule => Rule.required()
             }
-          ],
-          validation: Rule => Rule.required()
+          ]
         },
         {
           name: 'successRate',
@@ -145,88 +146,118 @@ export default defineType({
           fields: [
             {
               name: 'text',
-              title: 'Label Text',
+              title: 'Text',
               type: 'string',
-              description: 'e.g., "Success Rate"',
               validation: Rule => Rule.required()
             },
             {
               name: 'stats',
-              title: 'Statistics Number',
+              title: 'Statistics',
               type: 'string',
-              description: 'e.g., "98%"',
               validation: Rule => Rule.required()
             }
-          ],
-          validation: Rule => Rule.required()
+          ]
         }
-      ],
-      validation: Rule => Rule.required()
+      ]
     }),
     defineField({
       name: 'floatingCards',
-      title: 'Floating Subject Cards',
+      title: 'Floating Cards',
       type: 'array',
-      description: 'Three floating subject cards displayed on the right side',
+      description: 'Configure the floating cards displayed in the hero section',
       of: [
         {
           type: 'object',
-          title: 'Subject Card',
           fields: [
             {
               name: 'title',
-              title: 'Subject Title',
+              title: 'Card Title',
               type: 'string',
-              description: 'e.g., "Physics", "Mathematics", "Chemistry"',
               validation: Rule => Rule.required()
             },
             {
               name: 'description',
-              title: 'Description',
-              type: 'string',
-              description: 'Short description for the subject',
+              title: 'Card Description',
+              type: 'text',
               validation: Rule => Rule.required()
             },
             {
               name: 'maxCharactersPerLine',
               title: 'Max Characters Per Line',
               type: 'number',
-              description: 'Maximum number of characters to display per line in the description (for text wrapping control)',
-              validation: Rule => Rule.required().min(10).max(100),
-              initialValue: 30
+              description: 'Maximum number of characters per line in the description',
+              validation: Rule => Rule.required().min(20).max(100)
             }
-          ],
-          preview: {
-            select: {
-              title: 'title',
-              subtitle: 'description'
-            }
-          }
+          ]
         }
-      ],
-      validation: Rule => Rule.required().min(3).max(3).error('Exactly 3 subject cards are required')
+      ]
     }),
     defineField({
       name: 'isActive',
       title: 'Is Active',
       type: 'boolean',
-      description: 'Only one hero section configuration should be active at a time. This determines which hero appears on the website.',
-      initialValue: false
+      description: 'Enable or disable this hero configuration',
+      initialValue: true
+    }),
+    defineField({
+      name: 'cloneSpecificStyles',
+      title: 'Clone-Specific Styles',
+      type: 'object',
+      description: 'Style overrides specific to this clone version',
+      fields: [
+        {
+          name: 'backgroundColor',
+          title: 'Background Color',
+          type: 'string',
+          options: {
+            list: [
+              { title: 'White', value: 'bg-white' },
+              { title: 'Light Gray', value: 'bg-gray-50' },
+              { title: 'Blue', value: 'bg-blue-50' },
+              { title: 'Green', value: 'bg-green-50' }
+            ]
+          }
+        },
+        {
+          name: 'textColor',
+          title: 'Text Color',
+          type: 'string',
+          options: {
+            list: [
+              { title: 'Dark', value: 'text-gray-900' },
+              { title: 'Blue', value: 'text-blue-900' },
+              { title: 'Green', value: 'text-green-900' }
+            ]
+          }
+        },
+        {
+          name: 'highlightColor',
+          title: 'Highlight Color',
+          type: 'string',
+          options: {
+            list: [
+              { title: 'Blue', value: 'text-blue-600' },
+              { title: 'Green', value: 'text-green-600' },
+              { title: 'Purple', value: 'text-purple-600' }
+            ]
+          }
+        }
+      ]
     })
   ],
   preview: {
     select: {
       title: 'title',
-      isActive: 'isActive',
       sectionTitle: 'sectionTitle',
-      highlighted: 'sectionTitleHighlighted',
-      noHighlight: 'sectionTitleNoHighlight'
+      isActive: 'isActive',
+      cloneName: 'cloneReference.cloneName'
     },
     prepare(selection) {
-      const { title, isActive, sectionTitle, highlighted, noHighlight } = selection
+      const { title, sectionTitle, isActive, cloneName } = selection
       return {
         title: title,
-        subtitle: isActive ? `Active - ${sectionTitle} ${highlighted} ${noHighlight}` : `Inactive - ${sectionTitle} ${highlighted} ${noHighlight}`
+        subtitle: `${sectionTitle}${cloneName ? ` (${cloneName})` : ''}${isActive ? ' (Active)' : ''}`,
+        media: () => '🎯'
       }
     }
   }

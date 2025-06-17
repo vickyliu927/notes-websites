@@ -96,6 +96,65 @@ export default defineType({
       type: 'boolean',
       description: 'Only one header configuration should be active at a time. This determines which header appears on the website.',
       initialValue: false
+    }),
+    defineField({
+      name: 'cloneReference',
+      title: 'Clone Reference',
+      type: 'reference',
+      to: [{type: 'clone'}],
+      description: 'Select which clone this header belongs to (leave empty for main website)',
+      validation: (Rule: any) => Rule.custom((cloneRef: any, context: any) => {
+        // Allow empty for main website content
+        return true
+      })
+    }),
+    defineField({
+      name: 'cloneSpecificData',
+      title: 'Clone-Specific Customizations',
+      type: 'object',
+      description: 'Clone-specific styling and content options',
+      fields: [
+        {
+          name: 'customLogo',
+          title: 'Custom Logo (Override)',
+          type: 'image',
+          description: 'Clone-specific logo to override the main logo',
+          options: {
+            hotspot: true,
+            accept: 'image/*'
+          },
+          fields: [
+            {
+              name: 'alt',
+              type: 'string',
+              title: 'Alternative Text',
+              description: 'Describe the clone logo for screen readers',
+            }
+          ]
+        },
+        {
+          name: 'customColors',
+          title: 'Custom Colors',
+          type: 'object',
+          description: 'Clone-specific color scheme',
+          fields: [
+            {
+              name: 'primaryColor',
+              title: 'Primary Color',
+              type: 'string',
+              description: 'Main brand color for this clone (hex code)',
+              validation: Rule => Rule.regex(/^#[0-9A-Fa-f]{6}$/).error('Please enter a valid hex color code (e.g., #1a73e8)')
+            },
+            {
+              name: 'secondaryColor',
+              title: 'Secondary Color',
+              type: 'string',
+              description: 'Secondary brand color for this clone (hex code)',
+              validation: Rule => Rule.regex(/^#[0-9A-Fa-f]{6}$/).error('Please enter a valid hex color code (e.g., #34a853)')
+            }
+          ]
+        }
+      ]
     })
   ],
   preview: {

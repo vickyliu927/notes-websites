@@ -402,6 +402,61 @@ export default defineType({
         }
       ],
       validation: Rule => Rule.required()
+    }),
+    defineField({
+      name: 'cloneReference',
+      title: 'Clone Reference',
+      type: 'reference',
+      to: [{type: 'clone'}],
+      description: 'Select which clone this footer belongs to (leave empty for main website)',
+      validation: (Rule: any) => Rule.custom((cloneRef: any, context: any) => {
+        // Allow empty for main website content
+        return true
+      })
+    }),
+    defineField({
+      name: 'cloneSpecificData',
+      title: 'Clone-Specific Customizations',
+      type: 'object',
+      description: 'Clone-specific styling and content options',
+      fields: [
+        {
+          name: 'customCopyright',
+          title: 'Custom Copyright Text',
+          type: 'string',
+          description: 'Clone-specific copyright text to override the main copyright',
+          placeholder: '© 2024 Clone Website Name. All rights reserved.'
+        },
+        {
+          name: 'customColors',
+          title: 'Custom Colors',
+          type: 'object',
+          description: 'Clone-specific color scheme for footer',
+          fields: [
+            {
+              name: 'backgroundColor',
+              title: 'Background Color',
+              type: 'string',
+              description: 'Footer background color for this clone (hex code)',
+              validation: Rule => Rule.regex(/^#[0-9A-Fa-f]{6}$/).error('Please enter a valid hex color code (e.g., #1a1a1a)')
+            },
+            {
+              name: 'textColor',
+              title: 'Text Color',
+              type: 'string',
+              description: 'Footer text color for this clone (hex code)',
+              validation: Rule => Rule.regex(/^#[0-9A-Fa-f]{6}$/).error('Please enter a valid hex color code (e.g., #ffffff)')
+            },
+            {
+              name: 'linkColor',
+              title: 'Link Color',
+              type: 'string',
+              description: 'Footer link color for this clone (hex code)',
+              validation: Rule => Rule.regex(/^#[0-9A-Fa-f]{6}$/).error('Please enter a valid hex color code (e.g., #60a5fa)')
+            }
+          ]
+        }
+      ]
     })
   ],
   preview: {

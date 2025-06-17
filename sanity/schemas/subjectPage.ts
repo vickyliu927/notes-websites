@@ -14,6 +14,14 @@ export default defineType({
       validation: Rule => Rule.required()
     }),
     defineField({
+      name: 'cloneReference',
+      title: 'Clone Version',
+      type: 'reference',
+      description: 'Select which clone version this subject page belongs to',
+      to: [{ type: 'clone' }],
+      validation: Rule => Rule.required()
+    }),
+    defineField({
       name: 'subjectSlug',
       title: 'Subject Slug',
       type: 'slug',
@@ -48,6 +56,87 @@ export default defineType({
       type: 'text',
       description: 'Description text below the page title',
       validation: Rule => Rule.required()
+    }),
+    defineField({
+      name: 'cloneSpecificData',
+      title: 'Clone-Specific Content',
+      type: 'object',
+      description: 'Content specific to this clone version. If not set, will use default content.',
+      fields: [
+        {
+          name: 'customPageTitle',
+          title: 'Custom Page Title',
+          type: 'string',
+          description: 'Override the default page title for this clone'
+        },
+        {
+          name: 'customPageDescription',
+          title: 'Custom Page Description',
+          type: 'text',
+          description: 'Override the default page description for this clone'
+        },
+        {
+          name: 'customTopicBlockBackgroundColor',
+          title: 'Custom Topic Block Background Color',
+          type: 'string',
+          description: 'Override the default topic block background color for this clone',
+          options: {
+            list: [
+              { title: 'Warm Blue', value: 'bg-blue-500' },
+              { title: 'Sage Green', value: 'bg-green-500' },
+              { title: 'Lavender', value: 'bg-purple-500' },
+              { title: 'Dusty Rose', value: 'bg-pink-500' },
+              { title: 'Warm Orange', value: 'bg-orange-500' },
+              { title: 'Seafoam', value: 'bg-teal-500' },
+              { title: 'Warm Gray', value: 'bg-gray-500' }
+            ]
+          }
+        },
+        {
+          name: 'customTopics',
+          title: 'Custom Topics',
+          type: 'array',
+          description: 'Override the default topics for this clone',
+          of: [
+            {
+              type: 'object',
+              title: 'Topic',
+              fields: [
+                {
+                  name: 'topicName',
+                  title: 'Topic Name',
+                  type: 'string',
+                  validation: Rule => Rule.required()
+                },
+                {
+                  name: 'topicDescription',
+                  title: 'Topic Description',
+                  type: 'text'
+                },
+                {
+                  name: 'color',
+                  title: 'Color Theme',
+                  type: 'string',
+                  options: {
+                    list: [
+                      { title: 'Blue', value: 'bg-blue-500' },
+                      { title: 'Green', value: 'bg-green-500' },
+                      { title: 'Purple', value: 'bg-purple-500' },
+                      { title: 'Pink', value: 'bg-pink-500' },
+                      { title: 'Indigo', value: 'bg-indigo-500' },
+                      { title: 'Teal', value: 'bg-teal-500' },
+                      { title: 'Orange', value: 'bg-orange-500' },
+                      { title: 'Red', value: 'bg-red-500' },
+                      { title: 'Yellow', value: 'bg-yellow-500' },
+                      { title: 'Cyan', value: 'bg-cyan-500' }
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
     }),
     defineField({
       name: 'topicBlockBackgroundColor',
@@ -317,17 +406,17 @@ export default defineType({
   ],
   preview: {
     select: {
-      title: 'subjectName',
-      subtitle: 'pageTitle',
-      slug: 'subjectSlug.current',
-      isPublished: 'isPublished'
+      title: 'title',
+      subjectName: 'subjectName',
+      isActive: 'isActive',
+      cloneName: 'cloneReference.cloneName'
     },
     prepare(selection) {
-      const { title, subtitle, slug, isPublished } = selection
+      const { title, subjectName, isActive, cloneName } = selection
       return {
         title: title,
-        subtitle: `/${slug} - ${subtitle} ${isPublished ? '(Published)' : '(Draft)'}`,
-        media: () => title ? title[0] : '📚'
+        subtitle: `${subjectName}${cloneName ? ` (${cloneName})` : ''}${isActive ? ' (Active)' : ''}`,
+        media: () => '📚'
       }
     }
   }
