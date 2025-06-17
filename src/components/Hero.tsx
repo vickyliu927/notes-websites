@@ -110,13 +110,15 @@ export default function Hero({ heroData }: HeroProps) {
           {/* Left content - aligned with header logo */}
           <div className="space-y-8">
             <div className="space-y-6">
-              {/* Premium badge - updated color to #B14F29 */}
+              {/* Premium badge - updated color to #B14F29 - only show if premiumTag exists */}
+              {data.premiumTag && (
               <div className="inline-flex items-center px-4 py-2 bg-orange-100 rounded-full text-orange-700 text-sm font-semibold" style={{backgroundColor: '#fdeee6', color: '#B14F29'}}>
                 <svg className="h-4 w-4 mr-2 fill-current" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"/>
                 </svg>
                 {data.premiumTag}
               </div>
+              )}
 
               {/* Main heading - keeping highlighted text in original orange color */}
               <h1 className="font-bold leading-none font-serif" style={{fontSize: '55px', color: '#243b53', letterSpacing: '-0.01em', fontWeight: '600'}}>
@@ -166,27 +168,35 @@ export default function Hero({ heroData }: HeroProps) {
             </div>
             )}
 
-            {/* Statistics - adjust top margin based on whether buttons are present */}
+            {/* Statistics - adjust top margin based on whether buttons are present and only show if statistics exist */}
+            {data.statistics && (
             <div className={`flex items-center gap-8 ${hasAnyButtons ? 'pt-4' : 'pt-2'}`}>
-              <div className="text-center">
-                <div className="text-3xl font-serif font-bold" style={{color: '#243b53'}}>{data.statistics.studentsHelped.stats}</div>
-                <div className="text-sm font-sans" style={{color: '#64748b'}}>{data.statistics.studentsHelped.text}</div>
-              </div>
-              <div className="text-center">
-                <div className="text-3xl font-serif font-bold" style={{color: '#243b53'}}>{data.statistics.subjectsCovered.stats}</div>
-                <div className="text-sm font-sans" style={{color: '#64748b'}}>{data.statistics.subjectsCovered.text}</div>
-              </div>
-              <div className="text-center">
-                <div className="text-3xl font-serif font-bold" style={{color: '#243b53'}}>{data.statistics.successRate.stats}</div>
-                <div className="text-sm font-sans" style={{color: '#64748b'}}>{data.statistics.successRate.text}</div>
-              </div>
+              {data.statistics.studentsHelped && (
+                <div className="text-center">
+                  <div className="text-3xl font-serif font-bold" style={{color: '#243b53'}}>{data.statistics.studentsHelped.stats}</div>
+                  <div className="text-sm font-sans" style={{color: '#64748b'}}>{data.statistics.studentsHelped.text}</div>
+                </div>
+              )}
+              {data.statistics.subjectsCovered && (
+                <div className="text-center">
+                  <div className="text-3xl font-serif font-bold" style={{color: '#243b53'}}>{data.statistics.subjectsCovered.stats}</div>
+                  <div className="text-sm font-sans" style={{color: '#64748b'}}>{data.statistics.subjectsCovered.text}</div>
+                </div>
+              )}
+              {data.statistics.successRate && (
+                <div className="text-center">
+                  <div className="text-3xl font-serif font-bold" style={{color: '#243b53'}}>{data.statistics.successRate.stats}</div>
+                  <div className="text-sm font-sans" style={{color: '#64748b'}}>{data.statistics.successRate.text}</div>
+                </div>
+              )}
             </div>
+            )}
           </div>
 
           {/* Right side - Floating cards with gradient effects */}
           <div className="relative lg:h-96 hidden lg:block">
             {/* First card (Physics/top-right) with muted gradient overlay */}
-            {data.floatingCards[0] && (
+            {data.floatingCards && data.floatingCards[0] && (
               <div className="absolute top-0 right-8 bg-white rounded-2xl p-6 shadow-lg border border-slate-200 rotate-3 transform hover:rotate-0 transition-transform duration-300 overflow-hidden">
                 {/* Muted gradient overlay */}
                 <div className="absolute inset-0 bg-gradient-to-br from-slate-50/40 via-transparent to-slate-100/30 pointer-events-none"></div>
@@ -205,7 +215,7 @@ export default function Hero({ heroData }: HeroProps) {
             )}
 
             {/* Second card (Mathematics/left) with muted gradient overlay */}
-            {data.floatingCards[1] && (
+            {data.floatingCards && data.floatingCards[1] && (
               <div className="absolute top-8 left-4 bg-white rounded-2xl p-6 shadow-lg border border-slate-200 -rotate-2 transform hover:rotate-0 transition-transform duration-300 overflow-hidden">
                 {/* Muted gradient overlay */}
                 <div className="absolute inset-0 bg-gradient-to-br from-yellow-50/40 via-transparent to-yellow-100/30 pointer-events-none"></div>
@@ -227,7 +237,7 @@ export default function Hero({ heroData }: HeroProps) {
             )}
 
             {/* Third card (Chemistry/bottom-right) with muted gradient overlay */}
-            {data.floatingCards[2] && (
+            {data.floatingCards && data.floatingCards[2] && (
               <div className="absolute bottom-[-2rem] right-16 bg-white rounded-2xl p-4 shadow-lg border border-slate-200 rotate-1 transform hover:rotate-0 transition-transform duration-300 overflow-hidden">
                 {/* Muted gradient overlay */}
                 <div className="absolute inset-0 bg-gradient-to-br from-red-50/30 via-transparent to-red-100/25 pointer-events-none"></div>

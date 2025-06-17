@@ -5,7 +5,7 @@ import { schemaTypes } from './sanity/schemas'
 import { structure } from './sanity/structure'
 
 const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID || '8udeaunz'
-const dataset = process.env.NEXT_PUBLIC_SANITY_DATASET || 'question-bank'
+const dataset = process.env.NEXT_PUBLIC_SANITY_DATASET || 'production'
 
 console.log('Sanity config - Project ID:', projectId)
 console.log('Sanity config - Dataset:', dataset)

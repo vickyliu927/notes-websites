@@ -1,125 +1,183 @@
-export default {
+import { defineField, defineType } from 'sanity'
+
+export default defineType({
   name: 'faq',
-  title: 'FAQ Section',
+  title: 'FAQ',
   type: 'document',
   fields: [
-    {
+    defineField({
       name: 'title',
-      title: 'Document Title',
+      title: 'Internal Title',
       type: 'string',
-      description: 'Internal title for this document (not displayed on website)',
-      validation: (Rule: any) => Rule.required()
-    },
-    {
-      name: 'isActive',
-      title: 'Is Active',
-      type: 'boolean',
-      description: 'Toggle to activate/deactivate this section',
-      initialValue: true
-    },
-    {
+      description: 'Internal title for this FAQ configuration',
+      validation: Rule => Rule.required()
+    }),
+    defineField({
+      name: 'cloneReference',
+      title: 'Clone Version',
+      type: 'reference',
+      description: 'Select which clone version this FAQ belongs to (leave empty for default)',
+      to: [{ type: 'clone' }]
+    }),
+    defineField({
       name: 'sectionTitle',
       title: 'Section Title',
       type: 'string',
-      description: 'Main heading for the FAQ section',
-      validation: (Rule: any) => Rule.required().max(100)
-    },
-    {
+      description: 'Main title of the FAQ section',
+      validation: Rule => Rule.required()
+    }),
+    defineField({
       name: 'sectionDescription',
       title: 'Section Description',
       type: 'text',
       description: 'Description text below the section title',
-      validation: (Rule: any) => Rule.required().max(300)
-    },
-    {
+      validation: Rule => Rule.required()
+    }),
+    defineField({
       name: 'faqs',
       title: 'FAQ Items',
       type: 'array',
-      description: 'List of frequently asked questions and their answers',
+      description: 'List of frequently asked questions and answers',
       of: [
         {
           type: 'object',
-          name: 'faqItem',
-          title: 'FAQ Item',
           fields: [
             {
               name: 'question',
               title: 'Question',
               type: 'string',
-              description: 'The frequently asked question',
-              validation: (Rule: any) => Rule.required().max(200)
+              validation: Rule => Rule.required()
             },
             {
               name: 'answer',
               title: 'Answer',
               type: 'text',
-              description: 'The answer to the question',
-              validation: (Rule: any) => Rule.required().max(1000)
+              validation: Rule => Rule.required()
+            },
+            {
+              name: 'category',
+              title: 'Category',
+              type: 'string',
+              options: {
+                list: [
+                  { title: 'General', value: 'general' },
+                  { title: 'Pricing', value: 'pricing' },
+                  { title: 'Content', value: 'content' },
+                  { title: 'Technical', value: 'technical' }
+                ]
+              }
             }
           ],
           preview: {
             select: {
               title: 'question',
-              subtitle: 'answer'
+              category: 'category'
             },
-            prepare(selection: any) {
-              const { title, subtitle } = selection
+            prepare(selection) {
+              const { title, category } = selection
               return {
-                title: title || 'Untitled Question',
-                subtitle: subtitle ? subtitle.substring(0, 60) + '...' : 'No answer provided'
+                title: title,
+                subtitle: category ? `Category: ${category}` : 'No category'
               }
             }
           }
         }
       ],
-      validation: (Rule: any) => Rule.required().min(1)
-    },
-    {
+      validation: Rule => Rule.required().min(1)
+    }),
+    defineField({
       name: 'contactSupport',
-      title: 'Contact Support Section',
+      title: 'Contact Support',
       type: 'object',
-      description: 'Optional contact support button and information',
+      description: 'Configure the contact support section below FAQs',
       fields: [
         {
           name: 'description',
           title: 'Description',
           type: 'text',
-          description: 'Text description above the contact button (optional)',
-          validation: (Rule: any) => Rule.max(200)
+          validation: Rule => Rule.required()
         },
         {
           name: 'buttonText',
           title: 'Button Text',
           type: 'string',
-          description: 'Text displayed on the contact button (optional)',
-          validation: (Rule: any) => Rule.max(50)
+          validation: Rule => Rule.required()
         },
         {
           name: 'buttonLink',
           title: 'Button Link',
-          type: 'url',
-          description: 'URL for the contact button (optional)',
-          validation: (Rule: any) => Rule.uri({
-            scheme: ['http', 'https', 'mailto', 'tel']
-          })
+          type: 'string',
+          validation: Rule => Rule.required()
+        }
+      ],
+      validation: Rule => Rule.required()
+    }),
+    defineField({
+      name: 'isActive',
+      title: 'Is Active',
+      type: 'boolean',
+      description: 'Enable or disable this FAQ configuration',
+      initialValue: true
+    }),
+    defineField({
+      name: 'cloneSpecificStyles',
+      title: 'Clone-Specific Styles',
+      type: 'object',
+      description: 'Style overrides specific to this clone version',
+      fields: [
+        {
+          name: 'accordionStyle',
+          title: 'Accordion Style',
+          type: 'string',
+          options: {
+            list: [
+              { title: 'Default', value: 'default' },
+              { title: 'Minimal', value: 'minimal' },
+              { title: 'Bordered', value: 'bordered' }
+            ]
+          }
+        },
+        {
+          name: 'animationStyle',
+          title: 'Animation Style',
+          type: 'string',
+          options: {
+            list: [
+              { title: 'None', value: 'none' },
+              { title: 'Fade', value: 'fade' },
+              { title: 'Slide', value: 'slide' }
+            ]
+          }
+        },
+        {
+          name: 'categoryStyle',
+          title: 'Category Style',
+          type: 'string',
+          options: {
+            list: [
+              { title: 'None', value: 'none' },
+              { title: 'Tags', value: 'tags' },
+              { title: 'Pills', value: 'pills' }
+            ]
+          }
         }
       ]
-    }
+    })
   ],
   preview: {
     select: {
-      title: 'sectionTitle',
-      subtitle: 'sectionDescription',
-      active: 'isActive',
-      faqCount: 'faqs'
+      title: 'title',
+      sectionTitle: 'sectionTitle',
+      isActive: 'isActive',
+      cloneName: 'cloneReference.cloneName'
     },
-    prepare(selection: any) {
-      const { title, subtitle, active, faqCount } = selection
-      const count = faqCount ? faqCount.length : 0
+    prepare(selection) {
+      const { title, sectionTitle, isActive, cloneName } = selection
       return {
-        title: title || 'FAQ Section',
-        subtitle: active ? `${count} FAQ${count !== 1 ? 's' : ''} - ${subtitle}` : `(Inactive) ${count} FAQ${count !== 1 ? 's' : ''}`
+        title: title,
+        subtitle: `${sectionTitle}${cloneName ? ` (${cloneName})` : ''}${isActive ? ' (Active)' : ''}`,
+        media: () => '❓'
       }
     }
   }
-} 
+}) 

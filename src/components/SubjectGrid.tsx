@@ -7,6 +7,7 @@ import Image from "next/image";
 interface SubjectGridProps {
   subjectGridData?: SubjectGridData;
   publishedSubjects?: SubjectPageData[];
+  cloneId?: string;
 }
 
 // Helper function to create a slug from subject name
@@ -14,7 +15,7 @@ function createSlug(name: string): string {
   return name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
 }
 
-export default function SubjectGrid({ subjectGridData, publishedSubjects }: SubjectGridProps) {
+export default function SubjectGrid({ subjectGridData, publishedSubjects, cloneId }: SubjectGridProps) {
   // Fallback data if no Sanity data is provided
   const fallbackData: SubjectGridData = {
     _id: 'fallback-subject-grid',
@@ -146,22 +147,65 @@ export default function SubjectGrid({ subjectGridData, publishedSubjects }: Subj
   // Helper function to get the correct URL for a subject
   const getSubjectUrl = (subject: SubjectGridSubject): string => {
     if (!publishedSubjects) {
-      return subject.viewNotesButton.href || subject.viewNotesButton.url || '#';
+      const originalUrl = subject.viewNotesButton.href || subject.viewNotesButton.url || '#';
+      
+      // If we're in a clone context and the URL doesn't have the proper clone prefix
+      if (cloneId && originalUrl !== '#') {
+        // Extract the subject slug from the URL (handle various formats)
+        const urlParts = originalUrl.split('/').filter(part => part);
+        const lastPart = urlParts[urlParts.length - 1];
+        
+        // If it looks like a subject slug, create the proper clone URL
+        if (lastPart && lastPart.match(/^[a-z0-9]+(?:-[a-z0-9]+)*$/)) {
+          return `/clone/${cloneId}/${lastPart}`;
+        }
+      }
+      
+      return originalUrl;
     }
 
     // Check if there's a published subject page that matches this subject
     const matchingSubject = publishedSubjects.find(pubSubject => {
+      // Try multiple matching strategies
       const subjectNameMatch = pubSubject.subjectName.toLowerCase() === subject.name.toLowerCase();
       const slugMatch = pubSubject.subjectSlug.current === createSlug(subject.name);
-      return subjectNameMatch || slugMatch;
+      
+      // Also try partial matching for cases like "Test Subject 1 - clone 2" vs "Test"
+      const subjectNameInGrid = subject.name.toLowerCase();
+      const subjectNameInPage = pubSubject.subjectName.toLowerCase();
+      const partialMatch = subjectNameInGrid.includes(subjectNameInPage) || subjectNameInPage.includes(subjectNameInGrid);
+      
+      return subjectNameMatch || slugMatch || partialMatch;
     });
 
     if (matchingSubject) {
+      // If we're in a clone context, prefix with clone route
+      if (cloneId) {
+        return `/clone/${cloneId}/${matchingSubject.subjectSlug.current}`;
+      }
       return `/${matchingSubject.subjectSlug.current}`;
     }
 
     // Fallback to original URL or create a dynamic URL
     const originalUrl = subject.viewNotesButton.href || subject.viewNotesButton.url || '#';
+    
+    // If we're in a clone context and the URL doesn't have the proper clone prefix
+    if (cloneId && originalUrl !== '#' && !originalUrl.includes('/clone/')) {
+      // Extract the subject slug from the URL (handle various formats)
+      const urlParts = originalUrl.split('/').filter(part => part);
+      const lastPart = urlParts[urlParts.length - 1];
+      
+      // If it looks like a subject slug, create the proper clone URL
+      if (lastPart && lastPart.match(/^[a-z0-9]+(?:-[a-z0-9]+)*$/)) {
+        return `/clone/${cloneId}/${lastPart}`;
+      }
+      
+      // If it's a relative URL, prefix it with clone path
+      if (originalUrl.startsWith('/') && !originalUrl.startsWith('/clone/')) {
+        return `/clone/${cloneId}${originalUrl}`;
+      }
+    }
+    
     return originalUrl.startsWith('/subjects/') 
       ? `/${createSlug(subject.name)}`
       : originalUrl;
