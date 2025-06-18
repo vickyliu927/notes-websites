@@ -13,95 +13,48 @@ const DOMAIN_TO_CLONE_MAP = {
 // ===== CLONE DETECTION MIDDLEWARE =====
 
 export default function middleware(request) {
-  console.log('🔥 MIDDLEWARE EXECUTING - pathname:', request.nextUrl.pathname)
-  console.log('🔥 MIDDLEWARE EXECUTING - hostname:', request.headers.get('host'))
+  console.log('🚨🚨🚨 MIDDLEWARE EXECUTING - pathname:', request.nextUrl.pathname)
+  console.log('🚨🚨🚨 MIDDLEWARE EXECUTING - hostname:', request.headers.get('host'))
   
   const { pathname } = request.nextUrl
   const hostname = request.headers.get('host') || ''
   
-  // Skip middleware for certain paths
-  const skipPaths = [
-    '/api/',
-    '/studio/',
-    '/_next/',
-    '/favicon.ico',
-    '/robots.txt',
-    '/sitemap.xml',
-    '/clone-test',
-    '/debug',
-    '/test'
-  ]
+  // Always log middleware execution
+  console.log(`🔍 Middleware processing: ${hostname}${pathname}`)
   
-  if (skipPaths.some(path => pathname.startsWith(path))) {
-    console.log('🔥 MIDDLEWARE SKIPPING - path:', pathname)
-    return NextResponse.next()
-  }
+  // Check if domain should be mapped to a clone
+  const cloneId = DOMAIN_TO_CLONE_MAP[hostname]
   
-  // ===== DOMAIN-BASED ROUTING =====
-  // Check if the request is coming from a mapped custom domain
-  const mappedCloneId = DOMAIN_TO_CLONE_MAP[hostname]
-  console.log('🔥 MIDDLEWARE - mappedCloneId:', mappedCloneId, 'for hostname:', hostname)
-  
-  if (mappedCloneId) {
-    if (!pathname.startsWith('/clone/')) {
-      let targetPath
+  if (cloneId) {
+    console.log(`✅ Domain ${hostname} mapped to clone: ${cloneId}`)
+    
+    // Only rewrite homepage and subject pages to clone
+    if (pathname === '/' || !pathname.startsWith('/clone/')) {
+      const newUrl = new URL(`/clone/${cloneId}/homepage`, request.url)
+      console.log(`🔄 Rewriting ${pathname} to ${newUrl.pathname}`)
       
-      if (pathname === '/') {
-        // Root path goes to clone homepage
-        targetPath = `/clone/${mappedCloneId}/homepage`
-      } else {
-        // Other paths go to clone-specific subject pages
-        targetPath = `/clone/${mappedCloneId}${pathname}`
-      }
+      const response = NextResponse.rewrite(newUrl)
+      response.headers.set('x-clone-id', cloneId)
+      response.headers.set('x-clone-original-path', pathname)
+      response.headers.set('x-clone-rewritten-to', newUrl.pathname)
       
-      console.log('🔥 MIDDLEWARE REWRITING:', pathname, '->', targetPath)
-      
-      // Create the rewrite
-      const url = request.nextUrl.clone()
-      url.pathname = targetPath
-      
-      // Add helpful headers for debugging
-      const response = NextResponse.rewrite(url)
-      response.headers.set('x-clone-id', mappedCloneId)
-      response.headers.set('x-clone-domain', hostname)
-      response.headers.set('x-original-path', pathname)
-      response.headers.set('x-rewritten-path', targetPath)
-      
-      console.log('🔥 MIDDLEWARE RESPONSE HEADERS SET')
+      console.log(`📤 Middleware rewrite complete for ${hostname}`)
       return response
     }
+  } else {
+    console.log(`❌ No clone mapping found for domain: ${hostname}`)
   }
   
-  // ===== EXISTING CLONE URL DETECTION =====
-  // Check if URL already contains clone information (for existing /clone/[id] URLs)
-  const cloneMatch = pathname.match(/^\/clone\/([^\/]+)/)
-  if (cloneMatch) {
-    const cloneId = cloneMatch[1]
-    
-    console.log('🔥 MIDDLEWARE - existing clone URL detected:', cloneId)
-    
-    // Add clone information to headers for debugging
-    const response = NextResponse.next()
-    response.headers.set('x-clone-id', cloneId)
-    response.headers.set('x-clone-source', 'url-based')
-    response.headers.set('x-original-path', pathname)
-    
-    return response
-  }
-  
-  // ===== DEFAULT HANDLING =====
-  // For all other requests, proceed normally
-  console.log('🔥 MIDDLEWARE - default handling for:', pathname)
-  return NextResponse.next()
+  // Default response
+  const response = NextResponse.next()
+  response.headers.set('x-middleware-processed', 'true')
+  return response
 }
 
-// ===== CONFIGURATION =====
-
+// Configure middleware to run on all routes
 export const config = {
   matcher: [
-    /*
-     * Match all requests except static files and API routes
-     */
+    // Match all paths except Next.js internals and static files
     '/((?!_next/static|_next/image|favicon.ico).*)',
   ],
 } 
