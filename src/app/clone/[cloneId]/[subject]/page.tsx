@@ -110,7 +110,7 @@ export default async function CloneSubjectPage({ params }: CloneSubjectPageProps
   return (
     <SEOProvider seoData={subjectData.seo}>
       <div className="min-h-screen bg-white">
-        <Header headerData={headerData} isContactFormActive={shouldShowContactForm} />
+        <Header headerData={headerData} isContactFormActive={shouldShowContactForm} homepageUrl={`/clone/${cloneId}/homepage`} />
         
         <main>
           {/* Hero Section */}
@@ -123,9 +123,6 @@ export default async function CloneSubjectPage({ params }: CloneSubjectPageProps
                 <p className="text-lg md:text-xl text-gray-600 leading-relaxed">
                   {subjectData.pageDescription}
                 </p>
-                <div className="mt-4 text-sm text-blue-600 font-medium">
-                  Clone: {cloneId} | Source: {subjectResult.source}
-                </div>
               </div>
             </div>
           </section>

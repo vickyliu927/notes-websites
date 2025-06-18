@@ -108,7 +108,7 @@ export default async function CloneWebsite({ params }: CloneHomepageProps) {
           </div>
         </div>
 
-        <Header headerData={headerData} isContactFormActive={isContactFormActive} />
+        <Header headerData={headerData} isContactFormActive={isContactFormActive} homepageUrl={`/clone/${cloneId}/homepage`} />
         <main>
           <Hero heroData={heroData} />
           <SubjectGrid subjectGridData={subjectGridData} publishedSubjects={publishedSubjects} cloneId={cloneId} />

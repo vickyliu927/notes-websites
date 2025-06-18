@@ -76,7 +76,7 @@ export default defineType({
               name: 'description',
               title: 'Description',
               type: 'text',
-              validation: Rule => Rule.required()
+              description: 'Optional description for the subject card'
             },
             {
               name: 'color',

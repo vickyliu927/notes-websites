@@ -123,7 +123,7 @@ export default async function SubjectPage({ params }: SubjectPageProps) {
   return (
     <SEOProvider seoData={subjectPageData.seo}>
       <div className="min-h-screen bg-white">
-        <Header headerData={headerData} isContactFormActive={shouldShowContactForm} />
+        <Header headerData={headerData} isContactFormActive={shouldShowContactForm} homepageUrl="/" />
         <main>
           {/* Hero Section */}
           <section className="bg-white py-16">

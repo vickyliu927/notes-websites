@@ -25,7 +25,7 @@ export default defineType({
       name: 'subjectSlug',
       title: 'Subject Slug',
       type: 'slug',
-      description: 'URL slug for this subject (e.g., "maths", "physics", "chemistry")',
+      description: 'URL slug for this subject (e.g., "maths", "physics", "chemistry"). For clone-specific pages, consider using descriptive slugs like "biology-enhanced" or "biology-v2" to avoid conflicts.',
       options: {
         source: 'subjectName',
         maxLength: 50,

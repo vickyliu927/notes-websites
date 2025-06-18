@@ -400,10 +400,10 @@ export const structure = (S: StructureBuilder) =>
                         ),
 
                       // All Clone Content (Fallback)
-                      S.listItem()
+      S.listItem()
                         .title('📋 All Clone Content')
-                        .child(
-                          S.list()
+        .child(
+          S.list()
                             .title('All Clone Content')
                             .items([
                               S.listItem()

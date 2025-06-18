@@ -10,9 +10,10 @@ import { useContactNavigation } from "../hooks/useContactNavigation";
 interface HeaderProps {
   headerData?: HeaderData;
   isContactFormActive?: boolean;
+  homepageUrl?: string;
 }
 
-export default function Header({ headerData, isContactFormActive }: HeaderProps) {
+export default function Header({ headerData, isContactFormActive, homepageUrl = "/" }: HeaderProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { handleContactNavigation } = useContactNavigation({ 
     isContactFormActive,
@@ -87,7 +88,7 @@ export default function Header({ headerData, isContactFormActive }: HeaderProps)
           {/* Logo - Only display if uploaded via Sanity */}
           {hasLogo && (
             <div className="flex items-center">
-              <Link href="/" target="_blank" rel="noopener noreferrer" className="flex items-center">
+              <Link href={homepageUrl} className="flex items-center">
                 <Image 
                   src={logoSrc}
                   alt={logoAlt}
