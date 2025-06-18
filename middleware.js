@@ -30,13 +30,28 @@ export default function middleware(request) {
     
     // Only rewrite homepage and subject pages to clone
     if (pathname === '/' || !pathname.startsWith('/clone/')) {
-      const newUrl = new URL(`/clone/${cloneId}/homepage`, request.url)
-      console.log(`🔄 Rewriting ${pathname} to ${newUrl.pathname}`)
+      // For root path, redirect to clone homepage
+      if (pathname === '/') {
+        const cloneHomepageUrl = new URL(`/clone/${cloneId}/homepage`, request.url)
+        console.log(`🔄 Rewriting ${pathname} to ${cloneHomepageUrl.pathname}`)
+        
+        const response = NextResponse.rewrite(cloneHomepageUrl)
+        response.headers.set('x-clone-id', cloneId)
+        response.headers.set('x-clone-original-path', pathname)
+        response.headers.set('x-clone-rewritten-to', cloneHomepageUrl.pathname)
+        
+        console.log(`📤 Middleware rewrite complete for ${hostname}`)
+        return response
+      }
       
-      const response = NextResponse.rewrite(newUrl)
+      // For subject pages, redirect to clone subject page
+      const cloneSubjectUrl = new URL(`/clone/${cloneId}${pathname}`, request.url)
+      console.log(`🔄 Rewriting ${pathname} to ${cloneSubjectUrl.pathname}`)
+      
+      const response = NextResponse.rewrite(cloneSubjectUrl)
       response.headers.set('x-clone-id', cloneId)
       response.headers.set('x-clone-original-path', pathname)
-      response.headers.set('x-clone-rewritten-to', newUrl.pathname)
+      response.headers.set('x-clone-rewritten-to', cloneSubjectUrl.pathname)
       
       console.log(`📤 Middleware rewrite complete for ${hostname}`)
       return response
