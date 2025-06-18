@@ -12,7 +12,10 @@ const DOMAIN_TO_CLONE_MAP = {
 
 // ===== CLONE DETECTION MIDDLEWARE =====
 
-export function middleware(request) {
+export default function middleware(request) {
+  console.log('🔥 MIDDLEWARE EXECUTING - pathname:', request.nextUrl.pathname)
+  console.log('🔥 MIDDLEWARE EXECUTING - hostname:', request.headers.get('host'))
+  
   const { pathname } = request.nextUrl
   const hostname = request.headers.get('host') || ''
   
@@ -30,12 +33,14 @@ export function middleware(request) {
   ]
   
   if (skipPaths.some(path => pathname.startsWith(path))) {
+    console.log('🔥 MIDDLEWARE SKIPPING - path:', pathname)
     return NextResponse.next()
   }
   
   // ===== DOMAIN-BASED ROUTING =====
   // Check if the request is coming from a mapped custom domain
   const mappedCloneId = DOMAIN_TO_CLONE_MAP[hostname]
+  console.log('🔥 MIDDLEWARE - mappedCloneId:', mappedCloneId, 'for hostname:', hostname)
   
   if (mappedCloneId) {
     if (!pathname.startsWith('/clone/')) {
@@ -49,6 +54,8 @@ export function middleware(request) {
         targetPath = `/clone/${mappedCloneId}${pathname}`
       }
       
+      console.log('🔥 MIDDLEWARE REWRITING:', pathname, '->', targetPath)
+      
       // Create the rewrite
       const url = request.nextUrl.clone()
       url.pathname = targetPath
@@ -60,6 +67,7 @@ export function middleware(request) {
       response.headers.set('x-original-path', pathname)
       response.headers.set('x-rewritten-path', targetPath)
       
+      console.log('🔥 MIDDLEWARE RESPONSE HEADERS SET')
       return response
     }
   }
@@ -69,6 +77,8 @@ export function middleware(request) {
   const cloneMatch = pathname.match(/^\/clone\/([^\/]+)/)
   if (cloneMatch) {
     const cloneId = cloneMatch[1]
+    
+    console.log('🔥 MIDDLEWARE - existing clone URL detected:', cloneId)
     
     // Add clone information to headers for debugging
     const response = NextResponse.next()
@@ -81,6 +91,7 @@ export function middleware(request) {
   
   // ===== DEFAULT HANDLING =====
   // For all other requests, proceed normally
+  console.log('🔥 MIDDLEWARE - default handling for:', pathname)
   return NextResponse.next()
 }
 
