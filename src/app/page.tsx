@@ -256,7 +256,15 @@ async function getCloneAwareContactFormData(): Promise<ContactFormSectionData | 
 }
 
 export default async function Home() {
-  const headersList = await headers()
+  const headersList = headers()
+  
+  // Detailed header logging for debugging
+  console.log('--- Headers received on page ---')
+  for (const [key, value] of headersList.entries()) {
+    console.log(`${key}: ${value}`)
+  }
+  console.log('---------------------------------')
+  
   const cloneId = getCloneIdFromHeaders(headersList)
   const isClone = isCloneDomain(headersList)
   
