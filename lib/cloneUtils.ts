@@ -286,4 +286,78 @@ export function parseCloneUrl(url: string): { cloneId: string | null; path: stri
     cloneId: null,
     path: url
   }
+}
+
+// ===== HEADER UTILITIES =====
+
+export function getCloneIdFromHeaders(headers: Headers): string | null {
+  try {
+    const cloneId = headers.get('x-clone-id')
+    console.log('🔍 Extracted clone ID from headers:', cloneId)
+    return cloneId
+  } catch (error) {
+    console.error('Error extracting clone ID from headers:', error)
+    return null
+  }
+}
+
+export function isCloneDomain(headers: Headers): boolean {
+  try {
+    const isClone = headers.get('x-clone-domain') === 'true'
+    console.log('🔍 Is clone domain:', isClone)
+    return isClone
+  } catch (error) {
+    console.error('Error checking if clone domain:', error)
+    return false
+  }
+}
+
+// ===== CLONE-AWARE DATA FETCHING =====
+
+export async function getCloneAwareHomepageData(headers: Headers) {
+  const cloneId = getCloneIdFromHeaders(headers)
+  
+  if (cloneId) {
+    console.log(`🏠 Fetching clone-specific homepage data for ${cloneId}`)
+    const cloneData = await getCompleteCloneData(cloneId)
+    
+    if (cloneData?.clone && cloneData.clone.isActive) {
+      return {
+        data: cloneData,
+        source: 'clone-specific' as const,
+        cloneId
+      }
+    }
+  }
+  
+  console.log('🏠 Using default homepage data')
+  return {
+    data: null,
+    source: 'default' as const,
+    cloneId: null
+  }
+}
+
+export async function getCloneAwareSubjectData(subject: string, headers: Headers) {
+  const cloneId = getCloneIdFromHeaders(headers)
+  
+  if (cloneId) {
+    console.log(`📚 Fetching clone-specific subject data for ${cloneId}/${subject}`)
+    const subjectResult = await getSubjectPageForClone(cloneId, subject)
+    
+    if (subjectResult.data) {
+      return {
+        data: subjectResult.data,
+        source: subjectResult.source,
+        cloneId
+      }
+    }
+  }
+  
+  console.log(`📚 Using default subject data for ${subject}`)
+  return {
+    data: null,
+    source: 'default' as const,
+    cloneId: null
+  }
 } 

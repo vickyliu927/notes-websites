@@ -1,334 +1,190 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { CloneProvider, CloneDebugInfo, useClone } from '../../../contexts/CloneContext'
-import CloneSwitcher, { CloneSwitcherFloating } from '../../../components/clone/CloneSwitcher'
-import { 
-  getCompleteCloneData, 
-  getAllClones, 
-  getBaseline,
-  validateCloneId,
-  generateCloneUrl,
-  parseCloneUrl,
-  CloneData
-} from '../../../lib/cloneUtils'
 import Link from 'next/link'
 
-// ===== TEST COMPONENT =====
-
-function CloneSystemTestContent() {
-  const clone = useClone()
-  const [testResults, setTestResults] = useState<any>({})
-  const [isLoading, setIsLoading] = useState(false)
-  const [testCloneId, setTestCloneId] = useState('test-clone')
-
-  // Run comprehensive tests
-  const runTests = async () => {
-    setIsLoading(true)
-    const results: any = {}
-
-    try {
-      console.log('🧪 Running Clone System Tests...')
-
-      // Test 1: Validation
-      console.log('Testing validation...')
-      results.validation = {
-        validSlug: validateCloneId('test-clone'),
-        invalidSlug1: validateCloneId('Test Clone'),
-        invalidSlug2: validateCloneId('test_clone'),
-        invalidSlug3: validateCloneId('')
-      }
-
-      // Test 2: URL Generation
-      console.log('Testing URL generation...')
-      results.urlGeneration = {
-        basicUrl: generateCloneUrl('test-clone'),
-        urlWithPath: generateCloneUrl('test-clone', '/subjects'),
-        invalidClone: generateCloneUrl('Invalid Clone!', '/test')
-      }
-
-      // Test 3: URL Parsing
-      console.log('Testing URL parsing...')
-      results.urlParsing = {
-        cloneUrl: parseCloneUrl('/clone/test-clone/homepage'),
-        regularUrl: parseCloneUrl('/about'),
-        rootCloneUrl: parseCloneUrl('/clone/test-clone')
-      }
-
-      // Test 4: Clone Data Fetching
-      console.log('Testing clone data fetching...')
-      const [allClones, baseline, completeData] = await Promise.all([
-        getAllClones(),
-        getBaseline(),
-        getCompleteCloneData(testCloneId)
-      ])
-
-      results.dataFetching = {
-        allClonesCount: allClones.length,
-        allClones: allClones.map(c => ({
-          id: c.cloneId.current,
-          name: c.cloneName,
-          isBaseline: c.baselineClone,
-          isActive: c.isActive
-        })),
-        baseline: baseline ? {
-          id: baseline.cloneId.current,
-          name: baseline.cloneName
-        } : null,
-        completeData: completeData ? {
-          cloneName: completeData.clone?.cloneName,
-          componentCount: Object.keys(completeData.components).length,
-          components: Object.entries(completeData.components).map(([key, value]) => ({
-            name: key,
-            hasData: !!value.data,
-            source: value.source
-          }))
-        } : null
-      }
-
-      console.log('✅ All tests completed')
-      setTestResults(results)
-    } catch (error) {
-      console.error('❌ Test failed:', error)
-      results.error = error instanceof Error ? error.message : 'Unknown error'
-      setTestResults(results)
-    } finally {
-      setIsLoading(false)
-    }
-  }
+export default function CloneSystemTest() {
+  const [debugInfo, setDebugInfo] = useState<any>(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    runTests()
+    const fetchDebugInfo = async () => {
+      try {
+        const response = await fetch('/api/debug-middleware')
+        const data = await response.json()
+        setDebugInfo(data)
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Unknown error')
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchDebugInfo()
   }, [])
 
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-lg">Loading clone system debug information...</div>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-red-600">Error: {error}</div>
+      </div>
+    )
+  }
+
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-6xl mx-auto p-6">
-        {/* Header */}
-        <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            🔄 Clone System Test Dashboard
+    <div className="min-h-screen bg-gray-50 py-12">
+      <div className="max-w-4xl mx-auto px-4">
+        <div className="bg-white rounded-lg shadow-lg p-8">
+          <h1 className="text-3xl font-bold text-gray-900 mb-8">
+            🔄 Clone System Test
           </h1>
-          <p className="text-gray-600">
-            Comprehensive testing interface for the website cloning system
-          </p>
-          
-          {/* Clone Switcher */}
-          <div className="mt-4">
-            <CloneSwitcher className="inline-block" />
-          </div>
-        </div>
 
-        {/* Current Clone Status */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-          <div className="bg-white rounded-lg shadow-sm p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">Current Clone</h3>
-            <div className="space-y-2">
-              <div><span className="font-medium">ID:</span> {clone.currentCloneId || 'None'}</div>
-              <div><span className="font-medium">Name:</span> {clone.currentClone?.cloneName || 'N/A'}</div>
-              <div>
-                <span className="font-medium">Status:</span> 
-                <span className={`ml-2 px-2 py-1 rounded text-xs ${
-                  clone.currentClone?.isActive 
-                    ? 'bg-green-100 text-green-800' 
-                    : 'bg-gray-100 text-gray-800'
-                }`}>
-                  {clone.currentClone?.isActive ? 'Active' : 'Inactive'}
-                </span>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white rounded-lg shadow-sm p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">Available Clones</h3>
-            <div className="text-2xl font-bold text-blue-600">
-              {clone.availableClones.length}
-            </div>
-            <div className="text-sm text-gray-500">
-              {clone.isLoadingClones ? 'Loading...' : 'Total active clones'}
-            </div>
-          </div>
-
-          <div className="bg-white rounded-lg shadow-sm p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">Baseline Clone</h3>
-            <div className="space-y-1">
-              <div className="font-medium">
-                {clone.baselineClone?.cloneName || 'Not set'}
-              </div>
-              <div className="text-sm text-gray-500">
-                {clone.baselineClone?.cloneId.current || 'N/A'}
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Test Controls */}
-        <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Test Controls</h3>
-          <div className="flex flex-wrap gap-4 items-center">
-            <div className="flex items-center space-x-2">
-              <label htmlFor="testCloneId" className="text-sm font-medium text-gray-700">
-                Test Clone ID:
-              </label>
-              <input
-                id="testCloneId"
-                type="text"
-                value={testCloneId}
-                onChange={(e) => setTestCloneId(e.target.value)}
-                className="border border-gray-300 rounded px-3 py-1 text-sm"
-              />
-            </div>
-            <button
-              onClick={runTests}
-              disabled={isLoading}
-              className="bg-blue-600 text-white px-4 py-2 rounded text-sm hover:bg-blue-700 disabled:opacity-50"
-            >
-              {isLoading ? 'Running Tests...' : 'Run Tests'}
-            </button>
-          </div>
-        </div>
-
-        {/* Test Results */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-          {/* Validation Tests */}
-          <div className="bg-white rounded-lg shadow-sm p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">🔍 Validation Tests</h3>
-            {testResults.validation && (
-              <div className="space-y-2 text-sm">
-                <div className="flex justify-between">
-                  <span>Valid slug (test-clone):</span>
-                  <span className={testResults.validation.validSlug ? 'text-green-600' : 'text-red-600'}>
-                    {testResults.validation.validSlug ? '✅' : '❌'}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Invalid slug (Test Clone):</span>
-                  <span className={!testResults.validation.invalidSlug1 ? 'text-green-600' : 'text-red-600'}>
-                    {!testResults.validation.invalidSlug1 ? '✅' : '❌'}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Invalid slug (test_clone):</span>
-                  <span className={!testResults.validation.invalidSlug2 ? 'text-green-600' : 'text-red-600'}>
-                    {!testResults.validation.invalidSlug2 ? '✅' : '❌'}
-                  </span>
+          <div className="space-y-8">
+            {/* Current Domain Info */}
+            <section>
+              <h2 className="text-2xl font-semibold text-gray-800 mb-4">Current Domain Information</h2>
+              <div className="bg-gray-50 p-6 rounded-lg">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <strong>Hostname:</strong> {debugInfo?.hostname}
+                  </div>
+                  <div>
+                    <strong>Is Clone Domain:</strong> 
+                    <span className={`ml-2 px-2 py-1 rounded text-sm ${
+                      debugInfo?.isCloneDomain ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
+                    }`}>
+                      {debugInfo?.isCloneDomain ? 'Yes' : 'No'}
+                    </span>
+                  </div>
+                  <div>
+                    <strong>Clone ID:</strong> 
+                    <span className={`ml-2 px-2 py-1 rounded text-sm ${
+                      debugInfo?.currentCloneId ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800'
+                    }`}>
+                      {debugInfo?.currentCloneId || 'None'}
+                    </span>
+                  </div>
+                  <div>
+                    <strong>Pathname:</strong> {debugInfo?.pathname}
+                  </div>
                 </div>
               </div>
-            )}
-          </div>
+            </section>
 
-          {/* URL Generation Tests */}
-          <div className="bg-white rounded-lg shadow-sm p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">🔗 URL Generation</h3>
-            {testResults.urlGeneration && (
-              <div className="space-y-2 text-sm">
-                <div>
-                  <span className="font-medium">Basic:</span> 
-                  <code className="ml-2 bg-gray-100 px-1 rounded">
-                    {testResults.urlGeneration.basicUrl}
-                  </code>
-                </div>
-                <div>
-                  <span className="font-medium">With path:</span> 
-                  <code className="ml-2 bg-gray-100 px-1 rounded">
-                    {testResults.urlGeneration.urlWithPath}
-                  </code>
-                </div>
-                <div>
-                  <span className="font-medium">Invalid cleanup:</span> 
-                  <code className="ml-2 bg-gray-100 px-1 rounded">
-                    {testResults.urlGeneration.invalidClone}
-                  </code>
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Data Fetching Results */}
-        <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">📊 Data Fetching Results</h3>
-          {testResults.dataFetching && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* All Clones */}
-              <div>
-                <h4 className="font-medium text-gray-900 mb-2">All Clones ({testResults.dataFetching.allClonesCount})</h4>
+            {/* Domain Mapping */}
+            <section>
+              <h2 className="text-2xl font-semibold text-gray-800 mb-4">Domain Mapping Configuration</h2>
+              <div className="bg-gray-50 p-6 rounded-lg">
                 <div className="space-y-2">
-                  {testResults.dataFetching.allClones.map((clone: any, index: number) => (
-                    <div key={index} className="flex items-center justify-between text-sm bg-gray-50 p-2 rounded">
-                      <div>
-                        <span className="font-medium">{clone.name}</span>
-                        <span className="ml-2 text-gray-500">({clone.id})</span>
-                      </div>
-                      <div className="flex space-x-2">
-                        {clone.isBaseline && <span className="text-yellow-600">⭐</span>}
-                        {clone.isActive && <span className="text-green-600">✅</span>}
-                      </div>
+                  {Object.entries(debugInfo?.domainMapping || {}).map(([domain, cloneId]) => (
+                    <div key={domain} className="flex justify-between items-center p-3 bg-white rounded border">
+                      <span className="font-mono text-sm">{domain}</span>
+                      <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded text-sm">
+                        → {cloneId as string}
+                      </span>
                     </div>
                   ))}
                 </div>
               </div>
+            </section>
 
-              {/* Components */}
-              <div>
-                <h4 className="font-medium text-gray-900 mb-2">
-                  Test Clone Components ({testResults.dataFetching.completeData?.componentCount || 0})
-                </h4>
+            {/* Test Links */}
+            <section>
+              <h2 className="text-2xl font-semibold text-gray-800 mb-4">Test Navigation</h2>
+              <div className="bg-gray-50 p-6 rounded-lg">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <h3 className="font-semibold mb-2">Homepage Tests</h3>
+                    <div className="space-y-2">
+                      <Link 
+                        href="/" 
+                        className="block px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 text-center"
+                      >
+                        Test Current Domain Homepage
+                      </Link>
+                      <Link 
+                        href="/clone/test-clone/homepage" 
+                        className="block px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 text-center"
+                      >
+                        Test Clone Homepage (Direct)
+                      </Link>
+                    </div>
+                  </div>
+                  <div>
+                    <h3 className="font-semibold mb-2">Subject Page Tests</h3>
+                    <div className="space-y-2">
+                      <Link 
+                        href="/mathematics" 
+                        className="block px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 text-center"
+                      >
+                        Test Mathematics Page
+                      </Link>
+                      <Link 
+                        href="/clone/test-clone/mathematics" 
+                        className="block px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 text-center"
+                      >
+                        Test Clone Mathematics (Direct)
+                      </Link>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            {/* Headers Information */}
+            <section>
+              <h2 className="text-2xl font-semibold text-gray-800 mb-4">Response Headers</h2>
+              <div className="bg-gray-50 p-6 rounded-lg">
                 <div className="space-y-2">
-                  {testResults.dataFetching.completeData?.components.map((comp: any, index: number) => (
-                    <div key={index} className="flex items-center justify-between text-sm bg-gray-50 p-2 rounded">
-                      <span className="font-medium">{comp.name}</span>
-                      <div className="flex items-center space-x-2">
-                        <span className={`px-2 py-1 rounded text-xs ${
-                          comp.source === 'clone-specific' ? 'bg-green-100 text-green-700' :
-                          comp.source === 'baseline' ? 'bg-yellow-100 text-yellow-700' :
-                          comp.source === 'default' ? 'bg-blue-100 text-blue-700' :
-                          'bg-gray-100 text-gray-700'
-                        }`}>
-                          {comp.source}
-                        </span>
-                        {comp.hasData ? <span className="text-green-600">✅</span> : <span className="text-gray-400">⭕</span>}
-                      </div>
+                  {Object.entries(debugInfo?.headers || {}).map(([key, value]) => (
+                    <div key={key} className="flex justify-between items-center p-2 bg-white rounded border text-sm">
+                      <span className="font-mono">{key}:</span>
+                      <span className="font-mono text-gray-600">{value as string}</span>
                     </div>
                   ))}
                 </div>
               </div>
-            </div>
-          )}
-        </div>
+            </section>
 
-        {/* Quick Links */}
-        <div className="bg-white rounded-lg shadow-sm p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">🔗 Quick Links</h3>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <Link href="/" className="text-blue-600 hover:text-blue-800 text-sm">
-              → Original Homepage
-            </Link>
-            <Link href="/clone/test-clone" className="text-blue-600 hover:text-blue-800 text-sm">
-              → Test Clone
-            </Link>
-            <Link href="/clone/test-clone/homepage" className="text-blue-600 hover:text-blue-800 text-sm">
-              → Test Clone Homepage
-            </Link>
-            <Link href="/studio" className="text-blue-600 hover:text-blue-800 text-sm">
-              → Sanity Studio
-            </Link>
+            {/* Expected Behavior */}
+            <section>
+              <h2 className="text-2xl font-semibold text-gray-800 mb-4">Expected Behavior</h2>
+              <div className="bg-gray-50 p-6 rounded-lg">
+                <div className="space-y-4">
+                  <div>
+                    <h3 className="font-semibold text-green-700">✅ Working Correctly If:</h3>
+                    <ul className="list-disc list-inside space-y-1 text-sm text-gray-700 mt-2">
+                      <li>Clone domains show clone-specific content on clean URLs (/)</li>
+                      <li>Non-clone domains show default content</li>
+                      <li>Direct clone URLs redirect to clean URLs for clone domains</li>
+                      <li>Direct clone URLs redirect to appropriate domains for non-clone domains</li>
+                      <li>Clone indicator banner appears on clone domains</li>
+                    </ul>
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-red-700">❌ Issues If:</h3>
+                    <ul className="list-disc list-inside space-y-1 text-sm text-gray-700 mt-2">
+                      <li>Clone domains still show default content</li>
+                      <li>URLs are rewritten to /clone/ paths</li>
+                      <li>Redirects are not working properly</li>
+                      <li>Headers are not being set correctly</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </section>
           </div>
         </div>
       </div>
-
-      {/* Floating Clone Switcher */}
-      <CloneSwitcherFloating />
     </div>
-  )
-}
-
-// ===== MAIN COMPONENT =====
-
-export default function CloneSystemTest() {
-  return (
-    <CloneProvider enableAutoDetection={true}>
-      <CloneSystemTestContent />
-    </CloneProvider>
   )
 } 

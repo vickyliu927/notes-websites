@@ -1,10 +1,17 @@
 import { Metadata } from 'next'
 import { notFound } from 'next/navigation'
+import { headers } from 'next/headers'
 import { Header, Footer, SubjectTopicGrid, ContactForm, MoreResources } from '@/components'
 import { client, headerQuery, footerQuery, getSubjectPageData, getGlobalSEOSettings, allSubjectSlugsQuery, contactFormSectionQuery } from '../../../lib/sanity'
-import { HeaderData, FooterData, ContactFormSectionData } from '../../../types/sanity'
+import { HeaderData, FooterData, ContactFormSectionData, SubjectPageData } from '../../../types/sanity'
 import { generateSEOMetadata } from '../../../components/SEOHead'
 import { SEOProvider } from '../../../contexts/SEOContext'
+import { 
+  getCloneAwareSubjectData, 
+  getCloneIdFromHeaders, 
+  isCloneDomain,
+  getCloneAwareHomepageData
+} from '../../../lib/cloneUtils'
 
 // Revalidate every 10 seconds for fresh content during development
 export const revalidate = 10;
@@ -15,8 +22,19 @@ interface SubjectPageProps {
   }>
 }
 
-async function getHeaderData(): Promise<HeaderData | undefined> {
+// Clone-aware data fetching functions
+async function getCloneAwareHeaderData(): Promise<HeaderData | undefined> {
+  const headersList = await headers()
+  const cloneData = await getCloneAwareHomepageData(headersList)
+  
+  if (cloneData.data?.components?.header?.data) {
+    console.log('Using clone-specific header data')
+    return cloneData.data.components.header.data as HeaderData
+  }
+  
+  // Fallback to default header data
   try {
+    console.log('Using default header data')
     const headerData = await client.fetch(headerQuery)
     return headerData
   } catch (error) {
@@ -25,8 +43,18 @@ async function getHeaderData(): Promise<HeaderData | undefined> {
   }
 }
 
-async function getFooterData(): Promise<FooterData | undefined> {
+async function getCloneAwareFooterData(): Promise<FooterData | undefined> {
+  const headersList = await headers()
+  const cloneData = await getCloneAwareHomepageData(headersList)
+  
+  if (cloneData.data?.components?.footer?.data) {
+    console.log('Using clone-specific footer data')
+    return cloneData.data.components.footer.data as FooterData
+  }
+  
+  // Fallback to default footer data
   try {
+    console.log('Using default footer data')
     const footerData = await client.fetch(footerQuery)
     return footerData
   } catch (error) {
@@ -35,16 +63,23 @@ async function getFooterData(): Promise<FooterData | undefined> {
   }
 }
 
-async function getContactFormSectionData(): Promise<ContactFormSectionData | undefined> {
+async function getCloneAwareContactFormData(): Promise<ContactFormSectionData | undefined> {
+  const headersList = await headers()
+  const cloneData = await getCloneAwareHomepageData(headersList)
+  
+  if (cloneData.data?.components?.contactForm?.data) {
+    console.log('Using clone-specific contact form data')
+    return cloneData.data.components.contactForm.data as ContactFormSectionData
+  }
+  
+  // Fallback to default contact form data
   try {
-    console.log('Fetching contact form section data from Sanity...');
-    
-    const contactFormSectionData = await client.fetch(contactFormSectionQuery);
-    console.log('Fetched contact form section data:', contactFormSectionData);
-    return contactFormSectionData;
+    console.log('Using default contact form data')
+    const contactFormSectionData = await client.fetch(contactFormSectionQuery)
+    return contactFormSectionData
   } catch (error) {
-    console.error('Error fetching contact form section data:', error);
-    return undefined;
+    console.error('Error fetching contact form section data:', error)
+    return undefined
   }
 }
 
@@ -62,13 +97,36 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({ params }: SubjectPageProps): Promise<Metadata> {
   try {
-  const { subject } = await params
-  const subjectPageData = await getSubjectPageData(subject)
-  
-  if (!subjectPageData) {
+    const { subject } = await params
+    const headersList = await headers()
+    const cloneId = getCloneIdFromHeaders(headersList)
+    
+    if (cloneId) {
+      // Use clone-specific metadata
+      const subjectResult = await getCloneAwareSubjectData(subject, headersList)
+      const cloneData = await getCloneAwareHomepageData(headersList)
+      
+      if (subjectResult.data) {
+        const subjectData = subjectResult.data as SubjectPageData
+        const cloneName = cloneData.data?.clone?.cloneName || cloneId
+        const title = `${subjectData.pageTitle || subjectData.title} - ${cloneName} | CIE IGCSE Study Notes`
+        const description = subjectData.pageDescription || `Comprehensive ${subjectData.subjectName} study notes and revision materials for ${cloneName}.`
+        
+        return generateSEOMetadata({
+          title,
+          description,
+          seoData: subjectData.seo,
+        })
+      }
+    }
+    
+    // Use default metadata
+    const subjectPageData = await getSubjectPageData(subject)
+    
+    if (!subjectPageData) {
       return generateSEOMetadata({
-      title: 'Subject Not Found - CIE IGCSE Notes',
-      description: 'The requested subject page could not be found.'
+        title: 'Subject Not Found - CIE IGCSE Notes',
+        description: 'The requested subject page could not be found.'
       })
     }
 
@@ -96,10 +154,27 @@ export async function generateMetadata({ params }: SubjectPageProps): Promise<Me
 
 export default async function SubjectPage({ params }: SubjectPageProps) {
   const { subject } = await params
-  const headerData = await getHeaderData()
-  const footerData = await getFooterData()
-  const subjectPageData = await getSubjectPageData(subject)
-  const contactFormSectionData = await getContactFormSectionData()
+  const headersList = await headers()
+  const cloneId = getCloneIdFromHeaders(headersList)
+  const isClone = isCloneDomain(headersList)
+  
+  console.log(`📚 Rendering subject page - Subject: ${subject}, Clone ID: ${cloneId}, Is Clone: ${isClone}`)
+  
+  // Fetch clone-aware data
+  const headerData = await getCloneAwareHeaderData()
+  const footerData = await getCloneAwareFooterData()
+  const contactFormSectionData = await getCloneAwareContactFormData()
+  
+  // Get subject data
+  let subjectPageData: SubjectPageData | null = null
+  if (cloneId) {
+    const subjectResult = await getCloneAwareSubjectData(subject, headersList)
+    subjectPageData = subjectResult.data as SubjectPageData | null
+    console.log(`Using ${subjectResult.source} subject data for ${cloneId}/${subject}`)
+  } else {
+    subjectPageData = await getSubjectPageData(subject)
+    console.log(`Using default subject data for ${subject}`)
+  }
 
   if (!subjectPageData) {
     notFound()

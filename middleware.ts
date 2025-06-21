@@ -35,7 +35,8 @@ export function middleware(request: NextRequest) {
     '/sitemap.xml',
     '/clone-test',
     '/debug',
-    '/test'
+    '/test',
+    '/admin/'
   ]
   
   if (skipPaths.some(path => pathname.startsWith(path))) {
@@ -71,39 +72,18 @@ export function middleware(request: NextRequest) {
   if (cloneId) {
     console.log(`🔥 MIDDLEWARE: Domain ${hostname} mapped to clone ${cloneId}`)
     
-    // For homepage requests, rewrite to clone homepage
-    if (pathname === '/' || pathname === '') {
-      const rewriteUrl = new URL(`/clone/${cloneId}/homepage`, request.url)
-      console.log(`🔥 MIDDLEWARE: Rewriting ${pathname} to ${rewriteUrl.pathname}`)
-      
-      const response = NextResponse.rewrite(rewriteUrl)
-      
-      // Add debug headers
-      response.headers.set('x-clone-id', cloneId)
-      response.headers.set('x-clone-original-path', pathname)
-      response.headers.set('x-clone-rewritten-path', rewriteUrl.pathname)
-      response.headers.set('x-clone-hostname', hostname)
-      response.headers.set('x-middleware-cache', 'no-cache')
-      
-      return response
-    }
+    // For clone domains, add clone ID header and proceed normally
+    // This keeps users on clean URLs while enabling clone-specific content
+    const response = NextResponse.next()
     
-    // For subject pages, rewrite to clone subject pages
-    if (pathname.startsWith('/') && !pathname.startsWith('/clone/')) {
-      const rewriteUrl = new URL(`/clone/${cloneId}${pathname}`, request.url)
-      console.log(`🔥 MIDDLEWARE: Rewriting ${pathname} to ${rewriteUrl.pathname}`)
-      
-      const response = NextResponse.rewrite(rewriteUrl)
-      
-      // Add debug headers
-      response.headers.set('x-clone-id', cloneId)
-      response.headers.set('x-clone-original-path', pathname)
-      response.headers.set('x-clone-rewritten-path', rewriteUrl.pathname)
-      response.headers.set('x-clone-hostname', hostname)
-      response.headers.set('x-middleware-cache', 'no-cache')
-      
-      return response
-    }
+    // Add clone identification headers
+    response.headers.set('x-clone-id', cloneId)
+    response.headers.set('x-clone-hostname', hostname)
+    response.headers.set('x-clone-domain', 'true')
+    response.headers.set('x-middleware-cache', 'no-cache')
+    
+    console.log(`🔥 MIDDLEWARE: Added clone headers for ${cloneId}`)
+    return response
   } else {
     // For non-clone domains, handle direct clone URL access
     // Redirect to the appropriate clone domain if available
