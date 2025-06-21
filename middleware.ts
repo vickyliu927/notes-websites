@@ -117,6 +117,7 @@ export function middleware(request: NextRequest) {
   
   // For non-clone domains, proceed normally
   console.log(`🔥 MIDDLEWARE: No clone mapping for ${hostname}, proceeding normally`)
+  // Trigger deployment
   return NextResponse.next()
 }
 
