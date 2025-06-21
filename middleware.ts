@@ -72,18 +72,23 @@ export function middleware(request: NextRequest) {
   if (cloneId) {
     console.log(`🔥 MIDDLEWARE: Domain ${hostname} mapped to clone ${cloneId}`)
     
-    // For clone domains, add clone ID header and proceed normally
-    // This keeps users on clean URLs while enabling clone-specific content
-    const response = NextResponse.next()
+    // Create a new headers object so we can modify it
+    const requestHeaders = new Headers(request.headers)
     
     // Add clone identification headers
-    response.headers.set('x-clone-id', cloneId)
-    response.headers.set('x-clone-hostname', hostname)
-    response.headers.set('x-clone-domain', 'true')
-    response.headers.set('x-middleware-cache', 'no-cache')
+    requestHeaders.set('x-clone-id', cloneId)
+    requestHeaders.set('x-clone-hostname', hostname)
+    requestHeaders.set('x-clone-domain', 'true')
+    requestHeaders.set('x-middleware-cache', 'no-cache')
     
     console.log(`🔥 MIDDLEWARE: Added clone headers for ${cloneId}`)
-    return response
+    
+    // Forward the request with the new headers
+    return NextResponse.next({
+      request: {
+        headers: requestHeaders,
+      },
+    })
   } else {
     // For non-clone domains, handle direct clone URL access
     // Redirect to the appropriate clone domain if available
