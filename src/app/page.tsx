@@ -1,4 +1,5 @@
 import { Metadata } from 'next'
+import { headers } from 'next/headers'
 import { 
   Header, 
   Hero, 
@@ -10,88 +11,158 @@ import {
   SubjectRequestBanner
 } from '@/components'
 import { 
-  client, 
   headerQuery, 
   heroQuery, 
   subjectGridQuery, 
+  allSubjectPagesQuery, 
   whyChooseUsQuery, 
   faqQuery, 
-  contactFormSectionQuery,
   footerQuery,
-  allSubjectPagesQuery,
-  getHomepageData,
-  getSEOSettings
+  contactFormSectionQuery 
 } from '../../lib/sanity'
+import { 
+  getHeaderWithFallback,
+  getHeroWithFallback,
+  getSubjectGridWithFallback,
+  getWhyChooseUsWithFallback,
+  getFAQWithFallback,
+  getFooterWithFallback,
+  getContactFormWithFallback
+} from '../../lib/cloneQueries'
+import { client } from '../../lib/sanity'
+import { SEOProvider } from '../../contexts/SEOContext'
 import { 
   HeaderData, 
   HeroData, 
   SubjectGridData, 
+  SubjectPageData, 
   WhyChooseUsData, 
   FAQData, 
-  ContactFormSectionData,
   FooterData,
-  SubjectPageData
+  ContactFormSectionData 
 } from '../../types/sanity'
-import { generateSEOMetadata } from '../../components/SEOHead'
-import { SEOProvider } from '../../contexts/SEOContext'
 
 // Revalidate every 10 seconds for fresh content during development
 export const revalidate = 10;
 
-// Generate metadata for SEO
-export async function generateMetadata(): Promise<Metadata> {
-  const homepageData = await getHomepageData()
-  const seoSettings = await getSEOSettings()
+// Function to get clone ID by domain
+async function getCloneIdByDomain(hostname: string): Promise<string | null> {
+  console.log(`[DOMAIN_LOOKUP] Searching for hostname: ${hostname}`)
   
-  // Create SEO data object
-  const seoData = {
-    metaTitle: seoSettings?.metaTitle,
-    metaDescription: seoSettings?.metaDescription,
-    noFollowExternal: seoSettings?.noFollowExternal
+  try {
+    // Query Sanity for clone with matching custom domain
+    const query = `
+      *[_type == "clone" && metadata.customDomain == $hostname && isActive == true][0] {
+        cloneId,
+        metadata
+      }
+    `
+    console.log(`[DOMAIN_LOOKUP] Executing query:`, query, `with hostname:`, hostname)
+    
+    const result = await client.fetch(query, { hostname })
+    console.log(`[DOMAIN_LOOKUP] Query result:`, result)
+    
+    if (result?.cloneId?.current) {
+      console.log(`[DOMAIN_LOOKUP] Found clone: ${result.cloneId.current}`)
+      return result.cloneId.current
+    }
+    
+    console.log(`[DOMAIN_LOOKUP] No clone found for hostname: ${hostname}`)
+    return null
+  } catch (error) {
+    // Only log errors in production
+    console.error('[DOMAIN_LOOKUP] Error:', error instanceof Error ? error.message : String(error))
+    return null
   }
-  
-  return generateSEOMetadata({
-    title: homepageData?.pageTitle || 'CIE IGCSE Notes',
-    description: homepageData?.pageDescription,
-    seoData
-  })
 }
 
-async function getHeaderData(): Promise<HeaderData | undefined> {
+// Helper function to select best data from fallback query
+function selectBestData<T>(fallbackResult: { cloneSpecific?: T; baseline?: T; default?: T }): T | undefined {
+  return fallbackResult?.cloneSpecific || fallbackResult?.baseline || fallbackResult?.default
+}
+
+// Generate metadata for SEO
+export async function generateMetadata(): Promise<Metadata> {
   try {
-    console.log('Fetching header data from Sanity...');
-    console.log('Project ID:', process.env.NEXT_PUBLIC_SANITY_PROJECT_ID);
-    console.log('Dataset:', process.env.NEXT_PUBLIC_SANITY_DATASET);
+    const headersList = await headers();
+    const host = headersList.get('host');
+    const hostname = host?.split(':')[0] || 'localhost';
     
-    const headerData = await client.fetch(headerQuery);
-    console.log('Fetched header data:', headerData);
-    return headerData;
+    // Check if this is a clone request
+    let cloneId = null;
+    if (hostname !== 'localhost' && !hostname.includes('127.0.0.1') && !hostname.includes('.local')) {
+      cloneId = await getCloneIdByDomain(hostname);
+    }
+
+    // For now, return default metadata (can be enhanced later with clone-specific SEO)
+    return {
+      title: 'CIE IGCSE Notes',
+      description: 'CIE IGCSE Notes'
+    }
+  } catch (error) {
+    console.error('Error generating metadata:', error)
+    return {
+      title: 'CIE IGCSE Notes',
+      description: 'CIE IGCSE Notes'
+    }
+  }
+}
+
+// Clone-aware data fetching functions
+async function getHeaderData(cloneId?: string): Promise<HeaderData | undefined> {
+  try {
+    console.log(`Fetching header data${cloneId ? ` for clone: ${cloneId}` : ' (default)'}...`);
+    
+    if (cloneId) {
+      const fallbackResult = await client.fetch(getHeaderWithFallback(cloneId));
+      const headerData = selectBestData(fallbackResult) as HeaderData;
+      console.log(`Fetched header data:`, headerData);
+      return headerData;
+    } else {
+      const headerData = await client.fetch(headerQuery);
+      console.log('Fetched header data:', headerData);
+      return headerData;
+    }
   } catch (error) {
     console.error('Error fetching header data:', error);
     return undefined;
   }
 }
 
-async function getHeroData(): Promise<HeroData | undefined> {
+async function getHeroData(cloneId?: string): Promise<HeroData | undefined> {
   try {
-    console.log('Fetching hero data from Sanity...');
+    console.log(`Fetching hero data${cloneId ? ` for clone: ${cloneId}` : ' (default)'}...`);
     
-    const heroData = await client.fetch(heroQuery);
-    console.log('Fetched hero data:', heroData);
-    return heroData;
+    if (cloneId) {
+      const fallbackResult = await client.fetch(getHeroWithFallback(cloneId));
+      const heroData = selectBestData(fallbackResult) as HeroData;
+      console.log(`Fetched hero data:`, heroData);
+      return heroData;
+    } else {
+      const heroData = await client.fetch(heroQuery);
+      console.log('Fetched hero data:', heroData);
+      return heroData;
+    }
   } catch (error) {
     console.error('Error fetching hero data:', error);
     return undefined;
   }
 }
 
-async function getSubjectGridData(): Promise<SubjectGridData | undefined> {
+async function getSubjectGridData(cloneId?: string): Promise<SubjectGridData | undefined> {
   try {
-    console.log('Fetching subject grid data from Sanity...');
+    console.log(`Fetching subject grid data${cloneId ? ` for clone: ${cloneId}` : ' (default)'}...`);
     
-    const subjectGridData = await client.fetch(subjectGridQuery);
-    console.log('Fetched subject grid data:', subjectGridData);
-    return subjectGridData;
+    if (cloneId) {
+      const fallbackResult = await client.fetch(getSubjectGridWithFallback(cloneId));
+      const subjectGridData = selectBestData(fallbackResult) as SubjectGridData;
+      console.log(`Fetched subject grid data:`, subjectGridData);
+      return subjectGridData;
+    } else {
+      const subjectGridData = await client.fetch(subjectGridQuery);
+      console.log('Fetched subject grid data:', subjectGridData);
+      return subjectGridData;
+    }
   } catch (error) {
     console.error('Error fetching subject grid data:', error);
     return undefined;
@@ -111,68 +182,162 @@ async function getPublishedSubjects(): Promise<SubjectPageData[]> {
   }
 }
 
-async function getWhyChooseUsData(): Promise<WhyChooseUsData | undefined> {
+async function getPublishedSubjectsForClone(cloneId: string): Promise<SubjectPageData[]> {
   try {
-    console.log('Fetching why choose us data from Sanity...');
+    console.log(`Fetching published subjects for clone: ${cloneId}`);
     
-    const whyChooseUsData = await client.fetch(whyChooseUsQuery);
-    console.log('Fetched why choose us data:', whyChooseUsData);
-    return whyChooseUsData;
+    // Get only published subject pages that are specifically assigned to this clone
+    const publishedSubjects = await client.fetch(`
+      *[_type == "subjectPage" && isPublished == true && 
+        cloneReference->cloneId.current == "${cloneId}"
+      ] {
+        _id,
+        title,
+        subjectSlug,
+        subjectName,
+        pageTitle,
+        pageDescription,
+        seo,
+        showContactForm,
+        topicBlockBackgroundColor,
+        topics,
+        cloneReference
+      }
+    `);
+    
+    console.log(`Fetched ${publishedSubjects?.length || 0} subjects for clone ${cloneId}:`, publishedSubjects);
+    return publishedSubjects || [];
+  } catch (error) {
+    console.error('Error fetching published subjects for clone:', error);
+    return [];
+  }
+}
+
+async function getWhyChooseUsData(cloneId?: string): Promise<WhyChooseUsData | undefined> {
+  try {
+    console.log(`Fetching why choose us data${cloneId ? ` for clone: ${cloneId}` : ' (default)'}...`);
+    
+    if (cloneId) {
+      const fallbackResult = await client.fetch(getWhyChooseUsWithFallback(cloneId));
+      const whyChooseUsData = selectBestData(fallbackResult) as WhyChooseUsData;
+      console.log(`Fetched why choose us data:`, whyChooseUsData);
+      return whyChooseUsData;
+    } else {
+      const whyChooseUsData = await client.fetch(whyChooseUsQuery);
+      console.log('Fetched why choose us data:', whyChooseUsData);
+      return whyChooseUsData;
+    }
   } catch (error) {
     console.error('Error fetching why choose us data:', error);
     return undefined;
   }
 }
 
-async function getFAQData(): Promise<FAQData | undefined> {
+async function getFAQData(cloneId?: string): Promise<FAQData | undefined> {
   try {
-    console.log('Fetching FAQ data from Sanity...');
+    console.log(`Fetching FAQ data${cloneId ? ` for clone: ${cloneId}` : ' (default)'}...`);
     
-    const faqData = await client.fetch(faqQuery);
-    console.log('Fetched FAQ data:', faqData);
-    return faqData;
+    if (cloneId) {
+      const fallbackResult = await client.fetch(getFAQWithFallback(cloneId));
+      const faqData = selectBestData(fallbackResult) as FAQData;
+      console.log(`Fetched FAQ data:`, faqData);
+      return faqData;
+    } else {
+      const faqData = await client.fetch(faqQuery);
+      console.log('Fetched FAQ data:', faqData);
+      return faqData;
+    }
   } catch (error) {
     console.error('Error fetching FAQ data:', error);
     return undefined;
   }
 }
 
-async function getFooterData(): Promise<FooterData | undefined> {
+async function getFooterData(cloneId?: string): Promise<FooterData | undefined> {
   try {
-    console.log('Fetching footer data from Sanity...');
+    console.log(`Fetching footer data${cloneId ? ` for clone: ${cloneId}` : ' (default)'}...`);
     
-    const footerData = await client.fetch(footerQuery);
-    console.log('Fetched footer data:', footerData);
-    return footerData;
+    if (cloneId) {
+      const fallbackResult = await client.fetch(getFooterWithFallback(cloneId));
+      const footerData = selectBestData(fallbackResult) as FooterData;
+      console.log(`Fetched footer data:`, footerData);
+      return footerData;
+    } else {
+      const footerData = await client.fetch(footerQuery);
+      console.log('Fetched footer data:', footerData);
+      return footerData;
+    }
   } catch (error) {
     console.error('Error fetching footer data:', error);
     return undefined;
   }
 }
 
-async function getContactFormSectionData(): Promise<ContactFormSectionData | undefined> {
+async function getContactFormSectionData(cloneId?: string): Promise<ContactFormSectionData | undefined> {
   try {
-    console.log('Fetching contact form section data from Sanity...');
+    console.log(`Fetching contact form section data${cloneId ? ` for clone: ${cloneId}` : ' (default)'}...`);
     
-    const contactFormSectionData = await client.fetch(contactFormSectionQuery);
-    console.log('Fetched contact form section data:', contactFormSectionData);
-    return contactFormSectionData;
+    if (cloneId) {
+      const fallbackResult = await client.fetch(getContactFormWithFallback(cloneId));
+      const contactFormSectionData = selectBestData(fallbackResult) as ContactFormSectionData;
+      console.log(`Fetched contact form section data:`, contactFormSectionData);
+      return contactFormSectionData;
+    } else {
+      const contactFormSectionData = await client.fetch(contactFormSectionQuery);
+      console.log('Fetched contact form section data:', contactFormSectionData);
+      return contactFormSectionData;
+    }
   } catch (error) {
     console.error('Error fetching contact form section data:', error);
     return undefined;
   }
 }
 
+async function getSEOSettings() {
+  const seoSettings = await client.fetch(`
+    *[_type == "seoSettings"][0] {
+      metaTitle,
+      metaDescription,
+      noFollowExternal
+    }
+  `);
+  return seoSettings;
+}
+
 export default async function Home() {
-  const headerData = await getHeaderData();
-  const heroData = await getHeroData();
-  const subjectGridData = await getSubjectGridData();
-  const publishedSubjects = await getPublishedSubjects();
-  const whyChooseUsData = await getWhyChooseUsData();
-  const faqData = await getFAQData();
-  const footerData = await getFooterData();
+  // Read headers to get host information
+  const headersList = await headers();
+  const host = headersList.get('host');
+  const hostname = host?.split(':')[0] || 'localhost';
+  
+  console.log('📍 [HOMEPAGE] Checking domain:', hostname);
+  
+  // Directly check if this is a custom domain
+  let cloneId = null;
+  if (hostname !== 'localhost' && !hostname.includes('127.0.0.1') && !hostname.includes('.local')) {
+    console.log('📍 [HOMEPAGE] Custom domain detected, checking for clone...');
+    cloneId = await getCloneIdByDomain(hostname);
+  }
+  
+  console.log('📍 [HOMEPAGE] Clone detection result:', { hostname, cloneId });
+
+  // Fetch all data with clone awareness
+  const headerData = await getHeaderData(cloneId || undefined);
+  const heroData = await getHeroData(cloneId || undefined);
+  const subjectGridData = await getSubjectGridData(cloneId || undefined);
+  
+  // Use clone-specific subject filtering if clone is detected
+  const publishedSubjects = cloneId 
+    ? await getPublishedSubjectsForClone(cloneId)
+    : await getPublishedSubjects();
+    
+  console.log('📍 [HOMEPAGE] Using subjects for', cloneId ? `clone: ${cloneId}` : 'default site');
+  
+  const whyChooseUsData = await getWhyChooseUsData(cloneId || undefined);
+  const faqData = await getFAQData(cloneId || undefined);
+  const footerData = await getFooterData(cloneId || undefined);
   const seoSettings = await getSEOSettings();
-  const contactFormSectionData = await getContactFormSectionData();
+  const contactFormSectionData = await getContactFormSectionData(cloneId || undefined);
 
   // Create SEO data object
   const seoData = {
