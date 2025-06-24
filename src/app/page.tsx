@@ -119,9 +119,9 @@ async function getHeaderData(cloneId?: string): Promise<HeaderData | undefined> 
       console.log(`Fetched header data:`, headerData);
       return headerData;
     } else {
-      const headerData = await client.fetch(headerQuery);
-      console.log('Fetched header data:', headerData);
-      return headerData;
+    const headerData = await client.fetch(headerQuery);
+    console.log('Fetched header data:', headerData);
+    return headerData;
     }
   } catch (error) {
     console.error('Error fetching header data:', error);
@@ -139,9 +139,9 @@ async function getHeroData(cloneId?: string): Promise<HeroData | undefined> {
       console.log(`Fetched hero data:`, heroData);
       return heroData;
     } else {
-      const heroData = await client.fetch(heroQuery);
-      console.log('Fetched hero data:', heroData);
-      return heroData;
+    const heroData = await client.fetch(heroQuery);
+    console.log('Fetched hero data:', heroData);
+    return heroData;
     }
   } catch (error) {
     console.error('Error fetching hero data:', error);
@@ -159,9 +159,9 @@ async function getSubjectGridData(cloneId?: string): Promise<SubjectGridData | u
       console.log(`Fetched subject grid data:`, subjectGridData);
       return subjectGridData;
     } else {
-      const subjectGridData = await client.fetch(subjectGridQuery);
-      console.log('Fetched subject grid data:', subjectGridData);
-      return subjectGridData;
+    const subjectGridData = await client.fetch(subjectGridQuery);
+    console.log('Fetched subject grid data:', subjectGridData);
+    return subjectGridData;
     }
   } catch (error) {
     console.error('Error fetching subject grid data:', error);
@@ -223,9 +223,9 @@ async function getWhyChooseUsData(cloneId?: string): Promise<WhyChooseUsData | u
       console.log(`Fetched why choose us data:`, whyChooseUsData);
       return whyChooseUsData;
     } else {
-      const whyChooseUsData = await client.fetch(whyChooseUsQuery);
-      console.log('Fetched why choose us data:', whyChooseUsData);
-      return whyChooseUsData;
+    const whyChooseUsData = await client.fetch(whyChooseUsQuery);
+    console.log('Fetched why choose us data:', whyChooseUsData);
+    return whyChooseUsData;
     }
   } catch (error) {
     console.error('Error fetching why choose us data:', error);
@@ -243,9 +243,9 @@ async function getFAQData(cloneId?: string): Promise<FAQData | undefined> {
       console.log(`Fetched FAQ data:`, faqData);
       return faqData;
     } else {
-      const faqData = await client.fetch(faqQuery);
-      console.log('Fetched FAQ data:', faqData);
-      return faqData;
+    const faqData = await client.fetch(faqQuery);
+    console.log('Fetched FAQ data:', faqData);
+    return faqData;
     }
   } catch (error) {
     console.error('Error fetching FAQ data:', error);
@@ -263,9 +263,9 @@ async function getFooterData(cloneId?: string): Promise<FooterData | undefined> 
       console.log(`Fetched footer data:`, footerData);
       return footerData;
     } else {
-      const footerData = await client.fetch(footerQuery);
-      console.log('Fetched footer data:', footerData);
-      return footerData;
+    const footerData = await client.fetch(footerQuery);
+    console.log('Fetched footer data:', footerData);
+    return footerData;
     }
   } catch (error) {
     console.error('Error fetching footer data:', error);
@@ -283,9 +283,9 @@ async function getContactFormSectionData(cloneId?: string): Promise<ContactFormS
       console.log(`Fetched contact form section data:`, contactFormSectionData);
       return contactFormSectionData;
     } else {
-      const contactFormSectionData = await client.fetch(contactFormSectionQuery);
-      console.log('Fetched contact form section data:', contactFormSectionData);
-      return contactFormSectionData;
+    const contactFormSectionData = await client.fetch(contactFormSectionQuery);
+    console.log('Fetched contact form section data:', contactFormSectionData);
+    return contactFormSectionData;
     }
   } catch (error) {
     console.error('Error fetching contact form section data:', error);

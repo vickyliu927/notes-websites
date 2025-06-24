@@ -75,7 +75,7 @@ export async function middleware(request: NextRequest) {
   if (skipPaths.some(path => pathname.startsWith(path))) {
     return NextResponse.next()
   }
-
+  
   // Production domain detection - skip development domains
   if (hostname !== 'localhost' && 
       !hostname.includes('127.0.0.1') && 
@@ -85,11 +85,11 @@ export async function middleware(request: NextRequest) {
     const cloneIdFromDomain = await getCloneIdByDomain(hostname)
     
     if (cloneIdFromDomain) {
-      const response = NextResponse.next()
+    const response = NextResponse.next()
       response.headers.set('x-clone-id', cloneIdFromDomain)
       response.headers.set('x-clone-source', 'domain')
-      return response
-    }
+    return response
+  }
   }
   
   return NextResponse.next()

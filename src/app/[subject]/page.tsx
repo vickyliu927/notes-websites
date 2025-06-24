@@ -115,9 +115,9 @@ async function getContactFormSectionData(cloneId?: string): Promise<ContactFormS
       console.log(`[SUBJECT] Fetched contact form section data:`, contactFormSectionData);
       return contactFormSectionData;
     } else {
-      const contactFormSectionData = await client.fetch(contactFormSectionQuery);
+    const contactFormSectionData = await client.fetch(contactFormSectionQuery);
       console.log('[SUBJECT] Fetched contact form section data:', contactFormSectionData);
-      return contactFormSectionData;
+    return contactFormSectionData;
     }
   } catch (error) {
     console.error('[SUBJECT] Error fetching contact form section data:', error);
@@ -159,7 +159,7 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({ params }: SubjectPageProps): Promise<Metadata> {
   try {
-    const { subject } = await params
+  const { subject } = await params
     
     // Read headers to detect clone
     const headersList = await headers();
@@ -175,11 +175,11 @@ export async function generateMetadata({ params }: SubjectPageProps): Promise<Me
     console.log('📍 [SUBJECT_META] Clone detection:', { hostname, cloneId, subject });
     
     const subjectPageData = await getCloneAwareSubjectPageData(subject, cloneId || undefined)
-    
-    if (!subjectPageData) {
+  
+  if (!subjectPageData) {
       return generateSEOMetadata({
-        title: 'Subject Not Found - CIE IGCSE Notes',
-        description: 'The requested subject page could not be found.'
+      title: 'Subject Not Found - CIE IGCSE Notes',
+      description: 'The requested subject page could not be found.'
       })
     }
 

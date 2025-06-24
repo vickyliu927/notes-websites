@@ -173,7 +173,7 @@ export default {
   ],
   preview: {
     select: {
-      title: 'sectionTitle',
+      title: 'title',
       subtitle: 'sectionDescription',
       active: 'isActive'
     },

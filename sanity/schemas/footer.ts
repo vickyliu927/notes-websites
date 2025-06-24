@@ -461,7 +461,7 @@ export default defineType({
   ],
   preview: {
     select: {
-      title: 'websiteTitle',
+      title: 'title',
       subtitle: 'websiteDescription',
       isActive: 'isActive'
     },
