@@ -29,7 +29,7 @@ export interface CloneData {
   metadata?: {
     targetAudience?: string
     region?: string
-    customDomain?: string
+    domains?: string[]
   }
   createdAt: string
   updatedAt: string

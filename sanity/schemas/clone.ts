@@ -67,10 +67,14 @@ export default defineType({
           description: 'Geographic region this clone is intended for'
         },
         {
-          name: 'customDomain',
-          title: 'Custom Domain',
-          type: 'string',
-          description: 'Custom domain for this clone (if applicable)'
+          name: 'domains',
+          title: 'Custom Domains',
+          type: 'array',
+          of: [{ type: 'string' }],
+          description: 'Custom domains for this clone (e.g., ["www.example.com", "example.com"])',
+          options: {
+            layout: 'tags'
+          }
         }
       ]
     }),

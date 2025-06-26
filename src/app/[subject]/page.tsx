@@ -35,9 +35,9 @@ async function getCloneIdByDomain(hostname: string): Promise<string | null> {
   console.log(`[SUBJECT_DOMAIN_LOOKUP] Searching for hostname: ${hostname}`)
   
   try {
-    // Query Sanity for clone with matching custom domain
+    // Query Sanity for clone with matching custom domain from domains array
     const query = `
-      *[_type == "clone" && metadata.customDomain == $hostname && isActive == true][0] {
+      *[_type == "clone" && $hostname in metadata.domains && isActive == true][0] {
         cloneId,
         metadata
       }
