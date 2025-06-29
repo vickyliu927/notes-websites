@@ -408,9 +408,6 @@ export default function Footer({ footerData, isContactFormActive }: FooterProps)
                 <a href="#" target="_blank" rel="noopener noreferrer" className="text-white/70 hover:text-coral-400 transition-colors">
                   Cookies
                 </a>
-                <a href="#" target="_blank" rel="noopener noreferrer" className="text-white/70 hover:text-coral-400 transition-colors">
-                  Accessibility
-                </a>
             </div>
             </div>
           </div>
