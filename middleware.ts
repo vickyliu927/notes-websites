@@ -26,13 +26,25 @@ async function getValidSubjectSlugs(): Promise<string[]> {
   
   try {
     console.log('[SUBJECT_SLUGS] Fetching subject slugs from Sanity...')
+    // Get both the current slug and any base slug (before the first hyphen)
     const query = `*[_type == "subjectPage" && isPublished == true].subjectSlug.current`
     const slugs = await client.fetch(query)
     
-    subjectSlugsCache = slugs || []
+    // Process slugs to include both full slugs and base slugs
+    const processedSlugs = slugs.reduce((acc: string[], slug: string) => {
+      acc.push(slug) // Add full slug
+      // Add base slug (part before first hyphen) if it exists
+      const baseSlug = slug.split('-')[0]
+      if (baseSlug && !acc.includes(baseSlug)) {
+        acc.push(baseSlug)
+      }
+      return acc
+    }, [])
+    
+    subjectSlugsCache = processedSlugs || []
     subjectSlugsCacheTimestamp = now
     
-    console.log(`[SUBJECT_SLUGS] Cached ${subjectSlugsCache.length} subject slugs`)
+    console.log(`[SUBJECT_SLUGS] Cached ${subjectSlugsCache.length} subject slugs (including base slugs)`)
     return subjectSlugsCache
   } catch (error) {
     console.error('[SUBJECT_SLUGS] Error fetching subject slugs:', error)
