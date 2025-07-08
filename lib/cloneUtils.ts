@@ -14,6 +14,7 @@ import {
   getSubjectPageWithFallback,
   getCloneComponentSummary
 } from './cloneQueries'
+import { CloneData } from '../types/sanity'
 
 // ===== TYPES =====
 
@@ -286,4 +287,55 @@ export function parseCloneUrl(url: string): { cloneId: string | null; path: stri
     cloneId: null,
     path: url
   }
+}
+
+// Function to get clone data by domain including site title
+export async function getCloneDataByDomain(hostname: string): Promise<{ cloneId: string; siteTitle?: string; siteDescription?: string } | null> {
+  try {
+    const query = `
+      *[_type == "clone" && $hostname in metadata.domains && isActive == true][0] {
+        cloneId,
+        cloneName,
+        metadata {
+          targetAudience,
+          region,
+          domains,
+          siteTitle,
+          siteDescription
+        }
+      }
+    `
+    
+    const result = await client.fetch(query, { hostname })
+    
+    if (result?.cloneId?.current) {
+      return {
+        cloneId: result.cloneId.current,
+        siteTitle: result.metadata?.siteTitle,
+        siteDescription: result.metadata?.siteDescription
+      }
+    }
+    
+    return null
+  } catch (error) {
+    console.error('[DOMAIN_LOOKUP] Error:', error instanceof Error ? error.message : String(error))
+    return null
+  }
+}
+
+// Function to get just clone ID by domain (for backward compatibility)
+export async function getCloneIdByDomain(hostname: string): Promise<string | null> {
+  const cloneData = await getCloneDataByDomain(hostname)
+  return cloneData?.cloneId || null
+}
+
+// Function to generate site title with clone customization
+export function generateSiteTitle(pageTitle: string, cloneSiteTitle?: string): string {
+  const siteTitle = cloneSiteTitle || 'CIE IGCSE Notes'
+  return pageTitle ? `${pageTitle} - ${siteTitle}` : siteTitle
+}
+
+// Function to generate meta description with clone customization
+export function generateMetaDescription(pageDescription?: string, cloneSiteDescription?: string): string {
+  return pageDescription || cloneSiteDescription || 'Access comprehensive IGCSE study notes and revision materials.'
 } 

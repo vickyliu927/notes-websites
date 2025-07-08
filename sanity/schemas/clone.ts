@@ -75,6 +75,20 @@ export default defineType({
           options: {
             layout: 'tags'
           }
+        },
+        {
+          name: 'siteTitle',
+          title: 'Site Title',
+          type: 'string',
+          description: 'Custom title that appears in browser tabs (e.g., "Biology Study Notes", "Past Paper Website")',
+          placeholder: 'CIE IGCSE Notes'
+        },
+        {
+          name: 'siteDescription',
+          title: 'Site Description',
+          type: 'text',
+          description: 'Default meta description for SEO (optional)',
+          placeholder: 'Access comprehensive IGCSE study notes and revision materials.'
         }
       ]
     }),
