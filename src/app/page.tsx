@@ -335,7 +335,9 @@ export default async function Home() {
     console.log('🌐 [HOMEPAGE] Custom domain detected, checking for clone...');
     cloneId = await getCloneIdByDomain(hostname);
   } else {
-    console.log('🌐 [HOMEPAGE] Local development detected, skipping clone lookup');
+    console.log('🌐 [HOMEPAGE] Local development detected, but forcing clone for testing...');
+    // TEMPORARY: Force clone detection for local testing
+    cloneId = 'test-clone';
   }
   
   console.log('🌐 [HOMEPAGE] Final clone detection result:', { 

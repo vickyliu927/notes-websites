@@ -8,6 +8,39 @@ let cacheTimestamps = new Map<string, number>()
 const CACHE_DURATION = 10 * 60 * 1000 // 10 minutes for production
 const NEGATIVE_CACHE_DURATION = 2 * 60 * 1000 // 2 minutes for non-existent domains
 
+// Cache for subject slugs
+let subjectSlugsCache: string[] = []
+let subjectSlugsCacheTimestamp = 0
+const SUBJECT_SLUGS_CACHE_DURATION = 30 * 60 * 1000 // 30 minutes
+
+// ===== SUBJECT SLUGS CACHING =====
+
+async function getValidSubjectSlugs(): Promise<string[]> {
+  const now = Date.now()
+  
+  // Check if cache is valid
+  if (subjectSlugsCache.length > 0 && now - subjectSlugsCacheTimestamp < SUBJECT_SLUGS_CACHE_DURATION) {
+    console.log(`[SUBJECT_SLUGS] Using cached slugs (${subjectSlugsCache.length} items)`)
+    return subjectSlugsCache
+  }
+  
+  try {
+    console.log('[SUBJECT_SLUGS] Fetching subject slugs from Sanity...')
+    const query = `*[_type == "subjectPage" && isPublished == true].subjectSlug.current`
+    const slugs = await client.fetch(query)
+    
+    subjectSlugsCache = slugs || []
+    subjectSlugsCacheTimestamp = now
+    
+    console.log(`[SUBJECT_SLUGS] Cached ${subjectSlugsCache.length} subject slugs`)
+    return subjectSlugsCache
+  } catch (error) {
+    console.error('[SUBJECT_SLUGS] Error fetching subject slugs:', error)
+    // Return cached data if available, or empty array
+    return subjectSlugsCache
+  }
+}
+
 // ===== PRODUCTION DOMAIN DETECTION =====
 
 async function getCloneIdByDomain(hostname: string): Promise<string | null> {
@@ -90,7 +123,8 @@ export async function middleware(request: NextRequest) {
     '/sitemap.xml',
     '/debug',
     '/health',
-    '/.well-known/'
+    '/.well-known/',
+    '/exam-boards/' // Don't rewrite if already going to exam-boards
   ]
   
   if (skipPaths.some(path => pathname.startsWith(path))) {
@@ -108,6 +142,74 @@ export async function middleware(request: NextRequest) {
     console.log(`[MIDDLEWARE] Clone lookup result: ${cloneIdFromDomain}`)
     
     if (cloneIdFromDomain) {
+      // Check if this looks like a subject slug that should be rewritten
+      const pathSegments = pathname.split('/').filter(Boolean)
+      
+      // Handle two patterns:
+      // 1. /biology → /exam-boards/biology (exam board selection page)
+      // 2. /biology/aqa → /biology/aqa (subject + exam board specific page - no rewrite needed)
+      
+      if (pathSegments.length === 1) {
+        const potentialSubjectSlug = pathSegments[0]
+        
+        // Get valid subject slugs
+        const validSubjectSlugs = await getValidSubjectSlugs()
+        
+        if (validSubjectSlugs.includes(potentialSubjectSlug)) {
+          console.log(`[MIDDLEWARE] Rewriting ${pathname} to /exam-boards${pathname} for clone: ${cloneIdFromDomain}`)
+          
+          // Rewrite the URL to exam-boards path
+          const url = request.nextUrl.clone()
+          url.pathname = `/exam-boards${pathname}`
+          
+          const response = NextResponse.rewrite(url)
+          response.headers.set('x-clone-id', cloneIdFromDomain)
+          response.headers.set('x-clone-source', 'domain')
+          response.headers.set('x-browser-type', browserInfo.isChrome ? 'chrome' : browserInfo.isSafari ? 'safari' : 'other')
+          response.headers.set('x-rewritten-from', pathname)
+          response.headers.set('x-rewritten-to', `/exam-boards${pathname}`)
+          
+          // Add cache-busting headers to prevent browser caching issues
+          response.headers.set('Cache-Control', 'no-cache, no-store, must-revalidate, proxy-revalidate')
+          response.headers.set('Pragma', 'no-cache')
+          response.headers.set('Expires', '0')
+          response.headers.set('Vary', 'Host, User-Agent')
+          
+          console.log(`[MIDDLEWARE] URL rewrite completed: ${pathname} -> /exam-boards${pathname}`)
+          return response
+        } else {
+          console.log(`[MIDDLEWARE] ${potentialSubjectSlug} is not a valid subject slug, no rewrite needed`)
+        }
+      } else if (pathSegments.length === 2) {
+        const [potentialSubjectSlug, potentialExamBoard] = pathSegments
+        
+        // Get valid subject slugs
+        const validSubjectSlugs = await getValidSubjectSlugs()
+        
+        if (validSubjectSlugs.includes(potentialSubjectSlug)) {
+          console.log(`[MIDDLEWARE] Found subject + exam board pattern: ${pathname} for clone: ${cloneIdFromDomain}`)
+          
+          // This is a subject/examBoard URL - don't rewrite, just add clone headers
+          const response = NextResponse.next()
+          response.headers.set('x-clone-id', cloneIdFromDomain)
+          response.headers.set('x-clone-source', 'domain')
+          response.headers.set('x-browser-type', browserInfo.isChrome ? 'chrome' : browserInfo.isSafari ? 'safari' : 'other')
+          response.headers.set('x-subject-exam-board-route', 'true')
+          
+          // Add cache-busting headers to prevent browser caching issues
+          response.headers.set('Cache-Control', 'no-cache, no-store, must-revalidate, proxy-revalidate')
+          response.headers.set('Pragma', 'no-cache')
+          response.headers.set('Expires', '0')
+          response.headers.set('Vary', 'Host, User-Agent')
+          
+          console.log(`[MIDDLEWARE] Subject + exam board route: ${pathname} (no rewrite needed)`)
+          return response
+        } else {
+          console.log(`[MIDDLEWARE] ${potentialSubjectSlug} is not a valid subject slug, no rewrite needed`)
+        }
+      }
+      
+      // For non-subject paths, just set clone headers without rewriting
       const response = NextResponse.next()
       response.headers.set('x-clone-id', cloneIdFromDomain)
       response.headers.set('x-clone-source', 'domain')

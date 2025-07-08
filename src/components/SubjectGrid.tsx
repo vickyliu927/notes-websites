@@ -148,13 +148,23 @@ export default function SubjectGrid({ subjectGridData, publishedSubjects, cloneI
   const getSubjectUrl = (subject: SubjectGridSubject): string => {
     console.log('🔄 [SubjectGrid] Getting URL for subject:', subject.name);
     console.log('🔄 [SubjectGrid] Exam board settings:', data.examBoardSettings);
+    console.log('🔄 [SubjectGrid] Clone context:', { cloneId });
     
     // Check if exam board routing is enabled
     if (data.examBoardSettings?.useExamBoards) {
-      const pattern = data.examBoardSettings.examBoardUrlPattern || '/exam-boards/{subject}';
       const subjectSlug = createSlug(subject.name);
+      
+      // For clone domains, use direct subject slugs (middleware will rewrite to exam-boards)
+      if (cloneId) {
+        const directUrl = `/${subjectSlug}`;
+        console.log('✅ [SubjectGrid] Clone domain - using direct subject slug:', directUrl);
+        return directUrl;
+      }
+      
+      // For main domain, use the exam board pattern
+      const pattern = data.examBoardSettings.examBoardUrlPattern || '/exam-boards/{subject}';
       const finalUrl = pattern.replace('{subject}', subjectSlug);
-      console.log('✅ [SubjectGrid] Using exam board routing:', finalUrl);
+      console.log('✅ [SubjectGrid] Main domain - using exam board routing:', finalUrl);
       return finalUrl;
     }
 

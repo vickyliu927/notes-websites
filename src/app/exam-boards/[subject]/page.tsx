@@ -241,7 +241,11 @@ export default async function ExamBoardPage({ params }: ExamBoardPageProps) {
               <div className="flex flex-col lg:flex-row gap-12">
                 {/* Main Content */}
                 <div className="lg:w-2/3">
-                  <ExamBoardGrid examBoards={examBoardData.examBoards} />
+                  <ExamBoardGrid 
+                    examBoards={examBoardData.examBoards} 
+                    subjectSlug={subject}
+                    cloneId={cloneId}
+                  />
                 </div>
 
                 {/* Sidebar */}
