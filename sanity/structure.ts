@@ -252,6 +252,82 @@ export const structure = (S: StructureBuilder) =>
                                     ])
                                 ),
 
+                              // UK A-Levels Question Bank Content
+                              S.listItem()
+                                .title('📚 UK A-Levels Question Bank')
+                                .child(
+                                  S.list()
+                                    .title('UK A-Levels Question Bank Content')
+                                    .items([
+                                      // Homepage folder
+                                      S.listItem()
+                                        .title('📄 Homepage')
+                                        .child(
+                                          S.list()
+                                            .title('UK A-Levels Question Bank Homepage')
+                                            .items([
+                                              S.listItem()
+                                                .title('🔝 Header')
+                                                .child(
+                                                  S.documentTypeList('header')
+                                                    .title('UK A-Levels Question Bank Headers')
+                                                    .filter('_type == "header" && cloneReference->cloneId.current == "uk-a-levels-qb"')
+                                                ),
+                                              S.listItem()
+                                                .title('🎯 Hero Section')
+                                                .child(
+                                                  S.documentTypeList('hero')
+                                                    .title('UK A-Levels Question Bank Heroes')
+                                                    .filter('_type == "hero" && cloneReference->cloneId.current == "uk-a-levels-qb"')
+                                                ),
+                                              S.listItem()
+                                                .title('📊 Subject Grid')
+                                                .child(
+                                                  S.documentTypeList('subjectGrid')
+                                                    .title('UK A-Levels Question Bank Subject Grids')
+                                                    .filter('_type == "subjectGrid" && cloneReference->cloneId.current == "uk-a-levels-qb"')
+                                                ),
+                                              S.listItem()
+                                                .title('⭐ Why Choose Us')
+                                                .child(
+                                                  S.documentTypeList('whyChooseUs')
+                                                    .title('UK A-Levels Question Bank Why Choose Us')
+                                                    .filter('_type == "whyChooseUs" && cloneReference->cloneId.current == "uk-a-levels-qb"')
+                                                ),
+                                              S.listItem()
+                                                .title('❓ FAQ Section')
+                                                .child(
+                                                  S.documentTypeList('faq')
+                                                    .title('UK A-Levels Question Bank FAQs')
+                                                    .filter('_type == "faq" && cloneReference->cloneId.current == "uk-a-levels-qb"')
+                                                ),
+                                              S.listItem()
+                                                .title('📞 Contact Form')
+                                                .child(
+                                                  S.documentTypeList('contactFormSection')
+                                                    .title('UK A-Levels Question Bank Contact Forms')
+                                                    .filter('_type == "contactFormSection" && cloneReference->cloneId.current == "uk-a-levels-qb"')
+                                                ),
+                                              S.listItem()
+                                                .title('🔽 Footer')
+                                                .child(
+                                                  S.documentTypeList('footer')
+                                                    .title('UK A-Levels Question Bank Footers')
+                                                    .filter('_type == "footer" && cloneReference->cloneId.current == "uk-a-levels-qb"')
+                                                ),
+                                            ])
+                                        ),
+                                      // Subject Pages folder
+                                      S.listItem()
+                                        .title('📚 Subject Pages')
+                                        .child(
+                                          S.documentTypeList('subjectPage')
+                                            .title('UK A-Levels Question Bank Subject Pages')
+                                            .filter('_type == "subjectPage" && cloneReference->cloneId.current == "uk-a-levels-qb"')
+                                        ),
+                                    ])
+                                ),
+
 
                             ])
                         ),
