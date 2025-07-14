@@ -119,7 +119,7 @@ export default defineType({
                   name: 'url',
                   title: 'Button URL',
                   type: 'string',
-                  validation: Rule => Rule.required()
+                  description: 'Optional: Leave empty to use default subject page routing'
                 }
               ],
               validation: Rule => Rule.required()
