@@ -150,7 +150,17 @@ export const getSubjectGridWithFallback = (cloneId: string) => groq`
       sectionTitleFirstPart,
       sectionTitleSecondPart,
       sectionDescription,
-      subjects,
+      subjects[] {
+        name,
+        image,
+        description,
+        color,
+        dateUpdated,
+        viewNotesButton {
+          text,
+          url
+        }
+      },
       viewAllButton,
       "cloneName": cloneReference->cloneName,
       "cloneId": cloneReference->cloneId.current,
@@ -163,7 +173,17 @@ export const getSubjectGridWithFallback = (cloneId: string) => groq`
       sectionTitleFirstPart,
       sectionTitleSecondPart,
       sectionDescription,
-      subjects,
+      subjects[] {
+        name,
+        image,
+        description,
+        color,
+        dateUpdated,
+        viewNotesButton {
+          text,
+          url
+        }
+      },
       viewAllButton,
       "cloneName": cloneReference->cloneName,
       "cloneId": cloneReference->cloneId.current,
@@ -176,7 +196,17 @@ export const getSubjectGridWithFallback = (cloneId: string) => groq`
       sectionTitleFirstPart,
       sectionTitleSecondPart,
       sectionDescription,
-      subjects,
+      subjects[] {
+        name,
+        image,
+        description,
+        color,
+        dateUpdated,
+        viewNotesButton {
+          text,
+          url
+        }
+      },
       viewAllButton,
       isActive
     }
