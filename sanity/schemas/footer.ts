@@ -16,8 +16,15 @@ export default defineType({
       name: 'isActive',
       title: 'Is Active',
       type: 'boolean',
-      description: 'Only one footer configuration should be active at a time. This determines which footer appears on the website.',
-      initialValue: false
+      description: 'Enable or disable this footer',
+      initialValue: true
+    }),
+    defineField({
+      name: 'cloneReference',
+      title: 'Clone Reference',
+      type: 'reference',
+      to: [{ type: 'clone' }],
+      description: 'Select which clone this footer belongs to (leave empty for main website)'
     }),
     defineField({
       name: 'websiteTitle',
@@ -402,17 +409,6 @@ export default defineType({
         }
       ],
       validation: Rule => Rule.required()
-    }),
-    defineField({
-      name: 'cloneReference',
-      title: 'Clone Reference',
-      type: 'reference',
-      to: [{type: 'clone'}],
-      description: 'Select which clone this footer belongs to (leave empty for main website)',
-      validation: (Rule: any) => Rule.custom((cloneRef: any, context: any) => {
-        // Allow empty for main website content
-        return true
-      })
     }),
     defineField({
       name: 'cloneSpecificData',

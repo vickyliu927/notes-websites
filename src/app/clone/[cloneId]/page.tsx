@@ -18,7 +18,14 @@ import {
   getSEOSettings
 } from '../../../../lib/sanity'
 import { 
-  SubjectPageData
+  SubjectPageData,
+  HeaderData,
+  HeroData,
+  SubjectGridData,
+  WhyChooseUsData,
+  FAQData,
+  ContactFormSectionData,
+  FooterData
 } from '../../../../types/sanity'
 import { generateSEOMetadata } from '../../../../components/SEOHead'
 import { SEOProvider } from '../../../../contexts/SEOContext'
@@ -76,13 +83,13 @@ export default async function CloneWebsite({ params }: CloneHomepageProps) {
   }
 
   // Extract clone-specific data or use fallbacks
-  const headerData = components.header?.data as unknown
-  const heroData = components.hero?.data as unknown
-  const subjectGridData = components.subjectGrid?.data as unknown
-  const whyChooseUsData = components.whyChooseUs?.data as unknown
-  const faqData = components.faq?.data as unknown
-  const contactFormData = components.contactForm?.data as unknown
-  const footerData = components.footer?.data as unknown
+  const headerData = components.header?.data as HeaderData | undefined
+  const heroData = components.hero?.data as HeroData | undefined
+  const subjectGridData = components.subjectGrid?.data as SubjectGridData | undefined
+  const whyChooseUsData = components.whyChooseUs?.data as WhyChooseUsData | undefined
+  const faqData = components.faq?.data as FAQData | undefined
+  const contactFormData = components.contactForm?.data as ContactFormSectionData | undefined
+  const footerData = components.footer?.data as FooterData | undefined
 
   // Check if contact form is active
   const isContactFormActive = contactFormData?.isActive ?? false
