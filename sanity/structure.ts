@@ -320,6 +320,13 @@ export const structure = (S: StructureBuilder) =>
                                     .title('All Clone Contact Forms')
                                     .filter('_type == "contactFormSection" && defined(cloneReference)')
                                 ),
+                              S.listItem()
+                                .title('📖 All Clone Exam Board Pages')
+                                .child(
+                                  S.documentTypeList('examBoardPage')
+                                    .title('All Clone Exam Board Pages')
+                                    .filter('_type == "examBoardPage"')
+                                ),
                             ])
                         ),
 
