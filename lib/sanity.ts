@@ -412,6 +412,31 @@ export const mathsPageQuery = `*[_type == "mathsPage"][0]{
   }
 }`
 
+// GROQ query to fetch exam board page for a given clone and subject
+export const examBoardPageQuery = (cloneId: string, subjectPageId: string) => `*[_type == "examBoardPage" && cloneReference->cloneId.current == "${cloneId}" && subjectPageReference._ref == "${subjectPageId}" && isActive == true][0]{
+  _id,
+  title,
+  description,
+  isActive,
+  examBoards[] {
+    id,
+    name,
+    customTitle,
+    customDescription,
+    logo {
+      asset->{
+        _id,
+        url
+      },
+      alt,
+      hotspot,
+      crop
+    },
+    buttonLabel,
+    buttonUrl
+  }
+}`;
+
 // Helper function to get the appropriate client based on environment
 function getClient() {
   return process.env.NODE_ENV === 'development' ? freshClient : client
@@ -542,5 +567,18 @@ export async function getSubjectPageData(slug: string) {
   } catch (error) {
     console.error('Error fetching subject page data:', error)
     return null
+  }
+}
+
+// Fetch function for exam board page
+export async function getExamBoardPage(cloneId: string, subjectPageId: string) {
+  const query = examBoardPageQuery(cloneId, subjectPageId);
+  try {
+    const clientToUse = getClient();
+    const data = await clientToUse.fetch(query);
+    return data;
+  } catch (error) {
+    console.error('Error fetching exam board page:', error);
+    return null;
   }
 }

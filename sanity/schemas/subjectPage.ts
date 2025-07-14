@@ -34,7 +34,17 @@ export default defineType({
           .replace(/\s+/g, '-')
           .slice(0, 50)
       },
-      validation: Rule => Rule.required()
+      validation: Rule => Rule.required().custom(async (slug, context) => {
+        const { document, getClient } = context
+        const cloneRef = (document as any)?.cloneReference?._ref
+        if (!slug || !cloneRef) return true
+        const existing = await getClient({apiVersion: '2023-12-01'})
+          .fetch(
+            `count(*[_type == "subjectPage" && subjectSlug.current == $slug && cloneReference._ref == $cloneRef && _id != $id])`,
+            { slug, cloneRef, id: (document as any)?._id }
+          )
+        return existing === 0 || 'This subject slug is already used for this clone.'
+      })
     }),
     defineField({
       name: 'subjectName',

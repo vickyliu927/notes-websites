@@ -167,23 +167,23 @@ export default function SubjectGrid({ subjectGridData, publishedSubjects, cloneI
 
     // 2. Otherwise, check if there's a published subject page that matches this subject
     if (publishedSubjects) {
-      const matchingSubject = publishedSubjects.find(pubSubject => {
-        // Try multiple matching strategies
-        const subjectNameMatch = pubSubject.subjectName.toLowerCase() === subject.name.toLowerCase();
-        const slugMatch = pubSubject.subjectSlug.current === createSlug(subject.name);
-        // Also try partial matching for cases like "Test Subject 1 - clone 2" vs "Test"
-        const subjectNameInGrid = subject.name.toLowerCase();
-        const subjectNameInPage = pubSubject.subjectName.toLowerCase();
-        const partialMatch = subjectNameInGrid.includes(subjectNameInPage) || subjectNameInPage.includes(subjectNameInGrid);
-        return subjectNameMatch || slugMatch || partialMatch;
-      });
-      if (matchingSubject) {
-        // If we're in a clone context, prefix with clone route
-        if (cloneId) {
-          return `/clone/${cloneId}/${matchingSubject.subjectSlug.current}`;
-        }
-        return `/${matchingSubject.subjectSlug.current}`;
+    const matchingSubject = publishedSubjects.find(pubSubject => {
+      // Try multiple matching strategies
+      const subjectNameMatch = pubSubject.subjectName.toLowerCase() === subject.name.toLowerCase();
+      const slugMatch = pubSubject.subjectSlug.current === createSlug(subject.name);
+      // Also try partial matching for cases like "Test Subject 1 - clone 2" vs "Test"
+      const subjectNameInGrid = subject.name.toLowerCase();
+      const subjectNameInPage = pubSubject.subjectName.toLowerCase();
+      const partialMatch = subjectNameInGrid.includes(subjectNameInPage) || subjectNameInPage.includes(subjectNameInGrid);
+      return subjectNameMatch || slugMatch || partialMatch;
+    });
+    if (matchingSubject) {
+      // If we're in a clone context, prefix with clone route
+      if (cloneId) {
+        return `/clone/${cloneId}/${matchingSubject.subjectSlug.current}`;
       }
+      return `/${matchingSubject.subjectSlug.current}`;
+    }
     }
 
     // 3. Fallback: just use '#'

@@ -9,7 +9,8 @@ import {
   getSubjectPageData, 
   getGlobalSEOSettings, 
   allSubjectSlugsQuery, 
-  contactFormSectionQuery 
+  contactFormSectionQuery,
+  getExamBoardPage
 } from '../../../lib/sanity'
 import { 
   getHeaderWithFallback,
@@ -20,6 +21,7 @@ import {
 import { HeaderData, FooterData, ContactFormSectionData } from '../../../types/sanity'
 import { generateSEOMetadata } from '../../../components/SEOHead'
 import { SEOProvider } from '../../../contexts/SEOContext'
+import ExamBoardPage from '@/components/ExamBoardPage'
 
 // Revalidate every 10 seconds for fresh content during development
 export const revalidate = 10;
@@ -234,6 +236,9 @@ export default async function SubjectPage({ params }: SubjectPageProps) {
     notFound()
   }
 
+  // Fetch exam board page for this subject and clone
+  const examBoardPageData = await getExamBoardPage(cloneId || '', subjectPageData._id);
+
   // Debug log to check the data
   console.log('📍 [SUBJECT_PAGE] Subject page data:', {
     subject,
@@ -242,6 +247,7 @@ export default async function SubjectPage({ params }: SubjectPageProps) {
     topics: subjectPageData.topics?.length,
     title: subjectPageData.title
   })
+  console.log('📍 [SUBJECT_PAGE] Exam board page data:', examBoardPageData);
 
   // Ensure topicBlockBackgroundColor has a default value if not set
   const backgroundColorClass = subjectPageData.topicBlockBackgroundColor || 'bg-blue-500'
@@ -250,6 +256,21 @@ export default async function SubjectPage({ params }: SubjectPageProps) {
   const isContactFormActive = contactFormSectionData?.isActive ?? false;
   const showContactFormOnThisPage = subjectPageData.showContactForm ?? true; // Default to true for backward compatibility
   const shouldShowContactForm = isContactFormActive && showContactFormOnThisPage;
+
+  // If exam board page exists, render it instead of the default subject page UI
+  if (examBoardPageData) {
+    return (
+      <SEOProvider seoData={subjectPageData.seo}>
+        <div className="min-h-screen bg-white">
+          <Header headerData={headerData} isContactFormActive={shouldShowContactForm} homepageUrl="/" />
+          <main>
+            <ExamBoardPage examBoardPageData={examBoardPageData} />
+          </main>
+          <Footer footerData={footerData} isContactFormActive={shouldShowContactForm} />
+        </div>
+      </SEOProvider>
+    )
+  }
 
   return (
     <SEOProvider seoData={subjectPageData.seo}>
