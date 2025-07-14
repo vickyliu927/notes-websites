@@ -146,69 +146,48 @@ export default function SubjectGrid({ subjectGridData, publishedSubjects, cloneI
 
   // Helper function to get the correct URL for a subject
   const getSubjectUrl = (subject: SubjectGridSubject): string => {
-    if (!publishedSubjects) {
-      const originalUrl = subject.viewNotesButton.href || subject.viewNotesButton.url || '#';
-      
+    // 1. If a custom URL is set in Sanity, always use it (with clone logic if needed)
+    const customUrl = subject.viewNotesButton?.href || subject.viewNotesButton?.url;
+    if (customUrl && customUrl !== '#') {
       // If we're in a clone context and the URL doesn't have the proper clone prefix
-      if (cloneId && originalUrl !== '#') {
-        // Extract the subject slug from the URL (handle various formats)
-        const urlParts = originalUrl.split('/').filter(part => part);
-        const lastPart = urlParts[urlParts.length - 1];
-        
+      if (cloneId && !customUrl.includes('/clone/')) {
+        // If it's a relative URL (starts with /), prefix with clone path
+        if (customUrl.startsWith('/') && !customUrl.startsWith(`/clone/${cloneId}`)) {
+          return `/clone/${cloneId}${customUrl}`;
+        }
         // If it looks like a subject slug, create the proper clone URL
-        if (lastPart && lastPart.match(/^[a-z0-9]+(?:-[a-z0-9]+)*$/)) {
+        const urlParts = customUrl.split('/').filter(part => part);
+        const lastPart = urlParts[urlParts.length - 1];
+        if (lastPart && lastPart.match(/^[a-z0-9]+(?:-[a-z0-9]+)*$/) && !customUrl.startsWith('http')) {
           return `/clone/${cloneId}/${lastPart}`;
         }
       }
-      
-      return originalUrl;
+      return customUrl;
     }
 
-    // Check if there's a published subject page that matches this subject
-    const matchingSubject = publishedSubjects.find(pubSubject => {
-      // Try multiple matching strategies
-      const subjectNameMatch = pubSubject.subjectName.toLowerCase() === subject.name.toLowerCase();
-      const slugMatch = pubSubject.subjectSlug.current === createSlug(subject.name);
-      
-      // Also try partial matching for cases like "Test Subject 1 - clone 2" vs "Test"
-      const subjectNameInGrid = subject.name.toLowerCase();
-      const subjectNameInPage = pubSubject.subjectName.toLowerCase();
-      const partialMatch = subjectNameInGrid.includes(subjectNameInPage) || subjectNameInPage.includes(subjectNameInGrid);
-      
-      return subjectNameMatch || slugMatch || partialMatch;
-    });
-
-    if (matchingSubject) {
-      // If we're in a clone context, prefix with clone route
-      if (cloneId) {
-        return `/clone/${cloneId}/${matchingSubject.subjectSlug.current}`;
-      }
-      return `/${matchingSubject.subjectSlug.current}`;
-    }
-
-    // Fallback to original URL or create a dynamic URL
-    const originalUrl = subject.viewNotesButton.href || subject.viewNotesButton.url || '#';
-    
-    // If we're in a clone context and the URL doesn't have the proper clone prefix
-    if (cloneId && originalUrl !== '#' && !originalUrl.includes('/clone/')) {
-      // Extract the subject slug from the URL (handle various formats)
-      const urlParts = originalUrl.split('/').filter(part => part);
-      const lastPart = urlParts[urlParts.length - 1];
-      
-      // If it looks like a subject slug, create the proper clone URL
-      if (lastPart && lastPart.match(/^[a-z0-9]+(?:-[a-z0-9]+)*$/)) {
-        return `/clone/${cloneId}/${lastPart}`;
-      }
-      
-      // If it's a relative URL, prefix it with clone path
-      if (originalUrl.startsWith('/') && !originalUrl.startsWith('/clone/')) {
-        return `/clone/${cloneId}${originalUrl}`;
+    // 2. Otherwise, check if there's a published subject page that matches this subject
+    if (publishedSubjects) {
+      const matchingSubject = publishedSubjects.find(pubSubject => {
+        // Try multiple matching strategies
+        const subjectNameMatch = pubSubject.subjectName.toLowerCase() === subject.name.toLowerCase();
+        const slugMatch = pubSubject.subjectSlug.current === createSlug(subject.name);
+        // Also try partial matching for cases like "Test Subject 1 - clone 2" vs "Test"
+        const subjectNameInGrid = subject.name.toLowerCase();
+        const subjectNameInPage = pubSubject.subjectName.toLowerCase();
+        const partialMatch = subjectNameInGrid.includes(subjectNameInPage) || subjectNameInPage.includes(subjectNameInGrid);
+        return subjectNameMatch || slugMatch || partialMatch;
+      });
+      if (matchingSubject) {
+        // If we're in a clone context, prefix with clone route
+        if (cloneId) {
+          return `/clone/${cloneId}/${matchingSubject.subjectSlug.current}`;
+        }
+        return `/${matchingSubject.subjectSlug.current}`;
       }
     }
-    
-    return originalUrl.startsWith('/subjects/') 
-      ? `/${createSlug(subject.name)}`
-      : originalUrl;
+
+    // 3. Fallback: just use '#'
+    return '#';
   };
 
   // Helper function to format date
