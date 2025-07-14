@@ -12,6 +12,7 @@ import homepageSEO from './seoSettings'
 import contactForm from './contactForm'
 import contactFormSection from './contactFormSection'
 import clone from './clone'
+import examBoardPage from './examBoardPage'
 
 
 export const schemaTypes = [
@@ -28,5 +29,6 @@ export const schemaTypes = [
   homepageSEO,
   contactForm,
   contactFormSection,
-  clone
+  clone,
+  examBoardPage
 ] 
