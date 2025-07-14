@@ -152,7 +152,6 @@ export const getSubjectGridWithFallback = (cloneId: string) => groq`
       sectionDescription,
       subjects,
       viewAllButton,
-      examBoardSettings,
       "cloneName": cloneReference->cloneName,
       "cloneId": cloneReference->cloneId.current,
       cloneSpecificStyles,
@@ -166,7 +165,6 @@ export const getSubjectGridWithFallback = (cloneId: string) => groq`
       sectionDescription,
       subjects,
       viewAllButton,
-      examBoardSettings,
       "cloneName": cloneReference->cloneName,
       "cloneId": cloneReference->cloneId.current,
       cloneSpecificStyles,
@@ -180,7 +178,6 @@ export const getSubjectGridWithFallback = (cloneId: string) => groq`
       sectionDescription,
       subjects,
       viewAllButton,
-      examBoardSettings,
       isActive
     }
   }

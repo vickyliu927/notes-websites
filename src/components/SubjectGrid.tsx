@@ -146,31 +146,8 @@ export default function SubjectGrid({ subjectGridData, publishedSubjects, cloneI
 
   // Helper function to get the correct URL for a subject
   const getSubjectUrl = (subject: SubjectGridSubject): string => {
-    console.log('🔄 [SubjectGrid] Getting URL for subject:', subject.name);
-    console.log('🔄 [SubjectGrid] Exam board settings:', data.examBoardSettings);
-    console.log('🔄 [SubjectGrid] Clone context:', { cloneId });
-    
-    // Check if exam board routing is enabled
-    if (data.examBoardSettings?.useExamBoards) {
-      // Find matching published subject to get the correct slug
-      const matchingSubject = publishedSubjects?.find(pubSubject => 
-        pubSubject.subjectName.toLowerCase() === subject.name.toLowerCase()
-      );
-
-      const subjectSlug = matchingSubject?.subjectSlug.current || createSlug(subject.name);
-      
-      // For both clone and main domains, use the exam board pattern when enabled
-      const pattern = data.examBoardSettings.examBoardUrlPattern || '/exam-boards/{subject}';
-      const finalUrl = pattern.replace('{subject}', subjectSlug);
-      console.log('✅ [SubjectGrid] Using exam board routing:', finalUrl);
-      return finalUrl;
-    }
-
-    console.log('🚫 [SubjectGrid] Exam board routing not enabled, using fallback logic');
-    
     if (!publishedSubjects) {
       const originalUrl = subject.viewNotesButton.href || subject.viewNotesButton.url || '#';
-      console.log('📄 [SubjectGrid] No published subjects, using original URL:', originalUrl);
       
       // If we're in a clone context and the URL doesn't have the proper clone prefix
       if (cloneId && originalUrl !== '#') {
@@ -180,13 +157,10 @@ export default function SubjectGrid({ subjectGridData, publishedSubjects, cloneI
         
         // If it looks like a subject slug, create the proper clone URL
         if (lastPart && lastPart.match(/^[a-z0-9]+(?:-[a-z0-9]+)*$/)) {
-          const cloneUrl = `/clone/${cloneId}/${lastPart}`;
-          console.log('🔗 [SubjectGrid] Clone context detected, using clone URL:', cloneUrl);
-          return cloneUrl;
+          return `/clone/${cloneId}/${lastPart}`;
         }
       }
       
-      console.log('📄 [SubjectGrid] Using original URL:', originalUrl);
       return originalUrl;
     }
 

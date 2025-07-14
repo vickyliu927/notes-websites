@@ -135,8 +135,7 @@ export async function middleware(request: NextRequest) {
     '/sitemap.xml',
     '/debug',
     '/health',
-    '/.well-known/',
-    '/exam-boards/' // Don't rewrite if already going to exam-boards
+    '/.well-known/'
   ]
   
   if (skipPaths.some(path => pathname.startsWith(path))) {
@@ -154,74 +153,7 @@ export async function middleware(request: NextRequest) {
     console.log(`[MIDDLEWARE] Clone lookup result: ${cloneIdFromDomain}`)
     
     if (cloneIdFromDomain) {
-      // Check if this looks like a subject slug that should be rewritten
-      const pathSegments = pathname.split('/').filter(Boolean)
-      
-      // Handle two patterns:
-      // 1. /biology → /exam-boards/biology (exam board selection page)
-      // 2. /biology/aqa → /biology/aqa (subject + exam board specific page - no rewrite needed)
-      
-      if (pathSegments.length === 1) {
-        const potentialSubjectSlug = pathSegments[0]
-        
-        // Get valid subject slugs
-        const validSubjectSlugs = await getValidSubjectSlugs()
-        
-        if (validSubjectSlugs.includes(potentialSubjectSlug)) {
-          console.log(`[MIDDLEWARE] Rewriting ${pathname} to /exam-boards${pathname} for clone: ${cloneIdFromDomain}`)
-          
-          // Rewrite the URL to exam-boards path
-          const url = request.nextUrl.clone()
-          url.pathname = `/exam-boards${pathname}`
-          
-          const response = NextResponse.rewrite(url)
-          response.headers.set('x-clone-id', cloneIdFromDomain)
-          response.headers.set('x-clone-source', 'domain')
-          response.headers.set('x-browser-type', browserInfo.isChrome ? 'chrome' : browserInfo.isSafari ? 'safari' : 'other')
-          response.headers.set('x-rewritten-from', pathname)
-          response.headers.set('x-rewritten-to', `/exam-boards${pathname}`)
-          
-          // Add cache-busting headers to prevent browser caching issues
-          response.headers.set('Cache-Control', 'no-cache, no-store, must-revalidate, proxy-revalidate')
-          response.headers.set('Pragma', 'no-cache')
-          response.headers.set('Expires', '0')
-          response.headers.set('Vary', 'Host, User-Agent')
-          
-          console.log(`[MIDDLEWARE] URL rewrite completed: ${pathname} -> /exam-boards${pathname}`)
-          return response
-        } else {
-          console.log(`[MIDDLEWARE] ${potentialSubjectSlug} is not a valid subject slug, no rewrite needed`)
-        }
-      } else if (pathSegments.length === 2) {
-        const [potentialSubjectSlug, potentialExamBoard] = pathSegments
-        
-        // Get valid subject slugs
-        const validSubjectSlugs = await getValidSubjectSlugs()
-        
-        if (validSubjectSlugs.includes(potentialSubjectSlug)) {
-          console.log(`[MIDDLEWARE] Found subject + exam board pattern: ${pathname} for clone: ${cloneIdFromDomain}`)
-          
-          // This is a subject/examBoard URL - don't rewrite, just add clone headers
-          const response = NextResponse.next()
-          response.headers.set('x-clone-id', cloneIdFromDomain)
-          response.headers.set('x-clone-source', 'domain')
-          response.headers.set('x-browser-type', browserInfo.isChrome ? 'chrome' : browserInfo.isSafari ? 'safari' : 'other')
-          response.headers.set('x-subject-exam-board-route', 'true')
-          
-          // Add cache-busting headers to prevent browser caching issues
-          response.headers.set('Cache-Control', 'no-cache, no-store, must-revalidate, proxy-revalidate')
-          response.headers.set('Pragma', 'no-cache')
-          response.headers.set('Expires', '0')
-          response.headers.set('Vary', 'Host, User-Agent')
-          
-          console.log(`[MIDDLEWARE] Subject + exam board route: ${pathname} (no rewrite needed)`)
-          return response
-        } else {
-          console.log(`[MIDDLEWARE] ${potentialSubjectSlug} is not a valid subject slug, no rewrite needed`)
-        }
-      }
-      
-      // For non-subject paths, just set clone headers without rewriting
+      // For clone domains, we don't need to rewrite URLs - just set headers
       const response = NextResponse.next()
       response.headers.set('x-clone-id', cloneIdFromDomain)
       response.headers.set('x-clone-source', 'domain')

@@ -135,10 +135,7 @@ export const subjectGridQuery = `*[_type == "subjectGrid" && isActive == true &&
     text,
     url
   },
-  examBoardSettings{
-    useExamBoards,
-    examBoardUrlPattern
-  }
+
 }`
 
 // GROQ query to fetch why choose us data
@@ -204,65 +201,7 @@ export const contactFormSectionQuery = `*[_type == "contactFormSection" && isAct
   }
 }`
 
-// GROQ query to fetch exam board data by slug
-export const examBoardBySlugQuery = (slug: string) => `*[_type == "examBoard" && slug.current == "${slug}" && isActive == true][0]{
-  _id,
-  title,
-  subjectName,
-  slug,
-  isActive,
-  cloneReference,
-  heroSection{
-    title,
-    description,
-    ctaButtons{
-      primaryButton{
-        text,
-        href
-      },
-      secondaryButton{
-        text,
-        href
-      }
-    }
-  },
-  examBoards[]{
-    name,
-    fullName,
-    logo{
-      asset->{
-        _id,
-        _ref,
-        url
-      },
-      alt,
-      hotspot,
-      crop
-    },
-    description,
-    additionalInfo,
-    ctaButton{
-      text,
-      href
-    }
-  },
-  sidebarContent{
-    premiumNotesBox{
-      title,
-      subtitle,
-      description,
-      buttonText,
-      buttonUrl
-    },
-    practiceQuestionsBox{
-      title,
-      subtitle,
-      description,
-      buttonText,
-      buttonUrl
-    }
-  }
-}`
+
 
 // GROQ query to fetch footer data
 export const footerQuery = `*[_type == "footer" && isActive == true && !defined(cloneReference)][0]{

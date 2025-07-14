@@ -157,29 +157,7 @@ export default defineType({
       description: 'Enable or disable this subject grid configuration',
       initialValue: true
     }),
-    defineField({
-      name: 'examBoardSettings',
-      title: 'Exam Board Settings',
-      type: 'object',
-      description: 'Configure whether subjects should link to exam board pages',
-      fields: [
-        {
-          name: 'useExamBoards',
-          title: 'Use Exam Board Pages',
-          type: 'boolean',
-          description: 'When enabled, subject "View Notes" buttons will link to exam board selection pages instead of direct subject pages',
-          initialValue: false
-        },
-        {
-          name: 'examBoardUrlPattern',
-          title: 'Exam Board URL Pattern',
-          type: 'string',
-          description: 'URL pattern for exam board pages. Use {subject} as placeholder (e.g., "/exam-boards/{subject}")',
-          initialValue: '/exam-boards/{subject}',
-          hidden: ({ parent }: any) => !parent?.useExamBoards
-        }
-      ]
-    }),
+
     defineField({
       name: 'cloneSpecificStyles',
       title: 'Clone-Specific Styles',

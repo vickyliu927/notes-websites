@@ -87,10 +87,7 @@ export interface SubjectGridSubject {
   viewNotesButton: CTAButton
 }
 
-export interface ExamBoardSettings {
-  useExamBoards?: boolean
-  examBoardUrlPattern?: string
-}
+
 
 export interface SubjectGridData {
   _id: string
@@ -100,7 +97,7 @@ export interface SubjectGridData {
   sectionDescription: string
   subjects: SubjectGridSubject[]
   viewAllButton: CTAButton
-  examBoardSettings?: ExamBoardSettings
+
 }
 
 export interface AdditionalSubject {
@@ -383,50 +380,9 @@ export interface SubjectRequestData {
   requestButton: CTAButton
 }
 
-export interface ExamBoardItem {
-  name: string
-  fullName?: string
-  logo?: SanityImage
-  description: string
-  additionalInfo?: string
-  ctaButton: CTAButton
-}
 
-export interface ExamBoardHeroSection {
-  title: string
-  description: string
-  ctaButtons?: HeroCTAButtons
-}
 
-export interface ExamBoardSidebarBox {
-  title: string
-  subtitle: string
-  description: string
-  buttonText: string
-  buttonUrl?: string
-}
 
-export interface ExamBoardSidebarContent {
-  premiumNotesBox?: ExamBoardSidebarBox
-  practiceQuestionsBox?: ExamBoardSidebarBox
-}
-
-export interface ExamBoardData {
-  _id: string
-  title: string
-  subjectName: string
-  slug: {
-    current: string
-  }
-  isActive: boolean
-  cloneReference?: {
-    _ref: string
-    _type: 'reference'
-  }
-  heroSection: ExamBoardHeroSection
-  examBoards: ExamBoardItem[]
-  sidebarContent?: ExamBoardSidebarContent
-}
 
 // Clone Management Types
 export interface CloneMetadata {

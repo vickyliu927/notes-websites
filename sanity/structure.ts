@@ -119,36 +119,7 @@ export const structure = (S: StructureBuilder) =>
                     .filter('_type == "footer" && !defined(cloneReference)')
                 ),
               
-              // Exam Board
-              S.listItem()
-                .title('Exam Board')
-                .child(
-                  S.list()
-                    .title('Exam Board')
-                    .items([
-                      S.listItem()
-                        .title('📋 All Exam Boards')
-                        .child(
-                          S.documentTypeList('examBoard')
-                            .title('All Exam Boards')
-                            .filter('_type == "examBoard"')
-                        ),
-                      S.listItem()
-                        .title('🌐 Default Site Exam Boards')
-                        .child(
-                          S.documentTypeList('examBoard')
-                            .title('Default Site Exam Boards')
-                            .filter('_type == "examBoard" && !defined(cloneReference)')
-                        ),
-                      S.listItem()
-                        .title('🔗 Clone-Specific Exam Boards')
-                        .child(
-                          S.documentTypeList('examBoard')
-                            .title('Clone-Specific Exam Boards')
-                            .filter('_type == "examBoard" && defined(cloneReference)')
-                        ),
-                    ])
-                ),
+
             ])
         ),
 
@@ -277,14 +248,7 @@ export const structure = (S: StructureBuilder) =>
                                             .title('CIE IGCSE Question Bank Subject Pages')
                                             .filter('_type == "subjectPage" && cloneReference->cloneId.current == "test-clone"')
                                         ),
-                                      // Exam Boards folder
-                                      S.listItem()
-                                        .title('📋 Exam Boards')
-                                        .child(
-                                          S.documentTypeList('examBoard')
-                                            .title('CIE IGCSE Question Bank Exam Boards')
-                                            .filter('_type == "examBoard" && cloneReference->cloneId.current == "test-clone"')
-                                        ),
+
                                     ])
                                 ),
 
@@ -334,13 +298,7 @@ export const structure = (S: StructureBuilder) =>
                                     .title('All Clone Subject Pages')
                                     .filter('_type == "subjectPage" && defined(cloneReference)')
                                 ),
-                              S.listItem()
-                                .title('📋 All Clone Exam Boards')
-                                .child(
-                                  S.documentTypeList('examBoard')
-                                    .title('All Clone Exam Boards')
-                                    .filter('_type == "examBoard" && defined(cloneReference)')
-                                ),
+
                               S.listItem()
                                 .title('🔝 All Clone Headers')
                                 .child(
