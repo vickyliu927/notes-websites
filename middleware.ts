@@ -27,7 +27,7 @@ async function getValidSubjectSlugs(): Promise<string[]> {
   try {
     console.log('[SUBJECT_SLUGS] Fetching subject slugs from Sanity...')
     // Get both the current slug and any base slug (before the first hyphen)
-    const query = `*[_type == "subjectPage" && isPublished == true].subjectSlug.current`
+    const query = `*[_type == "subjectPage" && isPublished == true].subjectSlug`
     const slugs = await client.fetch(query)
     
     // Process slugs to include both full slugs and base slugs

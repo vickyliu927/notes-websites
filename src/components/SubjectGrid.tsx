@@ -170,7 +170,7 @@ export default function SubjectGrid({ subjectGridData, publishedSubjects, cloneI
     const matchingSubject = publishedSubjects.find(pubSubject => {
       // Try multiple matching strategies
       const subjectNameMatch = pubSubject.subjectName.toLowerCase() === subject.name.toLowerCase();
-      const slugMatch = pubSubject.subjectSlug.current === createSlug(subject.name);
+      const slugMatch = pubSubject.subjectSlug === createSlug(subject.name);
       // Also try partial matching for cases like "Test Subject 1 - clone 2" vs "Test"
       const subjectNameInGrid = subject.name.toLowerCase();
       const subjectNameInPage = pubSubject.subjectName.toLowerCase();
@@ -180,9 +180,9 @@ export default function SubjectGrid({ subjectGridData, publishedSubjects, cloneI
     if (matchingSubject) {
       // If we're in a clone context, prefix with clone route
       if (cloneId) {
-        return `/clone/${cloneId}/${matchingSubject.subjectSlug.current}`;
+        return `/clone/${cloneId}/${matchingSubject.subjectSlug}`;
       }
-      return `/${matchingSubject.subjectSlug.current}`;
+      return `/${matchingSubject.subjectSlug}`;
     }
     }
 

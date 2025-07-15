@@ -281,9 +281,7 @@ export interface MoreResourcesSection {
 export interface SubjectPageData {
   _id: string
   title: string
-  subjectSlug: {
-    current: string
-  }
+  subjectSlug: string
   subjectName: string
   pageTitle: string
   pageDescription: string

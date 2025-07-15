@@ -4,6 +4,15 @@ export const structure = (S: StructureBuilder) =>
   S.list()
     .title('Content')
     .items([
+      // Old Files Section - for documents starting with "Online" and ending with "Tutor"
+      S.listItem()
+        .title('🗂️ Old Files')
+        .child(
+          S.documentTypeList('subjectPage')
+            .title('Old Files')
+            .filter('_type == "subjectPage" && title match "Online*" && title match "*Tutor"')
+        ),
+
       // CIE IGCSE Notes Section (moved to root level)
       S.listItem()
         .title('CIE IGCSE Notes')
@@ -98,7 +107,7 @@ export const structure = (S: StructureBuilder) =>
                 .child(
                   S.documentTypeList('subjectPage')
                     .title('Subject Pages')
-                    .filter('_type == "subjectPage" && !defined(cloneReference)')
+                    .filter('_type == "subjectPage" && !defined(cloneReference) && !(title match "Online*" && title match "*Tutor")')
                 ),
               
               // Header
@@ -246,7 +255,7 @@ export const structure = (S: StructureBuilder) =>
                                         .child(
                                           S.documentTypeList('subjectPage')
                                             .title('CIE IGCSE Question Bank Subject Pages')
-                                            .filter('_type == "subjectPage" && cloneReference->cloneId.current == "test-clone"')
+                                            .filter('_type == "subjectPage" && cloneReference->cloneId.current == "test-clone" && !(title match "Online*" && title match "*Tutor")')
                                         ),
 
                                     ])
@@ -323,7 +332,7 @@ export const structure = (S: StructureBuilder) =>
                                         .child(
                                           S.documentTypeList('subjectPage')
                                             .title('UK A-Levels Question Bank Subject Pages')
-                                            .filter('_type == "subjectPage" && cloneReference->cloneId.current == "uk-a-levels-qb"')
+                                            .filter('_type == "subjectPage" && cloneReference->cloneId.current == "uk-a-levels-qb" && !(title match "Online*" && title match "*Tutor")')
                                         ),
                                     ])
                                 ),
@@ -372,7 +381,7 @@ export const structure = (S: StructureBuilder) =>
                                 .child(
                                   S.documentTypeList('subjectPage')
                                     .title('All Clone Subject Pages')
-                                    .filter('_type == "subjectPage" && defined(cloneReference)')
+                                    .filter('_type == "subjectPage" && defined(cloneReference) && !(title match "Online*" && title match "*Tutor")')
                                 ),
 
                               S.listItem()

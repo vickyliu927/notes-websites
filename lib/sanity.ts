@@ -337,7 +337,7 @@ export const allSubjectPagesQuery = `*[_type == "subjectPage" && isPublished == 
 }`
 
 // GROQ query to fetch a specific subject page by slug
-export const subjectPageBySlugQuery = (slug: string) => `*[_type == "subjectPage" && subjectSlug.current == "${slug}" && isPublished == true][0]{
+export const subjectPageBySlugQuery = (slug: string) => `*[_type == "subjectPage" && subjectSlug == "${slug}" && isPublished == true][0]{
   _id,
   title,
   subjectSlug,
@@ -380,7 +380,7 @@ export const subjectPageBySlugQuery = (slug: string) => `*[_type == "subjectPage
 }`
 
 // GROQ query to fetch all subject page slugs (for static generation)
-export const allSubjectSlugsQuery = `*[_type == "subjectPage" && isPublished == true].subjectSlug.current`
+export const allSubjectSlugsQuery = `*[_type == "subjectPage" && isPublished == true].subjectSlug`
 
 // Legacy GROQ query to fetch maths page data (for backward compatibility)
 export const mathsPageQuery = `*[_type == "mathsPage"][0]{
@@ -511,7 +511,7 @@ export async function getGlobalSEOSettings() {
 // Subject page data query (updated to include SEO)
 export async function getSubjectPageData(slug: string) {
   const query = `
-    *[_type == "subjectPage" && subjectSlug.current == $slug && isPublished == true][0] {
+    *[_type == "subjectPage" && subjectSlug == $slug && isPublished == true][0] {
       _id,
       title,
       subjectSlug,

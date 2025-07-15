@@ -17,34 +17,16 @@ export default defineType({
       name: 'cloneReference',
       title: 'Clone Version',
       type: 'reference',
-      description: 'Select which clone version this subject page belongs to',
-      to: [{ type: 'clone' }],
-      validation: Rule => Rule.required()
+      description: 'Select which clone version this subject page belongs to. Leave blank for the default/template version.',
+      to: [{ type: 'clone' }]
     }),
     defineField({
       name: 'subjectSlug',
       title: 'Subject Slug',
-      type: 'slug',
-      description: 'URL slug for this subject (e.g., "maths", "physics", "chemistry"). For clone-specific pages, consider using descriptive slugs like "biology-enhanced" or "biology-v2" to avoid conflicts.',
-      options: {
-        source: 'subjectName',
-        maxLength: 50,
-        slugify: (input: string) => input
-          .toLowerCase()
-          .replace(/\s+/g, '-')
-          .slice(0, 50)
-      },
-      validation: Rule => Rule.required().custom(async (slug, context) => {
-        const { document, getClient } = context
-        const cloneRef = (document as any)?.cloneReference?._ref
-        if (!slug || !cloneRef) return true
-        const existing = await getClient({apiVersion: '2023-12-01'})
-          .fetch(
-            `count(*[_type == "subjectPage" && subjectSlug.current == $slug && cloneReference._ref == $cloneRef && _id != $id])`,
-            { slug, cloneRef, id: (document as any)?._id }
-          )
-        return existing === 0 || 'This subject slug is already used for this clone.'
-      })
+      type: 'string',
+      description: 'URL slug for this subject (e.g., "maths", "physics", "chemistry"). The same slug can be used across different clones.',
+      validation: Rule => Rule.required(),
+      placeholder: 'e.g., maths, physics, chemistry'
     }),
     defineField({
       name: 'subjectName',

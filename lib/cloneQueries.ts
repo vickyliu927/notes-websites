@@ -423,7 +423,7 @@ export const getContactFormWithFallback = (cloneId: string) => groq`
 
 export const getSubjectPageWithFallback = (cloneId: string, slug: string) => groq`
   {
-    "cloneSpecific": *[_type == "subjectPage" && cloneReference->cloneId.current == "${cloneId}" && subjectSlug.current == "${slug}" && isPublished == true][0] {
+    "cloneSpecific": *[_type == "subjectPage" && cloneReference->cloneId.current == "${cloneId}" && subjectSlug == "${slug}" && isPublished == true][0] {
       _id,
       title,
       subjectSlug,
@@ -466,7 +466,7 @@ export const getSubjectPageWithFallback = (cloneId: string, slug: string) => gro
         }
       }
     },
-    "baseline": *[_type == "subjectPage" && cloneReference->baselineClone == true && subjectSlug.current == "${slug}" && isPublished == true][0] {
+    "baseline": *[_type == "subjectPage" && cloneReference->baselineClone == true && subjectSlug == "${slug}" && isPublished == true][0] {
       _id,
       title,
       subjectSlug,
@@ -509,7 +509,7 @@ export const getSubjectPageWithFallback = (cloneId: string, slug: string) => gro
         }
       }
     },
-    "default": *[_type == "subjectPage" && !defined(cloneReference) && subjectSlug.current == "${slug}" && isPublished == true][0] {
+    "default": *[_type == "subjectPage" && !defined(cloneReference) && subjectSlug == "${slug}" && isPublished == true][0] {
       _id,
       title,
       subjectSlug,
