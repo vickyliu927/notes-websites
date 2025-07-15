@@ -380,7 +380,12 @@ export const subjectPageBySlugQuery = (slug: string) => `*[_type == "subjectPage
 }`
 
 // GROQ query to fetch all subject page slugs (for static generation)
-export const allSubjectSlugsQuery = `*[_type == "subjectPage" && isPublished == true].subjectSlug`
+export const allSubjectSlugsQuery = `*[_type == "subjectPage" && isPublished == true]{
+  "slug": select(
+    defined(subjectSlug.current) => subjectSlug.current,
+    subjectSlug
+  )
+}.slug`
 
 // Legacy GROQ query to fetch maths page data (for backward compatibility)
 export const mathsPageQuery = `*[_type == "mathsPage"][0]{
