@@ -109,13 +109,13 @@ export default async function CloneWebsite({ params }: CloneHomepageProps) {
               View Original
             </Link>
             <span className="mx-2">•</span>
-            <a href="/" className="underline hover:no-underline">
-              Homepage
+            <a href={`/clone/${cloneId}/homepage`} className="underline hover:no-underline">
+              Dashboard
             </a>
           </div>
         </div>
 
-        <Header headerData={headerData} isContactFormActive={isContactFormActive} homepageUrl="/" />
+        <Header headerData={headerData} isContactFormActive={isContactFormActive} homepageUrl={`/clone/${cloneId}/homepage`} />
         <main>
           <Hero heroData={heroData} />
           <SubjectGrid subjectGridData={subjectGridData} publishedSubjects={publishedSubjects} cloneId={cloneId} />

@@ -1,18 +1,20 @@
 import { Metadata } from 'next'
 import { headers } from 'next/headers'
 import { notFound } from 'next/navigation'
-import { Header, Footer } from '@/components'
+import { Header, Footer, SubjectTopicGrid, ContactForm, MoreResources } from '@/components'
 import ExamBoardPage from '@/components/ExamBoardPage'
 import { 
   client, 
   headerQuery, 
   footerQuery, 
-  contactFormSectionQuery
+  contactFormSectionQuery,
+  hasActiveExamBoardPages
 } from '../../../../lib/sanity'
 import { 
   getHeaderWithFallback,
   getFooterWithFallback,
-  getContactFormWithFallback
+  getContactFormWithFallback,
+  getSubjectPageWithFallback
 } from '../../../../lib/cloneQueries'
 import { getSubjectPageForClone } from '../../../../lib/cloneUtils'
 import { HeaderData, FooterData, ContactFormSectionData, SubjectPageData } from '../../../../types/sanity'
@@ -210,9 +212,87 @@ async function getExamBoardData(subject: string, examBoard: string, cloneId?: st
   }
 }
 
+// Helper function to get clone-aware subject page data
+async function getCloneAwareSubjectPageData(slug: string, cloneId?: string): Promise<SubjectPageData | null> {
+  try {
+    console.log(`[EXAM_BOARD] Fetching subject page data for slug: ${slug}${cloneId ? ` with clone: ${cloneId}` : ' (default)'}...`);
+    
+    if (cloneId) {
+      const fallbackResult = await client.fetch(getSubjectPageWithFallback(cloneId, slug));
+      const subjectPageData = selectBestData(fallbackResult) as SubjectPageData;
+      console.log(`[EXAM_BOARD] Fetched clone-aware subject page data:`, subjectPageData);
+      return subjectPageData;
+    } else {
+      // For the main website (no cloneId), use the fallback system with the baseline clone
+      const baselineClone = await client.fetch(`*[_type == "clone" && baselineClone == true][0]{cloneId}`);
+      if (baselineClone?.cloneId?.current) {
+        const fallbackResult = await client.fetch(getSubjectPageWithFallback(baselineClone.cloneId.current, slug));
+        const subjectPageData = selectBestData(fallbackResult) as SubjectPageData;
+        console.log('[EXAM_BOARD] Fetched default subject page data using fallback system:', subjectPageData);
+        return subjectPageData;
+      } else {
+        console.log('[EXAM_BOARD] No baseline clone found, falling back to legacy method');
+        return null;
+      }
+    }
+  } catch (error) {
+    console.error('[EXAM_BOARD] Error fetching subject page data:', error);
+    return null;
+  }
+}
+
 export default async function ExamBoardPageHandler({ params }: ExamBoardPageProps) {
   const { subject, examBoard } = await params
   
+  // Check if there are any active exam board pages in the system
+  const { hasActive: hasActiveExamBoards, cloneId: examBoardCloneId } = await hasActiveExamBoardPages();
+  
+  console.log('📍 [EXAM_BOARD] Active exam board check:', { hasActiveExamBoards, examBoardCloneId, subject, examBoard });
+
+  // NEW URL STRUCTURE: If exam board pages are active, show subject content at /[subject]/[examBoard]
+  if (hasActiveExamBoards && examBoardCloneId) {
+    console.log('📍 [EXAM_BOARD] Showing subject content for exam board:', { subject, examBoard, examBoardCloneId });
+    
+    // Get the subject page data for the clone that has the active exam board page
+    const subjectPageData = await getCloneAwareSubjectPageData(subject, examBoardCloneId);
+    
+    if (!subjectPageData) {
+      notFound()
+    }
+
+    // Fetch layout components for the exam board clone
+    const headerData = await getHeaderData(examBoardCloneId);
+    const footerData = await getFooterData(examBoardCloneId);
+    const contactFormSectionData = await getContactFormSectionData(examBoardCloneId);
+
+    // Ensure topicBlockBackgroundColor has a default value if not set
+    const backgroundColorClass = subjectPageData.topicBlockBackgroundColor || 'bg-blue-500'
+
+    // Check if contact form is active
+    const isContactFormActive = contactFormSectionData?.isActive ?? false;
+    const showContactFormOnThisPage = subjectPageData.showContactForm ?? true;
+    const shouldShowContactForm = isContactFormActive && showContactFormOnThisPage;
+
+    return (
+      <SEOProvider seoData={subjectPageData.seo}>
+        <div className="min-h-screen bg-white">
+          <Header headerData={headerData} isContactFormActive={shouldShowContactForm} homepageUrl="/" />
+          <main>
+            {/* Subject content with exam board context */}
+            <SubjectTopicGrid 
+              topics={subjectPageData.topics || []} 
+              topicBlockBackgroundColor={backgroundColorClass}
+            />
+            <MoreResources moreResourcesData={subjectPageData.moreResources} />
+            {shouldShowContactForm && <ContactForm contactFormData={contactFormSectionData} />}
+          </main>
+          <Footer footerData={footerData} isContactFormActive={shouldShowContactForm} />
+        </div>
+      </SEOProvider>
+    )
+  }
+
+  // FALLBACK: Original exam board page logic when no active exam board pages exist
   // Validate exam board exists in database
   const examBoardInfo = await client.fetch(`*[_type == "examBoard" && (shortName == "${examBoard}" || slug.current == "${examBoard}") && isActive == true][0] {
     _id,

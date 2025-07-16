@@ -45,7 +45,47 @@ import {
 // Revalidate every 10 seconds for fresh content during development
 export const revalidate = 10;
 
-
+// Function to get clone ID by domain
+async function getCloneIdByDomain(hostname: string): Promise<string | null> {
+  console.log(`🔍 [DOMAIN_LOOKUP] Searching for hostname: "${hostname}"`)
+  console.log(`🔍 [DOMAIN_LOOKUP] Hostname type: ${typeof hostname}, length: ${hostname.length}`)
+  
+  try {
+    // Query Sanity for clone with matching custom domain from domains array
+    const query = `
+      *[_type == "clone" && $hostname in metadata.domains && isActive == true][0] {
+        cloneId,
+        metadata
+      }
+    `
+    console.log(`🔍 [DOMAIN_LOOKUP] Executing query with hostname: "${hostname}"`)
+    
+    const result = await client.fetch(query, { hostname })
+    console.log(`🔍 [DOMAIN_LOOKUP] Query result:`, JSON.stringify(result, null, 2))
+    
+    if (result?.cloneId?.current) {
+      console.log(`✅ [DOMAIN_LOOKUP] Found clone: ${result.cloneId.current}`)
+      return result.cloneId.current
+    }
+    
+    console.log(`❌ [DOMAIN_LOOKUP] No clone found for hostname: "${hostname}"`)
+    
+    // Debug: Check what domains ARE configured
+    const allClones = await client.fetch(`
+      *[_type == "clone" && isActive == true] {
+        cloneId,
+        cloneName,
+        "domains": metadata.domains
+      }
+    `)
+    console.log(`🔍 [DOMAIN_LOOKUP] Available clone domains:`, JSON.stringify(allClones, null, 2))
+    
+    return null
+  } catch (error) {
+    console.error('❌ [DOMAIN_LOOKUP] Error:', error instanceof Error ? error.message : String(error))
+    return null
+  }
+}
 
 // Helper function to select best data from fallback query
 function selectBestData<T>(fallbackResult: { cloneSpecific?: T; baseline?: T; default?: T }): T | undefined {
@@ -56,7 +96,14 @@ function selectBestData<T>(fallbackResult: { cloneSpecific?: T; baseline?: T; de
 export async function generateMetadata(): Promise<Metadata> {
   try {
     const headersList = await headers();
-    const cloneId = headersList.get('x-clone-id');
+    const host = headersList.get('host');
+    const hostname = host?.split(':')[0] || 'localhost';
+    
+    // Check if this is a clone request
+    let cloneId = null;
+    if (hostname !== 'localhost' && !hostname.includes('127.0.0.1') && !hostname.includes('.local')) {
+      cloneId = await getCloneIdByDomain(hostname);
+    }
 
     // For now, return default metadata (can be enhanced later with clone-specific SEO)
     return {
@@ -269,14 +316,36 @@ async function getSEOSettings() {
 }
 
 export default async function Home() {
-  // Read headers to get clone information (set by middleware)
+  // Read headers to get host information
   const headersList = await headers();
-  const cloneId = headersList.get('x-clone-id');
-  const cloneSource = headersList.get('x-clone-source');
   const host = headersList.get('host');
   const hostname = host?.split(':')[0] || 'localhost';
   
-  console.log('🌐 [HOMEPAGE] Request info:', { hostname, cloneId, cloneSource });
+  console.log('🌐 [HOMEPAGE] Raw host header:', host);
+  console.log('🌐 [HOMEPAGE] Extracted hostname:', hostname);
+  console.log('🌐 [HOMEPAGE] All headers:', Object.fromEntries(headersList.entries()));
+  
+  // Directly check if this is a custom domain
+  let cloneId = null;
+  const isLocalDevelopment = hostname === 'localhost' || hostname.includes('127.0.0.1') || hostname.includes('.local');
+  
+  console.log('🌐 [HOMEPAGE] Is local development?', isLocalDevelopment);
+  
+  if (!isLocalDevelopment) {
+    console.log('🌐 [HOMEPAGE] Custom domain detected, checking for clone...');
+    cloneId = await getCloneIdByDomain(hostname);
+  } else {
+    console.log('🌐 [HOMEPAGE] Local development detected, but forcing clone for testing...');
+    // TEMPORARY: Force clone detection for local testing
+    cloneId = 'test-clone';
+  }
+  
+  console.log('🌐 [HOMEPAGE] Final clone detection result:', { 
+    host, 
+    hostname, 
+    isLocalDevelopment, 
+    cloneId 
+  });
 
   // Fetch all data with clone awareness
   const headerData = await getHeaderData(cloneId || undefined);

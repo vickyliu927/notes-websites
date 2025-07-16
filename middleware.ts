@@ -141,30 +141,6 @@ export async function middleware(request: NextRequest) {
   if (skipPaths.some(path => pathname.startsWith(path))) {
     return NextResponse.next()
   }
-
-  // Redirect old clone URLs to clean URLs
-  // Pattern: /clone/[cloneId]/[subject] -> /[subject]
-  const cloneUrlMatch = pathname.match(/^\/clone\/([^\/]+)\/([^\/]+)$/)
-  if (cloneUrlMatch) {
-    const [, cloneId, subject] = cloneUrlMatch
-    console.log(`[MIDDLEWARE] Redirecting old clone URL from /clone/${cloneId}/${subject} to /${subject}`)
-    
-    // Redirect to the clean URL
-    const redirectUrl = new URL(`/${subject}`, request.url)
-    return NextResponse.redirect(redirectUrl, 301) // Permanent redirect
-  }
-
-  // Redirect old clone homepage URLs to clean URLs  
-  // Pattern: /clone/[cloneId]/homepage -> /
-  const cloneHomepageMatch = pathname.match(/^\/clone\/([^\/]+)\/homepage$/)
-  if (cloneHomepageMatch) {
-    const [, cloneId] = cloneHomepageMatch
-    console.log(`[MIDDLEWARE] Redirecting old clone homepage URL from /clone/${cloneId}/homepage to /`)
-    
-    // Redirect to the clean homepage URL
-    const redirectUrl = new URL('/', request.url)
-    return NextResponse.redirect(redirectUrl, 301) // Permanent redirect
-  }
   
   // Production domain detection - skip development domains
   if (hostname !== 'localhost' && 

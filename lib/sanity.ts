@@ -587,3 +587,23 @@ export async function getExamBoardPage(cloneId: string) {
     return null;
   }
 }
+
+// Check if there are any active exam board pages in the system
+export async function hasActiveExamBoardPages(): Promise<{ hasActive: boolean; cloneId?: string }> {
+  try {
+    const activeExamBoardPage = await client.fetch(`*[_type == "examBoardPage" && isActive == true][0]{
+      _id,
+      cloneReference->{
+        cloneId
+      }
+    }`);
+    
+    return {
+      hasActive: !!activeExamBoardPage,
+      cloneId: activeExamBoardPage?.cloneReference?.cloneId?.current
+    };
+  } catch (error) {
+    console.error('Error checking active exam board pages:', error);
+    return { hasActive: false };
+  }
+}

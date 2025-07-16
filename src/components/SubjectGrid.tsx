@@ -155,11 +155,11 @@ export default function SubjectGrid({ subjectGridData, publishedSubjects, cloneI
         if (customUrl.startsWith('/') && !customUrl.startsWith(`/clone/${cloneId}`)) {
           return `/clone/${cloneId}${customUrl}`;
         }
-        // If it looks like a subject slug, use the clean URL structure
+        // If it looks like a subject slug, create the proper clone URL
         const urlParts = customUrl.split('/').filter(part => part);
         const lastPart = urlParts[urlParts.length - 1];
         if (lastPart && lastPart.match(/^[a-z0-9]+(?:-[a-z0-9]+)*$/) && !customUrl.startsWith('http')) {
-          return `/${lastPart}`;
+          return `/clone/${cloneId}/${lastPart}`;
         }
       }
       return customUrl;
@@ -178,7 +178,10 @@ export default function SubjectGrid({ subjectGridData, publishedSubjects, cloneI
       return subjectNameMatch || slugMatch || partialMatch;
     });
     if (matchingSubject) {
-      // Use clean URL structure for both clone and main websites
+      // If we're in a clone context, prefix with clone route
+      if (cloneId) {
+        return `/clone/${cloneId}/${matchingSubject.subjectSlug}`;
+      }
       return `/${matchingSubject.subjectSlug}`;
     }
     }

@@ -10,7 +10,8 @@ import {
   getGlobalSEOSettings, 
   allSubjectSlugsQuery, 
   contactFormSectionQuery,
-  getExamBoardPage
+  getExamBoardPage,
+  hasActiveExamBoardPages
 } from '../../../lib/sanity'
 import { 
   getHeaderWithFallback,
@@ -174,11 +175,18 @@ export async function generateMetadata({ params }: SubjectPageProps): Promise<Me
   try {
   const { subject } = await params
     
-    // Read headers to get clone information (set by middleware)
+    // Read headers to detect clone
     const headersList = await headers();
-    const cloneId = headersList.get('x-clone-id');
+    const host = headersList.get('host');
+    const hostname = host?.split(':')[0] || 'localhost';
     
-    console.log('📍 [SUBJECT_META] Clone detection:', { cloneId, subject });
+    // Check if this is a custom domain
+    let cloneId = null;
+    if (hostname !== 'localhost' && !hostname.includes('127.0.0.1') && !hostname.includes('.local')) {
+      cloneId = await getCloneIdByDomain(hostname);
+    }
+    
+    console.log('📍 [SUBJECT_META] Clone detection:', { hostname, cloneId, subject });
     
     const subjectPageData = await getCloneAwareSubjectPageData(subject, cloneId || undefined)
   
@@ -214,14 +222,21 @@ export async function generateMetadata({ params }: SubjectPageProps): Promise<Me
 export default async function SubjectPage({ params }: SubjectPageProps) {
   const { subject } = await params
   
-  // Read headers to get clone information (set by middleware)
+  // Read headers to get host information
   const headersList = await headers();
-  const cloneId = headersList.get('x-clone-id');
-  const cloneSource = headersList.get('x-clone-source');
   const host = headersList.get('host');
   const hostname = host?.split(':')[0] || 'localhost';
   
-  console.log('📍 [SUBJECT_PAGE] Request info:', { hostname, cloneId, cloneSource, subject });
+  console.log('📍 [SUBJECT_PAGE] Checking domain:', hostname);
+  
+  // Directly check if this is a custom domain
+  let cloneId = null;
+  if (hostname !== 'localhost' && !hostname.includes('127.0.0.1') && !hostname.includes('.local')) {
+    console.log('📍 [SUBJECT_PAGE] Custom domain detected, checking for clone...');
+    cloneId = await getCloneIdByDomain(hostname);
+  }
+  
+  console.log('📍 [SUBJECT_PAGE] Clone detection result:', { hostname, cloneId, subject });
 
   // Fetch all data with clone awareness
   const headerData = await getHeaderData(cloneId || undefined);
@@ -233,8 +248,10 @@ export default async function SubjectPage({ params }: SubjectPageProps) {
     notFound()
   }
 
-  // Fetch exam board page for this clone (applies to all subjects)
-  const examBoardPageData = await getExamBoardPage(cloneId || '');
+  // Check if there are any active exam board pages in the system
+  const { hasActive: hasActiveExamBoards, cloneId: examBoardCloneId } = await hasActiveExamBoardPages();
+  
+  console.log('📍 [SUBJECT_PAGE] Active exam board check:', { hasActiveExamBoards, examBoardCloneId });
 
   // Debug log to check the data
   console.log('📍 [SUBJECT_PAGE] Subject page data:', {
@@ -244,7 +261,6 @@ export default async function SubjectPage({ params }: SubjectPageProps) {
     topics: subjectPageData.topics?.length,
     title: subjectPageData.title
   })
-  console.log('📍 [SUBJECT_PAGE] Exam board page data:', examBoardPageData);
 
   // Ensure topicBlockBackgroundColor has a default value if not set
   const backgroundColorClass = subjectPageData.topicBlockBackgroundColor || 'bg-blue-500'
@@ -254,19 +270,24 @@ export default async function SubjectPage({ params }: SubjectPageProps) {
   const showContactFormOnThisPage = subjectPageData.showContactForm ?? true; // Default to true for backward compatibility
   const shouldShowContactForm = isContactFormActive && showContactFormOnThisPage;
 
-  // If exam board page exists, render it instead of the default subject page UI
-  if (examBoardPageData) {
-    return (
-      <SEOProvider seoData={subjectPageData.seo}>
-        <div className="min-h-screen bg-white">
-          <Header headerData={headerData} isContactFormActive={shouldShowContactForm} homepageUrl="/" />
-          <main>
-            <ExamBoardPage examBoardPageData={examBoardPageData} />
-          </main>
-          <Footer footerData={footerData} isContactFormActive={shouldShowContactForm} />
-        </div>
-      </SEOProvider>
-    )
+  // NEW URL STRUCTURE: If there are active exam board pages, show exam board selection at /[subject]
+  if (hasActiveExamBoards && examBoardCloneId) {
+    const examBoardPageData = await getExamBoardPage(examBoardCloneId);
+    
+    if (examBoardPageData) {
+      console.log('📍 [SUBJECT_PAGE] Showing exam board selection for:', { subject, examBoardCloneId });
+      return (
+        <SEOProvider seoData={subjectPageData.seo}>
+          <div className="min-h-screen bg-white">
+            <Header headerData={headerData} isContactFormActive={shouldShowContactForm} homepageUrl="/" />
+            <main>
+              <ExamBoardPage examBoardPageData={examBoardPageData} />
+            </main>
+            <Footer footerData={footerData} isContactFormActive={shouldShowContactForm} />
+          </div>
+        </SEOProvider>
+      )
+    }
   }
 
   return (

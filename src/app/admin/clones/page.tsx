@@ -192,7 +192,7 @@ export default async function CloneManagementPage() {
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                       <div className="flex space-x-2">
                         <a
-                          href={clone.metadata?.domains?.[0] ? `http://${clone.metadata.domains[0]}` : '/'}
+                          href={`/clone/${clone.cloneId.current}/homepage`}
                           className="text-blue-600 hover:text-blue-900"
                         >
                           View
