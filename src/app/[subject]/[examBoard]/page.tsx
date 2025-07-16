@@ -287,14 +287,39 @@ export default async function ExamBoardPageHandler({ params }: ExamBoardPageProp
         <div className="min-h-screen bg-white">
           <Header headerData={headerData} isContactFormActive={shouldShowContactForm} homepageUrl="/" />
           <main>
-            {/* Subject content with exam board context */}
-            <SubjectTopicGrid 
-              topics={subjectPageData.topics || []} 
-              topicBlockBackgroundColor={backgroundColorClass}
-            />
-            <MoreResources moreResourcesData={subjectPageData.moreResources} />
-            {shouldShowContactForm && <ContactForm contactFormData={contactFormSectionData} />}
+            {/* Hero Section */}
+            <section className="bg-white py-16">
+              <div className="container mx-auto px-4">
+                <div className="text-center max-w-4xl mx-auto">
+                  <h1 className="font-serif font-bold mb-6" style={{fontSize: '55px', color: '#243b53', letterSpacing: '-0.01em', fontWeight: '600'}}>
+                    {subjectPageData.pageTitle}
+                  </h1>
+                  <p className="text-lg md:text-xl text-gray-600 leading-relaxed">
+                    {subjectPageData.pageDescription}
+                  </p>
+                </div>
+              </div>
+            </section>
+
+            {/* Topics Grid Section */}
+            <section className="py-16 bg-gray-50">
+              <div className="container mx-auto px-4">
+                <SubjectTopicGrid 
+                  topics={subjectPageData.topics || []} 
+                  topicBlockBackgroundColor={backgroundColorClass}
+                />
+              </div>
+            </section>
           </main>
+          
+          {/* More Resources Section - only show if active */}
+          <MoreResources moreResourcesData={subjectPageData.moreResources} />
+          
+          {/* Contact Form Section - only show if active */}
+          {shouldShowContactForm && (
+            <ContactForm contactFormData={contactFormSectionData} />
+          )}
+          
           <Footer footerData={footerData} isContactFormActive={shouldShowContactForm} />
         </div>
       </SEOProvider>
