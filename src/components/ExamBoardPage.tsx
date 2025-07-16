@@ -32,30 +32,33 @@ interface ExamBoardPageData {
       buttonUrl: string
     }
   }
+  sidebar?: {
+    isActive: boolean
+    studyNotesButton: {
+      buttonText: string
+      buttonUrl: string
+    }
+    practiceQuestionsButton: {
+      buttonText: string
+      buttonUrl: string
+    }
+  }
 }
 
-interface SidebarData {
-  practiceQuestionsButton: {
-    buttonText: string
-    buttonUrl: string
-  }
-  studyNotesButton: {
-    buttonText: string
-    buttonUrl: string
-  }
-  isActive: boolean
-}
+
 
 interface ExamBoardPageProps {
   examBoardPageData: ExamBoardPageData
   currentSubject?: string
-  sidebarData?: SidebarData
 }
 
-export const ExamBoardPage: React.FC<ExamBoardPageProps> = ({ examBoardPageData, currentSubject, sidebarData }) => {
-  // Debug logging
-  console.log('ExamBoardPage sidebarData:', sidebarData);
-  console.log('ExamBoardPage sidebarData.isActive:', sidebarData?.isActive);
+export const ExamBoardPage: React.FC<ExamBoardPageProps> = ({ examBoardPageData, currentSubject }) => {
+  // Debug logging - now using sidebar from examBoardPageData
+  console.log('ExamBoardPage examBoardPageData.sidebar:', examBoardPageData.sidebar);
+  console.log('ExamBoardPage sidebar.isActive:', examBoardPageData.sidebar?.isActive);
+  
+  // Use sidebar data from examBoardPageData instead of separate prop
+  const sidebarConfig = examBoardPageData.sidebar;
   
   const generateExamBoardUrl = (board: ExamBoard): string => {
     if (!currentSubject) {
@@ -127,8 +130,8 @@ export const ExamBoardPage: React.FC<ExamBoardPageProps> = ({ examBoardPageData,
             </div>
           ))}
         </div>
-        {/* Sidebar - Debug: Always show if data exists (ignoring isActive for now) */}
-        {sidebarData && (
+        {/* Sidebar - Only show if data exists and is active */}
+        {sidebarConfig && sidebarConfig.isActive && (
           <aside className="w-full lg:w-80 flex-shrink-0 space-y-6">
             {/* Premium Study Notes Card */}
             <div className="rounded-2xl p-8 text-white" style={{ backgroundColor: '#001a96' }}>
@@ -148,10 +151,10 @@ export const ExamBoardPage: React.FC<ExamBoardPageProps> = ({ examBoardPageData,
                 Study notes written by top graduates. Save hours of prep time with structured summaries.
               </p>
               <a 
-                href={sidebarData.studyNotesButton.buttonUrl} 
+                href={sidebarConfig.studyNotesButton.buttonUrl} 
                 className="inline-flex items-center gap-2 bg-white text-blue-900 px-6 py-3 rounded-xl font-medium hover:bg-blue-50 transition-colors duration-200"
               >
-                {sidebarData.studyNotesButton.buttonText}
+                {sidebarConfig.studyNotesButton.buttonText}
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                 </svg>
@@ -176,10 +179,10 @@ export const ExamBoardPage: React.FC<ExamBoardPageProps> = ({ examBoardPageData,
                 Master exam techniques with targeted practice questions. Get instant feedback and detailed explanations.
               </p>
               <a 
-                href={sidebarData.practiceQuestionsButton.buttonUrl} 
+                href={sidebarConfig.practiceQuestionsButton.buttonUrl} 
                 className="inline-flex items-center gap-2 bg-white text-orange-900 px-6 py-3 rounded-xl font-medium hover:bg-orange-50 transition-colors duration-200"
               >
-                {sidebarData.practiceQuestionsButton.buttonText}
+                {sidebarConfig.practiceQuestionsButton.buttonText}
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                 </svg>

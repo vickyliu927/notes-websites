@@ -11,8 +11,7 @@ import {
   allSubjectSlugsQuery, 
   contactFormSectionQuery,
   getExamBoardPage,
-  hasActiveExamBoardPages,
-  getExamBoardSidebar
+  hasActiveExamBoardPages
 } from '../../../lib/sanity'
 import { 
   getHeaderWithFallback,
@@ -274,7 +273,6 @@ export default async function SubjectPage({ params }: SubjectPageProps) {
   // NEW URL STRUCTURE: If there are active exam board pages, show exam board selection at /[subject]
   if (hasActiveExamBoards && examBoardCloneId) {
     const examBoardPageData = await getExamBoardPage(examBoardCloneId);
-    const sidebarData = await getExamBoardSidebar(examBoardCloneId);
     
     if (examBoardPageData) {
       console.log('📍 [SUBJECT_PAGE] Showing exam board selection for:', { subject, examBoardCloneId });
@@ -283,7 +281,7 @@ export default async function SubjectPage({ params }: SubjectPageProps) {
           <div className="min-h-screen bg-white">
             <Header headerData={headerData} isContactFormActive={shouldShowContactForm} homepageUrl="/" />
             <main>
-              <ExamBoardPage examBoardPageData={examBoardPageData} currentSubject={subject} sidebarData={sidebarData} />
+              <ExamBoardPage examBoardPageData={examBoardPageData} currentSubject={subject} />
             </main>
             <Footer footerData={footerData} isContactFormActive={shouldShowContactForm} />
           </div>

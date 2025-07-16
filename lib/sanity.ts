@@ -434,6 +434,17 @@ export const examBoardPageQuery = (cloneId: string) => `*[_type == "examBoardPag
       buttonUrl
     }
   },
+  sidebar {
+    isActive,
+    studyNotesButton {
+      buttonText,
+      buttonUrl
+    },
+    practiceQuestionsButton {
+      buttonText,
+      buttonUrl
+    }
+  },
   examBoards[] {
     id,
     name,

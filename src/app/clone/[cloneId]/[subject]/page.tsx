@@ -9,7 +9,7 @@ import {
   ExamBoardPage
 } from '@/components'
 import { validateCloneId, getCompleteCloneData, getSubjectPageForClone } from '../../../../../lib/cloneUtils'
-import { getExamBoardPage, getExamBoardSidebar } from '../../../../../lib/sanity'
+import { getExamBoardPage } from '../../../../../lib/sanity'
 import { generateSEOMetadata } from '../../../../../components/SEOHead'
 import { SEOProvider } from '../../../../../contexts/SEOContext'
 import { HeaderData, FooterData, ContactFormSectionData, SubjectPageData } from '../../../../../types/sanity'
@@ -103,7 +103,6 @@ export default async function CloneSubjectPage({ params }: CloneSubjectPageProps
 
   // Fetch exam board page for this clone (applies to all subjects)
   const examBoardPageData = await getExamBoardPage(cloneId)
-  const sidebarData = await getExamBoardSidebar(cloneId)
 
   // Ensure topicBlockBackgroundColor has a default value if not set
   const backgroundColorClass = subjectData.topicBlockBackgroundColor || 'bg-blue-500'
@@ -120,7 +119,7 @@ export default async function CloneSubjectPage({ params }: CloneSubjectPageProps
         <div className="min-h-screen bg-white">
           <Header headerData={headerData} isContactFormActive={shouldShowContactForm} homepageUrl={`/clone/${cloneId}/homepage`} />
           <main>
-            <ExamBoardPage examBoardPageData={examBoardPageData} currentSubject={subject} sidebarData={sidebarData} />
+            <ExamBoardPage examBoardPageData={examBoardPageData} currentSubject={subject} />
           </main>
           {shouldShowContactForm && contactFormData && (
             <ContactForm contactFormData={contactFormData} />

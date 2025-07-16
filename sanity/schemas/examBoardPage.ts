@@ -93,6 +93,61 @@ export default defineType({
       description: 'Configure the CTA buttons that appear under the exam board page description'
     }),
     defineField({
+      name: 'sidebar',
+      title: 'Sidebar Configuration',
+      type: 'object',
+      fields: [
+        {
+          name: 'isActive',
+          title: 'Show Sidebar',
+          type: 'boolean',
+          description: 'Toggle to show/hide the sidebar on exam board pages',
+          initialValue: false
+        },
+        {
+          name: 'studyNotesButton',
+          title: 'Study Notes Button',
+          type: 'object',
+          fields: [
+            {
+              name: 'buttonText',
+              title: 'Button Text',
+              type: 'string',
+              description: 'Text for the study notes button (e.g., "Access Notes")',
+              initialValue: 'Access Notes'
+            },
+            {
+              name: 'buttonUrl',
+              title: 'Button URL',
+              type: 'string',
+              description: 'URL for the study notes button'
+            }
+          ]
+        },
+        {
+          name: 'practiceQuestionsButton',
+          title: 'Practice Questions Button',
+          type: 'object',
+          fields: [
+            {
+              name: 'buttonText',
+              title: 'Button Text',
+              type: 'string',
+              description: 'Text for the practice questions button (e.g., "Start Practice")',
+              initialValue: 'Start Practice'
+            },
+            {
+              name: 'buttonUrl',
+              title: 'Button URL',
+              type: 'string',
+              description: 'URL for the practice questions button'
+            }
+          ]
+        }
+      ],
+      description: 'Configure the sidebar that appears on exam board pages'
+    }),
+    defineField({
       name: 'examBoards',
       title: 'Exam Boards',
       type: 'array',
