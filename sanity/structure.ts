@@ -181,164 +181,91 @@ export const structure = (S: StructureBuilder) =>
                       S.listItem()
                         .title('📋 All Clone Content By Website')
                         .child(
-                          S.list()
+                          S.documentTypeList('clone')
                             .title('All Clone Content By Website')
-                            .items([
-                              // CIE IGCSE Question Bank Content
-                              S.listItem()
-                                .title('📚 CIE IGCSE Question Bank')
-                                .child(
-                                  S.list()
-                                    .title('CIE IGCSE Question Bank Content')
-                                    .items([
-                                      // Homepage folder
-                                      S.listItem()
-                                        .title('📄 Homepage')
-                                        .child(
-                                          S.list()
-                                            .title('CIE IGCSE Question Bank Homepage')
-                                            .items([
-                                              S.listItem()
-                                                .title('🔝 Header')
-                                                .child(
-                                                  S.documentTypeList('header')
-                                                    .title('CIE IGCSE Question Bank Headers')
-                                                    .filter('_type == "header" && cloneReference->cloneId.current == "test-clone"')
-                                                ),
-                                              S.listItem()
-                                                .title('🎯 Hero Section')
-                                                .child(
-                                                  S.documentTypeList('hero')
-                                                    .title('CIE IGCSE Question Bank Heroes')
-                                                    .filter('_type == "hero" && cloneReference->cloneId.current == "test-clone"')
-                                                ),
-                                              S.listItem()
-                                                .title('📊 Subject Grid')
-                                                .child(
-                                                  S.documentTypeList('subjectGrid')
-                                                    .title('CIE IGCSE Question Bank Subject Grids')
-                                                    .filter('_type == "subjectGrid" && cloneReference->cloneId.current == "test-clone"')
-                                                ),
-                                              S.listItem()
-                                                .title('⭐ Why Choose Us')
-                                                .child(
-                                                  S.documentTypeList('whyChooseUs')
-                                                    .title('CIE IGCSE Question Bank Why Choose Us')
-                                                    .filter('_type == "whyChooseUs" && cloneReference->cloneId.current == "test-clone"')
-                                                ),
-                                              S.listItem()
-                                                .title('❓ FAQ Section')
-                                                .child(
-                                                  S.documentTypeList('faq')
-                                                    .title('CIE IGCSE Question Bank FAQs')
-                                                    .filter('_type == "faq" && cloneReference->cloneId.current == "test-clone"')
-                                                ),
-                                              S.listItem()
-                                                .title('📞 Contact Form')
-                                                .child(
-                                                  S.documentTypeList('contactFormSection')
-                                                    .title('CIE IGCSE Question Bank Contact Forms')
-                                                    .filter('_type == "contactFormSection" && cloneReference->cloneId.current == "test-clone"')
-                                                ),
-                                              S.listItem()
-                                                .title('🔽 Footer')
-                                                .child(
-                                                  S.documentTypeList('footer')
-                                                    .title('CIE IGCSE Question Bank Footers')
-                                                    .filter('_type == "footer" && cloneReference->cloneId.current == "test-clone"')
-                                                ),
-                                            ])
-                                        ),
-                                      // Subject Pages folder
-                                      S.listItem()
-                                        .title('📚 Subject Pages')
-                                        .child(
-                                          S.documentTypeList('subjectPage')
-                                            .title('CIE IGCSE Question Bank Subject Pages')
-                                            .filter('_type == "subjectPage" && cloneReference->cloneId.current == "test-clone" && !(title match "Online*" && title match "*Tutor")')
-                                        ),
+                            .filter('_type == "clone"')
+                            .child((cloneId: string) =>
+                              S.list()
+                                .title('Clone Content')
+                                .items([
+                                  // Homepage Content for this specific clone
+                                  S.listItem()
+                                    .title('📄 Homepage')
+                                    .child(
+                                      S.list()
+                                        .title('Homepage Content')
+                                        .items([
+                                          S.listItem()
+                                            .title('🔝 Header')
+                                            .child(
+                                              S.documentTypeList('header')
+                                                .title('Headers')
+                                                .filter(`_type == "header" && cloneReference._ref == "${cloneId}"`)
+                                            ),
+                                          S.listItem()
+                                            .title('🎯 Hero Section')
+                                            .child(
+                                              S.documentTypeList('hero')
+                                                .title('Hero Sections')
+                                                .filter(`_type == "hero" && cloneReference._ref == "${cloneId}"`)
+                                            ),
+                                          S.listItem()
+                                            .title('📊 Subject Grid')
+                                            .child(
+                                              S.documentTypeList('subjectGrid')
+                                                .title('Subject Grids')
+                                                .filter(`_type == "subjectGrid" && cloneReference._ref == "${cloneId}"`)
+                                            ),
+                                          S.listItem()
+                                            .title('⭐ Why Choose Us')
+                                            .child(
+                                              S.documentTypeList('whyChooseUs')
+                                                .title('Why Choose Us')
+                                                .filter(`_type == "whyChooseUs" && cloneReference._ref == "${cloneId}"`)
+                                            ),
+                                          S.listItem()
+                                            .title('❓ FAQ Section')
+                                            .child(
+                                              S.documentTypeList('faq')
+                                                .title('FAQ Sections')
+                                                .filter(`_type == "faq" && cloneReference._ref == "${cloneId}"`)
+                                            ),
+                                          S.listItem()
+                                            .title('📞 Contact Form')
+                                            .child(
+                                              S.documentTypeList('contactFormSection')
+                                                .title('Contact Forms')
+                                                .filter(`_type == "contactFormSection" && cloneReference._ref == "${cloneId}"`)
+                                            ),
+                                          S.listItem()
+                                            .title('🔽 Footer')
+                                            .child(
+                                              S.documentTypeList('footer')
+                                                .title('Footers')
+                                                .filter(`_type == "footer" && cloneReference._ref == "${cloneId}"`)
+                                            ),
+                                        ])
+                                    ),
 
-                                    ])
-                                ),
+                                  // Subject Pages for this specific clone
+                                  S.listItem()
+                                    .title('📚 Subject Pages')
+                                    .child(
+                                      S.documentTypeList('subjectPage')
+                                        .title('Subject Pages')
+                                        .filter(`_type == "subjectPage" && cloneReference._ref == "${cloneId}" && !(title match "Online*" && title match "*Tutor")`)
+                                    ),
 
-                              // UK A-Levels Question Bank Content
-                              S.listItem()
-                                .title('📚 UK A-Levels Question Bank')
-                                .child(
-                                  S.list()
-                                    .title('UK A-Levels Question Bank Content')
-                                    .items([
-                                      // Homepage folder
-                                      S.listItem()
-                                        .title('📄 Homepage')
-                                        .child(
-                                          S.list()
-                                            .title('UK A-Levels Question Bank Homepage')
-                                            .items([
-                                              S.listItem()
-                                                .title('🔝 Header')
-                                                .child(
-                                                  S.documentTypeList('header')
-                                                    .title('UK A-Levels Question Bank Headers')
-                                                    .filter('_type == "header" && cloneReference->cloneId.current == "uk-a-levels-qb"')
-                                                ),
-                                              S.listItem()
-                                                .title('🎯 Hero Section')
-                                                .child(
-                                                  S.documentTypeList('hero')
-                                                    .title('UK A-Levels Question Bank Heroes')
-                                                    .filter('_type == "hero" && cloneReference->cloneId.current == "uk-a-levels-qb"')
-                                                ),
-                                              S.listItem()
-                                                .title('📊 Subject Grid')
-                                                .child(
-                                                  S.documentTypeList('subjectGrid')
-                                                    .title('UK A-Levels Question Bank Subject Grids')
-                                                    .filter('_type == "subjectGrid" && cloneReference->cloneId.current == "uk-a-levels-qb"')
-                                                ),
-                                              S.listItem()
-                                                .title('⭐ Why Choose Us')
-                                                .child(
-                                                  S.documentTypeList('whyChooseUs')
-                                                    .title('UK A-Levels Question Bank Why Choose Us')
-                                                    .filter('_type == "whyChooseUs" && cloneReference->cloneId.current == "uk-a-levels-qb"')
-                                                ),
-                                              S.listItem()
-                                                .title('❓ FAQ Section')
-                                                .child(
-                                                  S.documentTypeList('faq')
-                                                    .title('UK A-Levels Question Bank FAQs')
-                                                    .filter('_type == "faq" && cloneReference->cloneId.current == "uk-a-levels-qb"')
-                                                ),
-                                              S.listItem()
-                                                .title('📞 Contact Form')
-                                                .child(
-                                                  S.documentTypeList('contactFormSection')
-                                                    .title('UK A-Levels Question Bank Contact Forms')
-                                                    .filter('_type == "contactFormSection" && cloneReference->cloneId.current == "uk-a-levels-qb"')
-                                                ),
-                                              S.listItem()
-                                                .title('🔽 Footer')
-                                                .child(
-                                                  S.documentTypeList('footer')
-                                                    .title('UK A-Levels Question Bank Footers')
-                                                    .filter('_type == "footer" && cloneReference->cloneId.current == "uk-a-levels-qb"')
-                                                ),
-                                            ])
-                                        ),
-                                      // Subject Pages folder
-                                      S.listItem()
-                                        .title('📚 Subject Pages')
-                                        .child(
-                                          S.documentTypeList('subjectPage')
-                                            .title('UK A-Levels Question Bank Subject Pages')
-                                            .filter('_type == "subjectPage" && cloneReference->cloneId.current == "uk-a-levels-qb" && !(title match "Online*" && title match "*Tutor")')
-                                        ),
-                                    ])
-                                ),
-
-
-                            ])
+                                  // Exam Board Pages for this specific clone
+                                  S.listItem()
+                                    .title('📖 Exam Board Pages')
+                                    .child(
+                                      S.documentTypeList('examBoardPage')
+                                        .title('Exam Board Pages')
+                                        .filter(`_type == "examBoardPage" && cloneReference._ref == "${cloneId}"`)
+                                    ),
+                                ])
+                            )
                         ),
 
                       // All Clone Content By Section
@@ -410,7 +337,7 @@ export const structure = (S: StructureBuilder) =>
                                 .child(
                                   S.documentTypeList('examBoardPage')
                                     .title('All Clone Exam Board Pages')
-                                    .filter('_type == "examBoardPage"')
+                                    .filter('_type == "examBoardPage" && defined(cloneReference)')
                                 ),
                             ])
                         ),
