@@ -138,22 +138,22 @@ export const ExamBoardPage: React.FC<ExamBoardPageProps> = ({ examBoardPageData,
         </div>
         {/* Sidebar - Only show if data exists and is active */}
         {sidebarConfig && sidebarConfig.isActive && (
-          <aside className="w-full lg:w-80 flex-shrink-0 space-y-6">
+          <aside className="w-full lg:w-96 flex-shrink-0 space-y-4">
             {/* Premium Study Notes Card */}
-            <div className="rounded-2xl p-8 text-white w-full" style={{ backgroundColor: '#001a96' }}>
-              <div className="flex items-start gap-4 mb-4">
+            <div className="rounded-2xl p-6 text-white w-full" style={{ backgroundColor: '#001a96' }}>
+              <div className="flex items-start gap-3 mb-3">
                 {/* Book Icon */}
-                <div className="w-12 h-12 bg-white bg-opacity-20 rounded-xl flex items-center justify-center flex-shrink-0">
+                <div className="w-10 h-10 bg-white bg-opacity-20 rounded-lg flex items-center justify-center flex-shrink-0">
                   <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
                   </svg>
                 </div>
                                   <div>
-                    <h3 className="text-xl font-bold mb-1">{sidebarConfig.studyNotesButton.blockTitle}</h3>
-                    <p className="text-blue-100 text-sm">{sidebarConfig.studyNotesButton.blockSubtitle}</p>
+                    <h3 className="text-lg font-bold mb-1">{sidebarConfig.studyNotesButton.blockTitle}</h3>
+                    <p className="text-blue-100 text-xs">{sidebarConfig.studyNotesButton.blockSubtitle}</p>
                   </div>
                 </div>
-                <p className="text-white mb-6 leading-relaxed">
+                <p className="text-white mb-4 leading-relaxed text-sm">
                   {sidebarConfig.studyNotesButton.blockDescription}
                 </p>
               <a 
@@ -168,20 +168,20 @@ export const ExamBoardPage: React.FC<ExamBoardPageProps> = ({ examBoardPageData,
             </div>
 
             {/* Practice Questions Card */}
-            <div className="rounded-2xl p-8 text-white w-full" style={{ backgroundColor: '#fb510f' }}>
-              <div className="flex items-start gap-4 mb-4">
+            <div className="rounded-2xl p-6 text-white w-full" style={{ backgroundColor: '#fb510f' }}>
+              <div className="flex items-start gap-3 mb-3">
                 {/* Checkmark Icon */}
-                <div className="w-12 h-12 bg-white bg-opacity-20 rounded-xl flex items-center justify-center flex-shrink-0">
+                <div className="w-10 h-10 bg-white bg-opacity-20 rounded-lg flex items-center justify-center flex-shrink-0">
                   <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
                 </div>
                                   <div>
-                    <h3 className="text-xl font-bold mb-1">{sidebarConfig.practiceQuestionsButton.blockTitle}</h3>
-                    <p className="text-orange-100 text-sm">{sidebarConfig.practiceQuestionsButton.blockSubtitle}</p>
+                    <h3 className="text-lg font-bold mb-1">{sidebarConfig.practiceQuestionsButton.blockTitle}</h3>
+                    <p className="text-orange-100 text-xs">{sidebarConfig.practiceQuestionsButton.blockSubtitle}</p>
                   </div>
                 </div>
-                <p className="text-white mb-6 leading-relaxed">
+                <p className="text-white mb-4 leading-relaxed text-sm">
                   {sidebarConfig.practiceQuestionsButton.blockDescription}
                 </p>
               <a 

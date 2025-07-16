@@ -138,76 +138,7 @@ async function getContactFormSectionData(cloneId?: string): Promise<ContactFormS
 }
 
 // Helper function to get exam board data
-async function getExamBoardData(subject: string, examBoard: string, cloneId?: string) {
-  // Get the subject page data first
-  const subjectPageResult = await getSubjectPageForClone(cloneId || '', subject)
-  const subjectPageData = subjectPageResult.data as SubjectPageData | null
-  
-  if (!subjectPageData) {
-    return null
-  }
 
-  // Create dynamic exam board page data
-  const subjectName = subjectPageData.subjectName || subject.charAt(0).toUpperCase() + subject.slice(1)
-  const examBoardDisplay = examBoard.toUpperCase()
-  
-  // Generate dynamic title and description
-  const title = `${subjectName} ${examBoardDisplay} Resources`
-  const description = `Access comprehensive ${subjectName} study materials specifically tailored for ${examBoardDisplay} exam board requirements.`
-  
-  // Create exam board blocks with dynamic links
-  const examBoards = [
-    {
-      id: 'practice-questions',
-      name: 'Practice Questions',
-      customTitle: `${examBoardDisplay} Practice Questions`,
-      customDescription: `Exam-style questions specifically designed for ${examBoardDisplay} ${subjectName} syllabus.`,
-      logo: {
-        asset: {
-          _id: 'practice-icon',
-          url: '/file.svg'
-        },
-        alt: 'Practice Questions'
-      },
-      buttonLabel: 'Start Practice'
-    },
-    {
-      id: 'study-notes',
-      name: 'Study Notes',
-      customTitle: `${examBoardDisplay} Study Notes`,
-      customDescription: `Comprehensive revision notes aligned with ${examBoardDisplay} ${subjectName} specification.`,
-      logo: {
-        asset: {
-          _id: 'notes-icon',
-          url: '/globe.svg'
-        },
-        alt: 'Study Notes'
-      },
-      buttonLabel: 'Access Notes'
-    },
-    {
-      id: 'past-papers',
-      name: 'Past Papers',
-      customTitle: `${examBoardDisplay} Past Papers`,
-      customDescription: `Previous examination papers and mark schemes for ${examBoardDisplay} ${subjectName}.`,
-      logo: {
-        asset: {
-          _id: 'papers-icon',
-          url: '/next.svg'
-        },
-        alt: 'Past Papers'
-      },
-      buttonLabel: 'View Papers'
-    }
-  ]
-
-  return {
-    title,
-    description,
-    examBoards,
-    subjectPageData
-  }
-}
 
 // Helper function to get clone-aware subject page data
 async function getCloneAwareSubjectPageData(slug: string, cloneId?: string): Promise<SubjectPageData | null> {
@@ -325,52 +256,65 @@ export default async function ExamBoardPageHandler({ params }: ExamBoardPageProp
     )
   }
 
-  // FALLBACK: Original exam board page logic when no active exam board pages exist
-  // Validate exam board exists in database
-  const examBoardInfo = await client.fetch(`*[_type == "examBoard" && (shortName == "${examBoard}" || slug.current == "${examBoard}") && isActive == true][0] {
-    _id,
-    name,
-    shortName,
-    slug,
-    logo {
-      asset->{
-        _id,
-        url
-      },
-      alt
-    },
-    description,
-    officialWebsite
-  }`)
+  // FALLBACK: Use normal subject page layout for all exam board subject pages
+  // Get the subject page data for the current clone
+  const subjectPageData = await getCloneAwareSubjectPageData(subject, cloneId || undefined);
   
-  if (!examBoardInfo) {
+  if (!subjectPageData) {
     notFound()
   }
 
-  // Get exam board page data
-  const examBoardPageData = await getExamBoardData(subject, examBoard, cloneId || undefined)
-  
-  if (!examBoardPageData) {
-    notFound()
-  }
-
-  // Fetch layout components and sidebar
+  // Fetch layout components for the current clone
   const headerData = await getHeaderData(cloneId || undefined);
   const footerData = await getFooterData(cloneId || undefined);
   const contactFormSectionData = await getContactFormSectionData(cloneId || undefined);
 
+  // Ensure topicBlockBackgroundColor has a default value if not set
+  const backgroundColorClass = subjectPageData.topicBlockBackgroundColor || 'bg-blue-500'
+
   // Check if contact form is active
   const isContactFormActive = contactFormSectionData?.isActive ?? false;
-  const showContactFormOnThisPage = examBoardPageData.subjectPageData.showContactForm ?? true;
+  const showContactFormOnThisPage = subjectPageData.showContactForm ?? true;
   const shouldShowContactForm = isContactFormActive && showContactFormOnThisPage;
 
   return (
-    <SEOProvider seoData={examBoardPageData.subjectPageData.seo}>
+    <SEOProvider seoData={subjectPageData.seo}>
       <div className="min-h-screen bg-white">
         <Header headerData={headerData} isContactFormActive={shouldShowContactForm} homepageUrl="/" />
         <main>
-          <ExamBoardPage examBoardPageData={examBoardPageData} currentSubject={subject} />
+          {/* Hero Section */}
+          <section className="bg-white py-16">
+            <div className="container mx-auto px-4">
+              <div className="text-center max-w-4xl mx-auto">
+                <h1 className="font-serif font-bold mb-6" style={{fontSize: '55px', color: '#243b53', letterSpacing: '-0.01em', fontWeight: '600'}}>
+                  {subjectPageData.pageTitle}
+                </h1>
+                <p className="text-lg md:text-xl text-gray-600 leading-relaxed">
+                  {subjectPageData.pageDescription}
+                </p>
+              </div>
+            </div>
+          </section>
+
+          {/* Topics Grid Section */}
+          <section className="py-16 bg-gray-50">
+            <div className="container mx-auto px-4">
+              <SubjectTopicGrid 
+                topics={subjectPageData.topics || []} 
+                topicBlockBackgroundColor={backgroundColorClass}
+              />
+            </div>
+          </section>
         </main>
+        
+        {/* More Resources Section - only show if active */}
+        <MoreResources moreResourcesData={subjectPageData.moreResources} />
+        
+        {/* Contact Form Section - only show if active */}
+        {shouldShowContactForm && (
+          <ContactForm contactFormData={contactFormSectionData} />
+        )}
+        
         <Footer footerData={footerData} isContactFormActive={shouldShowContactForm} />
       </div>
     </SEOProvider>
