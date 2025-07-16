@@ -138,9 +138,9 @@ export const ExamBoardPage: React.FC<ExamBoardPageProps> = ({ examBoardPageData,
         </div>
         {/* Sidebar - Only show if data exists and is active */}
         {sidebarConfig && sidebarConfig.isActive && (
-          <aside className="w-full lg:w-96 flex-shrink-0 space-y-6">
+          <aside className="w-full lg:w-80 flex-shrink-0 space-y-6">
             {/* Premium Study Notes Card */}
-            <div className="rounded-2xl p-10 text-white w-full" style={{ backgroundColor: '#001a96' }}>
+            <div className="rounded-2xl p-8 text-white w-full" style={{ backgroundColor: '#001a96' }}>
               <div className="flex items-start gap-4 mb-4">
                 {/* Book Icon */}
                 <div className="w-12 h-12 bg-white bg-opacity-20 rounded-xl flex items-center justify-center flex-shrink-0">
@@ -168,7 +168,7 @@ export const ExamBoardPage: React.FC<ExamBoardPageProps> = ({ examBoardPageData,
             </div>
 
             {/* Practice Questions Card */}
-            <div className="rounded-2xl p-10 text-white w-full" style={{ backgroundColor: '#fb510f' }}>
+            <div className="rounded-2xl p-8 text-white w-full" style={{ backgroundColor: '#fb510f' }}>
               <div className="flex items-start gap-4 mb-4">
                 {/* Checkmark Icon */}
                 <div className="w-12 h-12 bg-white bg-opacity-20 rounded-xl flex items-center justify-center flex-shrink-0">
