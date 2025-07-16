@@ -83,16 +83,10 @@ export default defineType({
               name: 'buttonLabel',
               title: 'Button Label',
               type: 'string',
-              description: 'Text for the button (e.g., "View Papers", "Official CIE Website")',
-              validation: Rule => Rule.required()
-            },
-            {
-              name: 'buttonUrl',
-              title: 'Button URL',
-              type: 'url',
-              description: 'URL for the button (can be internal or external)',
+              description: 'Text for the button (e.g., "View Questions", "View Papers")',
               validation: Rule => Rule.required()
             }
+            // Note: buttonUrl removed - now using dynamic routing /[subject]/[examBoard]
           ],
           preview: {
             select: {

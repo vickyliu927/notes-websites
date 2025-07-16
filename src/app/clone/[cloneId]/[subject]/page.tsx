@@ -119,7 +119,7 @@ export default async function CloneSubjectPage({ params }: CloneSubjectPageProps
         <div className="min-h-screen bg-white">
           <Header headerData={headerData} isContactFormActive={shouldShowContactForm} homepageUrl={`/clone/${cloneId}/homepage`} />
           <main>
-            <ExamBoardPage examBoardPageData={examBoardPageData} />
+            <ExamBoardPage examBoardPageData={examBoardPageData} currentSubject={subject} />
           </main>
           {shouldShowContactForm && contactFormData && (
             <ContactForm contactFormData={contactFormData} />

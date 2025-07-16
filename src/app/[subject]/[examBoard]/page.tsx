@@ -169,8 +169,7 @@ async function getExamBoardData(subject: string, examBoard: string, cloneId?: st
         },
         alt: 'Practice Questions'
       },
-      buttonLabel: 'Start Practice',
-      buttonUrl: `/${subject}?examBoard=${examBoard}&type=practice`
+      buttonLabel: 'Start Practice'
     },
     {
       id: 'study-notes',
@@ -184,8 +183,7 @@ async function getExamBoardData(subject: string, examBoard: string, cloneId?: st
         },
         alt: 'Study Notes'
       },
-      buttonLabel: 'Access Notes',
-      buttonUrl: `/${subject}?examBoard=${examBoard}&type=notes`
+      buttonLabel: 'Access Notes'
     },
     {
       id: 'past-papers',
@@ -199,8 +197,7 @@ async function getExamBoardData(subject: string, examBoard: string, cloneId?: st
         },
         alt: 'Past Papers'
       },
-      buttonLabel: 'View Papers',
-      buttonUrl: `/${subject}?examBoard=${examBoard}&type=papers`
+      buttonLabel: 'View Papers'
     }
   ]
 
@@ -347,7 +344,7 @@ export default async function ExamBoardPageHandler({ params }: ExamBoardPageProp
       <div className="min-h-screen bg-white">
         <Header headerData={headerData} isContactFormActive={shouldShowContactForm} homepageUrl="/" />
         <main>
-          <ExamBoardPage examBoardPageData={examBoardPageData} />
+          <ExamBoardPage examBoardPageData={examBoardPageData} currentSubject={subject} />
         </main>
         <Footer footerData={footerData} isContactFormActive={shouldShowContactForm} />
       </div>

@@ -15,7 +15,6 @@ interface ExamBoard {
     crop?: any
   }
   buttonLabel: string
-  buttonUrl: string
 }
 
 interface ExamBoardPageData {
@@ -24,7 +23,24 @@ interface ExamBoardPageData {
   examBoards: ExamBoard[]
 }
 
-export const ExamBoardPage: React.FC<{ examBoardPageData: ExamBoardPageData }> = ({ examBoardPageData }) => {
+interface ExamBoardPageProps {
+  examBoardPageData: ExamBoardPageData
+  currentSubject?: string
+}
+
+export const ExamBoardPage: React.FC<ExamBoardPageProps> = ({ examBoardPageData, currentSubject }) => {
+  const generateExamBoardUrl = (board: ExamBoard): string => {
+    if (!currentSubject) {
+      return '#'
+    }
+    
+    const examBoardSlug = board.name.toLowerCase()
+      .replace(/\s+/g, '-')
+      .replace(/[^a-z0-9-]/g, '')
+    
+    return `/${currentSubject}/${examBoardSlug}`
+  }
+
   return (
     <div className="container mx-auto px-4 py-16">
       {/* Hero Section */}
@@ -47,7 +63,10 @@ export const ExamBoardPage: React.FC<{ examBoardPageData: ExamBoardPageData }> =
               )}
               <h2 className="text-xl font-bold mb-2">{board.customTitle || board.name}</h2>
               <p className="text-gray-600 mb-4">{board.customDescription}</p>
-              <a href={board.buttonUrl} target="_blank" rel="noopener noreferrer" className="mt-auto px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition">
+              <a 
+                href={generateExamBoardUrl(board)} 
+                className="mt-auto px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
+              >
                 {board.buttonLabel}
               </a>
             </div>

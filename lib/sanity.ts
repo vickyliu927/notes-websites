@@ -437,8 +437,7 @@ export const examBoardPageQuery = (cloneId: string) => `*[_type == "examBoardPag
       hotspot,
       crop
     },
-    buttonLabel,
-    buttonUrl
+    buttonLabel
   }
 }`;
 

@@ -281,7 +281,7 @@ export default async function SubjectPage({ params }: SubjectPageProps) {
           <div className="min-h-screen bg-white">
             <Header headerData={headerData} isContactFormActive={shouldShowContactForm} homepageUrl="/" />
             <main>
-              <ExamBoardPage examBoardPageData={examBoardPageData} />
+              <ExamBoardPage examBoardPageData={examBoardPageData} currentSubject={subject} />
             </main>
             <Footer footerData={footerData} isContactFormActive={shouldShowContactForm} />
           </div>
