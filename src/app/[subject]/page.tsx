@@ -174,18 +174,11 @@ export async function generateMetadata({ params }: SubjectPageProps): Promise<Me
   try {
   const { subject } = await params
     
-    // Read headers to detect clone
+    // Read headers to get clone information (set by middleware)
     const headersList = await headers();
-    const host = headersList.get('host');
-    const hostname = host?.split(':')[0] || 'localhost';
+    const cloneId = headersList.get('x-clone-id');
     
-    // Check if this is a custom domain
-    let cloneId = null;
-    if (hostname !== 'localhost' && !hostname.includes('127.0.0.1') && !hostname.includes('.local')) {
-      cloneId = await getCloneIdByDomain(hostname);
-    }
-    
-    console.log('📍 [SUBJECT_META] Clone detection:', { hostname, cloneId, subject });
+    console.log('📍 [SUBJECT_META] Clone detection:', { cloneId, subject });
     
     const subjectPageData = await getCloneAwareSubjectPageData(subject, cloneId || undefined)
   
@@ -221,21 +214,14 @@ export async function generateMetadata({ params }: SubjectPageProps): Promise<Me
 export default async function SubjectPage({ params }: SubjectPageProps) {
   const { subject } = await params
   
-  // Read headers to get host information
+  // Read headers to get clone information (set by middleware)
   const headersList = await headers();
+  const cloneId = headersList.get('x-clone-id');
+  const cloneSource = headersList.get('x-clone-source');
   const host = headersList.get('host');
   const hostname = host?.split(':')[0] || 'localhost';
   
-  console.log('📍 [SUBJECT_PAGE] Checking domain:', hostname);
-  
-  // Directly check if this is a custom domain
-  let cloneId = null;
-  if (hostname !== 'localhost' && !hostname.includes('127.0.0.1') && !hostname.includes('.local')) {
-    console.log('📍 [SUBJECT_PAGE] Custom domain detected, checking for clone...');
-    cloneId = await getCloneIdByDomain(hostname);
-  }
-  
-  console.log('📍 [SUBJECT_PAGE] Clone detection result:', { hostname, cloneId, subject });
+  console.log('📍 [SUBJECT_PAGE] Request info:', { hostname, cloneId, cloneSource, subject });
 
   // Fetch all data with clone awareness
   const headerData = await getHeaderData(cloneId || undefined);

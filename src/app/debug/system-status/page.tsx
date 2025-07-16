@@ -371,7 +371,7 @@ export default function SystemStatusPage() {
                 </span>
               </div>
               <Link 
-                href={`/clone/${cloneId}/homepage`}
+                href="/"
                 className="text-blue-600 hover:text-blue-800 text-sm underline"
               >
                 View Clone →

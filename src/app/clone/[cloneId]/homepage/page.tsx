@@ -1,162 +1,32 @@
-import { Metadata } from 'next'
-import { redirect } from 'next/navigation'
-import { validateCloneId, getCompleteCloneData } from '../../../../../lib/cloneUtils'
-import { client, allSubjectPagesQuery } from '../../../../../lib/sanity'
-import { 
-  Header, 
-  Hero, 
-  SubjectGrid, 
-  WhyChooseUs, 
-  FAQ, 
-  ContactForm,
-  Footer,
-  SubjectRequestBanner
-} from '@/components'
-import { HeaderData, HeroData, SubjectGridData, WhyChooseUsData, FAQData, ContactFormSectionData, FooterData, SubjectPageData } from '../../../../../types/sanity'
-import Link from 'next/link'
+'use client'
 
-// ===== TYPES =====
+import { useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 
-interface CloneHomepageProps {
+interface CloneHomepageRedirectProps {
   params: Promise<{
     cloneId: string
   }>
 }
 
-// ===== UTILITY FUNCTIONS =====
+// This page redirects old clone homepage URLs to the new clean URL structure
+export default function CloneHomepageRedirect({ params }: CloneHomepageRedirectProps) {
+  const router = useRouter()
 
-async function getPublishedSubjectsForClone(cloneId: string): Promise<SubjectPageData[]> {
-  try {
-    // Get all published subject pages that match this clone or are general
-    const publishedSubjects = await client.fetch(`
-      *[_type == "subjectPage" && isPublished == true && 
-        (cloneReference->cloneId.current == "${cloneId}" || !defined(cloneReference))
-      ] {
-        _id,
-        title,
-        subjectSlug,
-        subjectName,
-        cloneReference
-      }
-    `)
-    return publishedSubjects || []
-  } catch (error) {
-    console.error('Error fetching published subjects for clone:', error)
-    return []
-  }
-}
-
-// ===== METADATA =====
-
-export async function generateMetadata({ params }: CloneHomepageProps): Promise<Metadata> {
-  const { cloneId } = await params
-  
-  // Fetch clone data for metadata
-  const cloneData = await getCompleteCloneData(cloneId)
-  const cloneName = cloneData?.clone?.cloneName || cloneId
-  
-  return {
-    title: `${cloneName} - Homepage | CIE IGCSE Study Notes`,
-    description: `Access ${cloneName} variant of comprehensive CIE IGCSE study notes and revision materials.`,
-  }
-}
-
-// ===== MAIN COMPONENT =====
-
-export default async function CloneHomepage({ params }: CloneHomepageProps) {
-  const { cloneId } = await params
-  
-  // Basic validation
-  const isValidFormat = validateCloneId(cloneId)
-  if (!isValidFormat) {
-    redirect('/404')
-  }
-
-  // Fetch complete clone data
-  const cloneData = await getCompleteCloneData(cloneId)
-  
-  // If clone doesn't exist or is inactive, redirect to 404
-  if (!cloneData?.clone || !cloneData.clone.isActive) {
-    redirect('/404')
-  }
-
-  const { clone, components } = cloneData
-
-  // Get published subjects for this clone
-  const publishedSubjects = await getPublishedSubjectsForClone(cloneId)
-
-  // Extract component data with fallbacks
-  const headerData = components.header?.data as HeaderData | undefined
-  const heroData = components.hero?.data as HeroData | undefined
-  const subjectGridData = components.subjectGrid?.data as SubjectGridData | undefined
-  const whyChooseUsData = components.whyChooseUs?.data as WhyChooseUsData | undefined
-  const faqData = components.faq?.data as FAQData | undefined
-  const contactFormData = components.contactForm?.data as ContactFormSectionData | undefined
-  const footerData = components.footer?.data as FooterData | undefined
-
-  // Check if contact form is active
-  const isContactFormActive = contactFormData?.isActive ?? false
+  useEffect(() => {
+    const redirect = async () => {
+      console.log(`[CLONE_REDIRECT] Redirecting from /clone/*/homepage to /`)
+      router.replace('/')
+    }
+    redirect()
+  }, [params, router])
 
   return (
-    <div className="min-h-screen bg-white">
-      {/* Clone Indicator Banner */}
-      <div className="bg-blue-600 text-white px-4 py-2 text-center text-sm">
-        <div className="max-w-7xl mx-auto">
-          🔄 <strong>Clone Version:</strong> {clone.cloneName} 
-          <span className="mx-2">•</span>
-          <strong>ID:</strong> {cloneId}
-          <span className="mx-2">•</span>
-          <Link 
-            href="/"
-            className="text-blue-600 hover:text-blue-800 underline"
-          >
-            View Original Site
-          </Link>
-          <span className="mx-2">•</span>
-          <Link 
-            href="/admin/clones/"
-            className="text-blue-600 hover:text-blue-800 underline"
-          >
-            Admin Dashboard
-          </Link>
-        </div>
+    <div className="min-h-screen flex items-center justify-center bg-white">
+      <div className="text-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
+        <p className="text-gray-600">Redirecting...</p>
       </div>
-
-      {/* Header */}
-      <Header headerData={headerData} isContactFormActive={isContactFormActive} homepageUrl={`/clone/${cloneId}/homepage`} />
-      
-      <main>
-        {/* Hero Section */}
-        <Hero heroData={heroData} />
-        
-        {/* Subject Grid with Clone Context */}
-        <SubjectGrid 
-          subjectGridData={subjectGridData} 
-          publishedSubjects={publishedSubjects}
-          cloneId={cloneId}
-        />
-        
-        {/* Subject Request Banner */}
-        <SubjectRequestBanner />
-        
-        {/* Why Choose Us */}
-        <WhyChooseUs whyChooseUsData={whyChooseUsData} />
-        
-        {/* FAQ */}
-        <FAQ faqData={faqData} />
-        
-        {/* Contact Form - only show if active */}
-        {isContactFormActive && (
-          <ContactForm contactFormData={contactFormData} />
-        )}
-      </main>
-      
-      {/* Footer */}
-      <Footer footerData={footerData} isContactFormActive={isContactFormActive} />
     </div>
   )
-}
-
-// ===== REVALIDATION =====
-
-export const revalidate = 60 
+} 
