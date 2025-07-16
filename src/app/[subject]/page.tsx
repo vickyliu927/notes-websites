@@ -252,7 +252,7 @@ export default async function SubjectPage({ params }: SubjectPageProps) {
   // Check if there are active exam board pages for the current clone
   const { hasActive: hasActiveExamBoards, cloneId: examBoardCloneId } = await hasActiveExamBoardPages(cloneId || undefined);
   
-  console.log('📍 [SUBJECT_PAGE] Active exam board check:', { hasActiveExamBoards, examBoardCloneId });
+  console.log('📍 [SUBJECT_PAGE] Active exam board check:', { hasActiveExamBoards, examBoardCloneId, subject, currentCloneId: cloneId });
 
   // Debug log to check the data
   console.log('📍 [SUBJECT_PAGE] Subject page data:', {
