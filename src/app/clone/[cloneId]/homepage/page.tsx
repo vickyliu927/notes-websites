@@ -1,7 +1,7 @@
 import { Metadata } from 'next'
 import { redirect } from 'next/navigation'
 import { validateCloneId, getCompleteCloneData } from '../../../../../lib/cloneUtils'
-import { client, allSubjectPagesQuery } from '../../../../../lib/sanity'
+import { client, allSubjectPagesQuery, hasActiveExamBoardPages } from '../../../../../lib/sanity'
 import { 
   Header, 
   Hero, 
@@ -85,6 +85,9 @@ export default async function CloneHomepage({ params }: CloneHomepageProps) {
   // Get published subjects for this clone
   const publishedSubjects = await getPublishedSubjectsForClone(cloneId)
 
+  // Check if there are active exam board pages for URL structure
+  const { hasActive: hasActiveExamBoards } = await hasActiveExamBoardPages();
+
   // Extract component data with fallbacks
   const headerData = components.header?.data as HeaderData | undefined
   const heroData = components.hero?.data as HeroData | undefined
@@ -134,6 +137,7 @@ export default async function CloneHomepage({ params }: CloneHomepageProps) {
           subjectGridData={subjectGridData} 
           publishedSubjects={publishedSubjects}
           cloneId={cloneId}
+          hasActiveExamBoards={hasActiveExamBoards}
         />
         
         {/* Subject Request Banner */}

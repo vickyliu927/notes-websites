@@ -8,6 +8,7 @@ interface SubjectGridProps {
   subjectGridData?: SubjectGridData;
   publishedSubjects?: SubjectPageData[];
   cloneId?: string;
+  hasActiveExamBoards?: boolean;
 }
 
 // Helper function to create a slug from subject name
@@ -15,7 +16,7 @@ function createSlug(name: string): string {
   return name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
 }
 
-export default function SubjectGrid({ subjectGridData, publishedSubjects, cloneId }: SubjectGridProps) {
+export default function SubjectGrid({ subjectGridData, publishedSubjects, cloneId, hasActiveExamBoards }: SubjectGridProps) {
   // Fallback data if no Sanity data is provided
   const fallbackData: SubjectGridData = {
     _id: 'fallback-subject-grid',
@@ -149,7 +150,20 @@ export default function SubjectGrid({ subjectGridData, publishedSubjects, cloneI
     // 1. If a custom URL is set in Sanity, always use it (with clone logic if needed)
     const customUrl = subject.viewNotesButton?.href || subject.viewNotesButton?.url;
     if (customUrl && customUrl !== '#') {
-      // If we're in a clone context and the URL doesn't have the proper clone prefix
+      // NEW URL STRUCTURE: If exam board pages are active, use clean URLs
+      if (hasActiveExamBoards && cloneId && !customUrl.includes('/clone/')) {
+        // Use clean URLs for exam board structure
+        if (customUrl.startsWith('/') && !customUrl.startsWith('http')) {
+          return customUrl;
+        }
+        // If it looks like a subject slug, use clean URL
+        const urlParts = customUrl.split('/').filter(part => part);
+        const lastPart = urlParts[urlParts.length - 1];
+        if (lastPart && lastPart.match(/^[a-z0-9]+(?:-[a-z0-9]+)*$/) && !customUrl.startsWith('http')) {
+          return `/${lastPart}`;
+        }
+      }
+      // ORIGINAL LOGIC: If we're in a clone context and the URL doesn't have the proper clone prefix
       if (cloneId && !customUrl.includes('/clone/')) {
         // If it's a relative URL (starts with /), prefix with clone path
         if (customUrl.startsWith('/') && !customUrl.startsWith(`/clone/${cloneId}`)) {
@@ -178,7 +192,12 @@ export default function SubjectGrid({ subjectGridData, publishedSubjects, cloneI
       return subjectNameMatch || slugMatch || partialMatch;
     });
     if (matchingSubject) {
-      // If we're in a clone context, prefix with clone route
+      // NEW URL STRUCTURE: If exam board pages are active, use clean URLs
+      if (hasActiveExamBoards && cloneId) {
+        // Use the new clean URL structure: /[subject] instead of /clone/[cloneId]/[subject]
+        return `/${matchingSubject.subjectSlug}`;
+      }
+      // ORIGINAL LOGIC: If we're in a clone context but no active exam boards, prefix with clone route
       if (cloneId) {
         return `/clone/${cloneId}/${matchingSubject.subjectSlug}`;
       }

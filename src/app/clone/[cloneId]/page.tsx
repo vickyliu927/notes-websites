@@ -15,7 +15,8 @@ import {
   client, 
   allSubjectPagesQuery,
   getHomepageData,
-  getSEOSettings
+  getSEOSettings,
+  hasActiveExamBoardPages
 } from '../../../../lib/sanity'
 import { 
   SubjectPageData,
@@ -82,6 +83,9 @@ export default async function CloneWebsite({ params }: CloneHomepageProps) {
     noFollowExternal: seoSettings?.noFollowExternal
   }
 
+  // Check if there are active exam board pages for URL structure
+  const { hasActive: hasActiveExamBoards } = await hasActiveExamBoardPages();
+
   // Extract clone-specific data or use fallbacks
   const headerData = components.header?.data as HeaderData | undefined
   const heroData = components.hero?.data as HeroData | undefined
@@ -118,7 +122,7 @@ export default async function CloneWebsite({ params }: CloneHomepageProps) {
         <Header headerData={headerData} isContactFormActive={isContactFormActive} homepageUrl={`/clone/${cloneId}/homepage`} />
         <main>
           <Hero heroData={heroData} />
-          <SubjectGrid subjectGridData={subjectGridData} publishedSubjects={publishedSubjects} cloneId={cloneId} />
+          <SubjectGrid subjectGridData={subjectGridData} publishedSubjects={publishedSubjects} cloneId={cloneId} hasActiveExamBoards={hasActiveExamBoards} />
           <SubjectRequestBanner />
           <WhyChooseUs whyChooseUsData={whyChooseUsData} />
           <FAQ faqData={faqData} />

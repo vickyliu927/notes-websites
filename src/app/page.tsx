@@ -18,7 +18,8 @@ import {
   whyChooseUsQuery, 
   faqQuery, 
   footerQuery,
-  contactFormSectionQuery 
+  contactFormSectionQuery,
+  hasActiveExamBoardPages
 } from '../../lib/sanity'
 import { 
   getHeaderWithFallback,
@@ -352,6 +353,9 @@ export default async function Home() {
   const heroData = await getHeroData(cloneId || undefined);
   const subjectGridData = await getSubjectGridData(cloneId || undefined);
   
+  // Check if there are active exam board pages for URL structure
+  const { hasActive: hasActiveExamBoards } = await hasActiveExamBoardPages();
+  
   // Use clone-specific subject filtering if clone is detected
   const publishedSubjects = cloneId 
     ? await getPublishedSubjectsForClone(cloneId)
@@ -381,7 +385,7 @@ export default async function Home() {
         <Header headerData={headerData} isContactFormActive={isContactFormActive} />
         <main>
           <Hero heroData={heroData} />
-          <SubjectGrid subjectGridData={subjectGridData} publishedSubjects={publishedSubjects} cloneId={cloneId || undefined} />
+          <SubjectGrid subjectGridData={subjectGridData} publishedSubjects={publishedSubjects} cloneId={cloneId || undefined} hasActiveExamBoards={hasActiveExamBoards} />
           <SubjectRequestBanner />
           <WhyChooseUs whyChooseUsData={whyChooseUsData} />
           <FAQ faqData={faqData} />
