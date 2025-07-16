@@ -53,6 +53,10 @@ interface ExamBoardPageProps {
 }
 
 export const ExamBoardPage: React.FC<ExamBoardPageProps> = ({ examBoardPageData, currentSubject, sidebarData }) => {
+  // Debug logging
+  console.log('ExamBoardPage sidebarData:', sidebarData);
+  console.log('ExamBoardPage sidebarData.isActive:', sidebarData?.isActive);
+  
   const generateExamBoardUrl = (board: ExamBoard): string => {
     if (!currentSubject) {
       return '#'
@@ -123,8 +127,8 @@ export const ExamBoardPage: React.FC<ExamBoardPageProps> = ({ examBoardPageData,
             </div>
           ))}
         </div>
-        {/* Sidebar - Only show if sidebar data is available and active */}
-        {sidebarData && sidebarData.isActive && (
+        {/* Sidebar - Debug: Always show if data exists (ignoring isActive for now) */}
+        {sidebarData && (
           <aside className="w-full lg:w-80 flex-shrink-0 space-y-6">
             {/* Premium Study Notes Card */}
             <div className="rounded-2xl p-8 text-white" style={{ backgroundColor: '#001a96' }}>
