@@ -353,8 +353,8 @@ export default async function Home() {
   const heroData = await getHeroData(cloneId || undefined);
   const subjectGridData = await getSubjectGridData(cloneId || undefined);
   
-  // Check if there are active exam board pages for URL structure
-  const { hasActive: hasActiveExamBoards } = await hasActiveExamBoardPages();
+  // Check if there are active exam board pages for URL structure (for this specific clone)
+  const { hasActive: hasActiveExamBoards } = await hasActiveExamBoardPages(cloneId || undefined);
   
   // Use clone-specific subject filtering if clone is detected
   const publishedSubjects = cloneId 

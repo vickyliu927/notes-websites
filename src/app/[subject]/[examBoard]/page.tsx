@@ -241,8 +241,19 @@ async function getCloneAwareSubjectPageData(slug: string, cloneId?: string): Pro
 export default async function ExamBoardPageHandler({ params }: ExamBoardPageProps) {
   const { subject, examBoard } = await params
   
-  // Check if there are any active exam board pages in the system
-  const { hasActive: hasActiveExamBoards, cloneId: examBoardCloneId } = await hasActiveExamBoardPages();
+  // Read headers to get host information for clone detection
+  const headersList = await headers();
+  const host = headersList.get('host');
+  const hostname = host?.split(':')[0] || 'localhost';
+  
+  // Check if this is a custom domain
+  let cloneId = null;
+  if (hostname !== 'localhost' && !hostname.includes('127.0.0.1') && !hostname.includes('.local')) {
+    cloneId = await getCloneIdByDomain(hostname);
+  }
+
+  // Check if there are active exam board pages for the current clone
+  const { hasActive: hasActiveExamBoards, cloneId: examBoardCloneId } = await hasActiveExamBoardPages(cloneId || undefined);
   
   console.log('📍 [EXAM_BOARD] Active exam board check:', { hasActiveExamBoards, examBoardCloneId, subject, examBoard });
 
@@ -309,17 +320,6 @@ export default async function ExamBoardPageHandler({ params }: ExamBoardPageProp
   
   if (!examBoardInfo) {
     notFound()
-  }
-
-  // Read headers to get host information for clone detection
-  const headersList = await headers();
-  const host = headersList.get('host');
-  const hostname = host?.split(':')[0] || 'localhost';
-  
-  // Check if this is a custom domain
-  let cloneId = null;
-  if (hostname !== 'localhost' && !hostname.includes('127.0.0.1') && !hostname.includes('.local')) {
-    cloneId = await getCloneIdByDomain(hostname);
   }
 
   // Get exam board page data

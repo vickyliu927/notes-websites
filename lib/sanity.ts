@@ -587,10 +587,21 @@ export async function getExamBoardPage(cloneId: string) {
   }
 }
 
-// Check if there are any active exam board pages in the system
-export async function hasActiveExamBoardPages(): Promise<{ hasActive: boolean; cloneId?: string }> {
+// Check if a specific clone has active exam board pages
+export async function hasActiveExamBoardPages(cloneId?: string): Promise<{ hasActive: boolean; cloneId?: string }> {
   try {
-    const activeExamBoardPage = await client.fetch(`*[_type == "examBoardPage" && isActive == true][0]{
+    // If no cloneId provided, check the baseline clone
+    let targetCloneId = cloneId;
+    if (!targetCloneId) {
+      const baselineClone = await client.fetch(`*[_type == "clone" && baselineClone == true][0]{cloneId}`);
+      targetCloneId = baselineClone?.cloneId?.current;
+    }
+    
+    if (!targetCloneId) {
+      return { hasActive: false };
+    }
+    
+    const activeExamBoardPage = await client.fetch(`*[_type == "examBoardPage" && cloneReference->cloneId.current == "${targetCloneId}" && isActive == true][0]{
       _id,
       cloneReference->{
         cloneId

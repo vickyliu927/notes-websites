@@ -83,8 +83,8 @@ export default async function CloneWebsite({ params }: CloneHomepageProps) {
     noFollowExternal: seoSettings?.noFollowExternal
   }
 
-  // Check if there are active exam board pages for URL structure
-  const { hasActive: hasActiveExamBoards } = await hasActiveExamBoardPages();
+  // Check if there are active exam board pages for URL structure (for this specific clone)
+  const { hasActive: hasActiveExamBoards } = await hasActiveExamBoardPages(cloneId);
 
   // Extract clone-specific data or use fallbacks
   const headerData = components.header?.data as HeaderData | undefined
