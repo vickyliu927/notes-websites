@@ -35,10 +35,16 @@ interface ExamBoardPageData {
   sidebar?: {
     isActive: boolean
     studyNotesButton: {
+      blockTitle: string
+      blockSubtitle: string
+      blockDescription: string
       buttonText: string
       buttonUrl: string
     }
     practiceQuestionsButton: {
+      blockTitle: string
+      blockSubtitle: string
+      blockDescription: string
       buttonText: string
       buttonUrl: string
     }
@@ -132,9 +138,9 @@ export const ExamBoardPage: React.FC<ExamBoardPageProps> = ({ examBoardPageData,
         </div>
         {/* Sidebar - Only show if data exists and is active */}
         {sidebarConfig && sidebarConfig.isActive && (
-          <aside className="w-full lg:w-80 flex-shrink-0 space-y-6">
+          <aside className="w-full lg:w-96 flex-shrink-0 space-y-6">
             {/* Premium Study Notes Card */}
-            <div className="rounded-2xl p-8 text-white" style={{ backgroundColor: '#001a96' }}>
+            <div className="rounded-2xl p-10 text-white w-full" style={{ backgroundColor: '#001a96' }}>
               <div className="flex items-start gap-4 mb-4">
                 {/* Book Icon */}
                 <div className="w-12 h-12 bg-white bg-opacity-20 rounded-xl flex items-center justify-center flex-shrink-0">
@@ -142,14 +148,14 @@ export const ExamBoardPage: React.FC<ExamBoardPageProps> = ({ examBoardPageData,
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
                   </svg>
                 </div>
-                <div>
-                  <h3 className="text-xl font-bold mb-1">Premium Study Notes</h3>
-                  <p className="text-blue-100 text-sm">Expert-crafted summaries</p>
+                                  <div>
+                    <h3 className="text-xl font-bold mb-1">{sidebarConfig.studyNotesButton.blockTitle}</h3>
+                    <p className="text-blue-100 text-sm">{sidebarConfig.studyNotesButton.blockSubtitle}</p>
+                  </div>
                 </div>
-              </div>
-              <p className="text-white mb-6 leading-relaxed">
-                Study notes written by top graduates. Save hours of prep time with structured summaries.
-              </p>
+                <p className="text-white mb-6 leading-relaxed">
+                  {sidebarConfig.studyNotesButton.blockDescription}
+                </p>
               <a 
                 href={sidebarConfig.studyNotesButton.buttonUrl} 
                 className="inline-flex items-center gap-2 bg-white text-blue-900 px-6 py-3 rounded-xl font-medium hover:bg-blue-50 transition-colors duration-200"
@@ -162,7 +168,7 @@ export const ExamBoardPage: React.FC<ExamBoardPageProps> = ({ examBoardPageData,
             </div>
 
             {/* Practice Questions Card */}
-            <div className="rounded-2xl p-8 text-white" style={{ backgroundColor: '#fb510f' }}>
+            <div className="rounded-2xl p-10 text-white w-full" style={{ backgroundColor: '#fb510f' }}>
               <div className="flex items-start gap-4 mb-4">
                 {/* Checkmark Icon */}
                 <div className="w-12 h-12 bg-white bg-opacity-20 rounded-xl flex items-center justify-center flex-shrink-0">
@@ -170,14 +176,14 @@ export const ExamBoardPage: React.FC<ExamBoardPageProps> = ({ examBoardPageData,
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
                 </div>
-                <div>
-                  <h3 className="text-xl font-bold mb-1">Practice Questions</h3>
-                  <p className="text-orange-100 text-sm">Test your knowledge</p>
+                                  <div>
+                    <h3 className="text-xl font-bold mb-1">{sidebarConfig.practiceQuestionsButton.blockTitle}</h3>
+                    <p className="text-orange-100 text-sm">{sidebarConfig.practiceQuestionsButton.blockSubtitle}</p>
+                  </div>
                 </div>
-              </div>
-              <p className="text-white mb-6 leading-relaxed">
-                Master exam techniques with targeted practice questions. Get instant feedback and detailed explanations.
-              </p>
+                <p className="text-white mb-6 leading-relaxed">
+                  {sidebarConfig.practiceQuestionsButton.blockDescription}
+                </p>
               <a 
                 href={sidebarConfig.practiceQuestionsButton.buttonUrl} 
                 className="inline-flex items-center gap-2 bg-white text-orange-900 px-6 py-3 rounded-xl font-medium hover:bg-orange-50 transition-colors duration-200"

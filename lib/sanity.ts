@@ -437,10 +437,16 @@ export const examBoardPageQuery = (cloneId: string) => `*[_type == "examBoardPag
   sidebar {
     isActive,
     studyNotesButton {
+      blockTitle,
+      blockSubtitle,
+      blockDescription,
       buttonText,
       buttonUrl
     },
     practiceQuestionsButton {
+      blockTitle,
+      blockSubtitle,
+      blockDescription,
       buttonText,
       buttonUrl
     }

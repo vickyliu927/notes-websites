@@ -106,9 +106,30 @@ export default defineType({
         },
         {
           name: 'studyNotesButton',
-          title: 'Study Notes Button',
+          title: 'Study Notes Block',
           type: 'object',
           fields: [
+            {
+              name: 'blockTitle',
+              title: 'Block Title',
+              type: 'string',
+              description: 'Main title for the study notes block (e.g., "Premium Study Notes")',
+              initialValue: 'Premium Study Notes'
+            },
+            {
+              name: 'blockSubtitle',
+              title: 'Block Subtitle',
+              type: 'string',
+              description: 'Subtitle for the study notes block (e.g., "Expert-crafted summaries")',
+              initialValue: 'Expert-crafted summaries'
+            },
+            {
+              name: 'blockDescription',
+              title: 'Block Description',
+              type: 'text',
+              description: 'Description text for the study notes block',
+              initialValue: 'Study notes written by top graduates. Save hours of prep time with structured summaries.'
+            },
             {
               name: 'buttonText',
               title: 'Button Text',
@@ -126,9 +147,30 @@ export default defineType({
         },
         {
           name: 'practiceQuestionsButton',
-          title: 'Practice Questions Button',
+          title: 'Practice Questions Block',
           type: 'object',
           fields: [
+            {
+              name: 'blockTitle',
+              title: 'Block Title',
+              type: 'string',
+              description: 'Main title for the practice questions block (e.g., "Practice Questions")',
+              initialValue: 'Practice Questions'
+            },
+            {
+              name: 'blockSubtitle',
+              title: 'Block Subtitle',
+              type: 'string',
+              description: 'Subtitle for the practice questions block (e.g., "Test your knowledge")',
+              initialValue: 'Test your knowledge'
+            },
+            {
+              name: 'blockDescription',
+              title: 'Block Description',
+              type: 'text',
+              description: 'Description text for the practice questions block',
+              initialValue: 'Master exam techniques with targeted practice questions. Get instant feedback and detailed explanations.'
+            },
             {
               name: 'buttonText',
               title: 'Button Text',
