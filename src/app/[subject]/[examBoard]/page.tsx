@@ -52,11 +52,14 @@ async function getCloneIdByDomain(hostname: string): Promise<string | null> {
   try {
     console.log(`[EXAM_BOARD_DOMAIN_LOOKUP] Looking up hostname: ${hostname}`)
     
-    const query = `*[_type == "clone" && customDomain == "${hostname}" && isActive == true][0] {
-      cloneId
-    }`
+    const query = `
+      *[_type == "clone" && $hostname in metadata.domains && isActive == true][0] {
+        cloneId,
+        metadata
+      }
+    `
     
-    const result = await client.fetch(query)
+    const result = await client.fetch(query, { hostname })
     console.log(`[EXAM_BOARD_DOMAIN_LOOKUP] Query result:`, result)
     
     if (result?.cloneId?.current) {
@@ -65,6 +68,17 @@ async function getCloneIdByDomain(hostname: string): Promise<string | null> {
     }
     
     console.log(`[EXAM_BOARD_DOMAIN_LOOKUP] No clone found for hostname: ${hostname}`)
+    
+    // Debug: Show all configured clone domains
+    const allClones = await client.fetch(`
+      *[_type == "clone" && isActive == true] {
+        cloneId,
+        cloneName,
+        "domains": metadata.domains
+      }
+    `)
+    console.log(`[EXAM_BOARD_DOMAIN_LOOKUP] Available clone domains:`, JSON.stringify(allClones, null, 2))
+    
     return null
   } catch (error) {
     console.error('[EXAM_BOARD_DOMAIN_LOOKUP] Error:', error instanceof Error ? error.message : String(error))
