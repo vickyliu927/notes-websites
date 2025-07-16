@@ -137,9 +137,20 @@ async function getCloneAwareSubjectPageData(slug: string, cloneId?: string) {
       console.log(`[SUBJECT] Fetched clone-aware subject page data:`, subjectPageData);
       return subjectPageData;
     } else {
-      const subjectPageData = await getSubjectPageData(slug);
-      console.log('[SUBJECT] Fetched default subject page data:', subjectPageData);
-      return subjectPageData;
+      // For the main website (no cloneId), use the fallback system with the baseline clone
+      // Find the baseline clone ID first
+      const baselineClone = await client.fetch(`*[_type == "clone" && baselineClone == true][0]{cloneId}`);
+      if (baselineClone?.cloneId?.current) {
+        const fallbackResult = await client.fetch(getSubjectPageWithFallback(baselineClone.cloneId.current, slug));
+        const subjectPageData = selectBestData(fallbackResult);
+        console.log('[SUBJECT] Fetched default subject page data using fallback system:', subjectPageData);
+        return subjectPageData;
+      } else {
+        // Fallback to the old method if no baseline clone is found
+        const subjectPageData = await getSubjectPageData(slug);
+        console.log('[SUBJECT] Fetched default subject page data (legacy):', subjectPageData);
+        return subjectPageData;
+      }
     }
   } catch (error) {
     console.error('[SUBJECT] Error fetching subject page data:', error);

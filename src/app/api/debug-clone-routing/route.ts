@@ -1,106 +1,80 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { client } from '../../../../lib/sanity'
+import { getSubjectPageWithFallback } from '../../../../lib/cloneQueries'
 
 export async function GET(req: NextRequest) {
   try {
+    const url = new URL(req.url)
+    const subject = url.searchParams.get('subject') || 'biology'
+    
     // Get all clones
-    const clones = await client.fetch(`
-      *[_type == "clone"] | order(baselineClone desc, _createdAt asc) {
+    const clones = await client.fetch(`*[_type == "clone"] | order(baselineClone desc) {
+      _id,
+      cloneId,
+      cloneName,
+      baselineClone,
+      isActive,
+      metadata
+    }`)
+
+    // Get all subject pages for the specified subject
+    const subjectPages = await client.fetch(`*[_type == "subjectPage" && subjectSlug == "${subject}"] {
+      _id,
+      title,
+      pageTitle,
+      pageDescription,
+      isPublished,
+      subjectName,
+      subjectSlug,
+      cloneReference->{
         _id,
         cloneId,
         cloneName,
-        isActive,
         baselineClone,
-        metadata {
-          domains,
-          siteTitle,
-          targetAudience
-        }
+        isActive
       }
-    `)
+    }`)
 
-    // Get all biology subject pages
-    const biologyPages = await client.fetch(`
-      *[_type == "subjectPage" && subjectSlug == "biology"] {
+    // Get all subject pages for comparison
+    const allSubjectPages = await client.fetch(`*[_type == "subjectPage"] {
+      _id,
+      title,
+      subjectName,
+      subjectSlug,
+      isPublished,
+      cloneReference->{
         _id,
-        title,
-        subjectSlug,
-        subjectName,
-        pageTitle,
-        pageDescription,
-        isPublished,
-        cloneReference->{
-          _id,
-          cloneId,
-          cloneName,
-          baselineClone,
-          isActive
-        }
+        cloneId,
+        cloneName,
+        baselineClone
       }
-    `)
+    }`)
 
-    // Get all subject pages for better understanding
-    const allSubjectPages = await client.fetch(`
-      *[_type == "subjectPage"] | order(subjectSlug asc) {
-        _id,
-        title,
-        subjectSlug,
-        subjectName,
-        isPublished,
-        cloneReference->{
-          _id,
-          cloneId,
-          cloneName,
-          baselineClone,
-          isActive
-        }
-      }
-    `)
-
-    // Test the fallback query for different clones
+    // Test fallback logic for each clone
     const fallbackTests = []
-    for (const clone of clones.filter(c => c.isActive)) {
-      const fallbackResult = await client.fetch(`
-        {
-          "cloneSpecific": *[_type == "subjectPage" && cloneReference->cloneId.current == "${clone.cloneId.current}" && subjectSlug == "biology" && isPublished == true][0] {
-            _id,
-            title,
-            pageTitle,
-            cloneReference->{cloneId, cloneName}
-          },
-          "baseline": *[_type == "subjectPage" && cloneReference->baselineClone == true && subjectSlug == "biology" && isPublished == true][0] {
-            _id,
-            title,
-            pageTitle,
-            cloneReference->{cloneId, cloneName}
-          },
-          "default": *[_type == "subjectPage" && !defined(cloneReference) && subjectSlug == "biology" && isPublished == true][0] {
-            _id,
-            title,
-            pageTitle
-          }
-        }
-      `)
-      
+    for (const clone of clones) {
+      const result = await client.fetch(getSubjectPageWithFallback(clone.cloneId.current, subject))
       fallbackTests.push({
         clone: clone.cloneName,
         cloneId: clone.cloneId.current,
-        fallbackResult
+        fallbackResult: result
       })
     }
 
     return NextResponse.json({
+      subject,
       clones,
-      biologyPages,
+      [`${subject}Pages`]: subjectPages,
       allSubjectPages,
       fallbackTests,
       summary: {
         totalClones: clones.length,
-        activeClones: clones.filter(c => c.isActive).length,
-        biologyPagesCount: biologyPages.length,
+        activeClones: clones.filter((c: any) => c.isActive).length,
+        [`${subject}PagesCount`]: subjectPages.length,
         totalSubjectPages: allSubjectPages.length
       }
     })
+
   } catch (error) {
     return NextResponse.json({ 
       error: error instanceof Error ? error.message : String(error),
