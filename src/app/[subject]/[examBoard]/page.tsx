@@ -148,7 +148,13 @@ async function getCloneAwareSubjectPageData(slug: string, cloneId?: string): Pro
     if (cloneId) {
       const fallbackResult = await client.fetch(getSubjectPageWithFallback(cloneId, slug));
       const subjectPageData = selectBestData(fallbackResult) as SubjectPageData;
-      console.log(`[EXAM_BOARD] Fetched clone-aware subject page data:`, subjectPageData);
+      console.log(`[EXAM_BOARD] Fetched clone-aware subject page data:`, {
+        requestedClone: cloneId,
+        requestedSubject: slug,
+        resultTitle: subjectPageData?.pageTitle,
+        resultSubject: subjectPageData?.subjectName,
+        fallbackDataSources: Object.keys(fallbackResult || {})
+      });
       return subjectPageData;
     } else {
       // For the main website (no cloneId), use the fallback system with the baseline clone
@@ -156,7 +162,13 @@ async function getCloneAwareSubjectPageData(slug: string, cloneId?: string): Pro
       if (baselineClone?.cloneId?.current) {
         const fallbackResult = await client.fetch(getSubjectPageWithFallback(baselineClone.cloneId.current, slug));
         const subjectPageData = selectBestData(fallbackResult) as SubjectPageData;
-        console.log('[EXAM_BOARD] Fetched default subject page data using fallback system:', subjectPageData);
+        console.log('[EXAM_BOARD] Fetched default subject page data using fallback system:', {
+          baselineCloneId: baselineClone.cloneId.current,
+          requestedSubject: slug,
+          resultTitle: subjectPageData?.pageTitle,
+          resultSubject: subjectPageData?.subjectName,
+          fallbackDataSources: Object.keys(fallbackResult || {})
+        });
         return subjectPageData;
       } else {
         console.log('[EXAM_BOARD] No baseline clone found, falling back to legacy method');
@@ -183,17 +195,27 @@ export default async function ExamBoardPageHandler({ params }: ExamBoardPageProp
     cloneId = await getCloneIdByDomain(hostname);
   }
 
+  console.log('📍 [EXAM_BOARD] Domain detection:', { hostname, detectedCloneId: cloneId });
+
   // Check if there are active exam board pages for the current clone
   const { hasActive: hasActiveExamBoards, cloneId: examBoardCloneId } = await hasActiveExamBoardPages(cloneId || undefined);
   
-  console.log('📍 [EXAM_BOARD] Active exam board check:', { hasActiveExamBoards, examBoardCloneId, subject, examBoard });
+  console.log('📍 [EXAM_BOARD] Active exam board check:', { hasActiveExamBoards, examBoardCloneId, subject, examBoard, originalCloneId: cloneId });
 
   // NEW URL STRUCTURE: If exam board pages are active, show subject content at /[subject]/[examBoard]
   if (hasActiveExamBoards && examBoardCloneId) {
     console.log('📍 [EXAM_BOARD] Showing subject content for exam board:', { subject, examBoard, examBoardCloneId });
     
     // Get the subject page data for the clone that has the active exam board page
+    console.log('📍 [EXAM_BOARD] Fetching subject data for:', { subject, examBoardCloneId });
     const subjectPageData = await getCloneAwareSubjectPageData(subject, examBoardCloneId);
+    console.log('📍 [EXAM_BOARD] Fetched subject data:', { 
+      subject, 
+      cloneUsed: examBoardCloneId, 
+      pageTitle: subjectPageData?.pageTitle,
+      subjectName: subjectPageData?.subjectName,
+      topicsCount: subjectPageData?.topics?.length
+    });
     
     if (!subjectPageData) {
       notFound()
@@ -258,7 +280,15 @@ export default async function ExamBoardPageHandler({ params }: ExamBoardPageProp
 
   // FALLBACK: Use normal subject page layout for all exam board subject pages
   // Get the subject page data for the current clone
+  console.log('📍 [EXAM_BOARD] FALLBACK - Fetching subject data for:', { subject, cloneId });
   const subjectPageData = await getCloneAwareSubjectPageData(subject, cloneId || undefined);
+  console.log('📍 [EXAM_BOARD] FALLBACK - Fetched subject data:', { 
+    subject, 
+    cloneUsed: cloneId, 
+    pageTitle: subjectPageData?.pageTitle,
+    subjectName: subjectPageData?.subjectName,
+    topicsCount: subjectPageData?.topics?.length
+  });
   
   if (!subjectPageData) {
     notFound()
