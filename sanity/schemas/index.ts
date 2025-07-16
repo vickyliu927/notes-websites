@@ -14,6 +14,7 @@ import contactFormSection from './contactFormSection'
 import clone from './clone'
 import examBoard from './examBoard'
 import examBoardPage from './examBoardPage'
+import examBoardSidebar from './examBoardSidebar'
 
 
 export const schemaTypes = [
@@ -32,5 +33,6 @@ export const schemaTypes = [
   contactFormSection,
   clone,
   examBoard,
-  examBoardPage
+  examBoardPage,
+  examBoardSidebar
 ] 

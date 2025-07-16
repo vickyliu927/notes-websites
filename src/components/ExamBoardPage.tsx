@@ -21,14 +21,38 @@ interface ExamBoardPageData {
   title: string
   description: string
   examBoards: ExamBoard[]
+  ctaButtons?: {
+    isActive: boolean
+    studyNotesButton: {
+      buttonText: string
+      buttonUrl: string
+    }
+    practiceQuestionsButton: {
+      buttonText: string
+      buttonUrl: string
+    }
+  }
+}
+
+interface SidebarData {
+  practiceQuestionsButton: {
+    buttonText: string
+    buttonUrl: string
+  }
+  studyNotesButton: {
+    buttonText: string
+    buttonUrl: string
+  }
+  isActive: boolean
 }
 
 interface ExamBoardPageProps {
   examBoardPageData: ExamBoardPageData
   currentSubject?: string
+  sidebarData?: SidebarData
 }
 
-export const ExamBoardPage: React.FC<ExamBoardPageProps> = ({ examBoardPageData, currentSubject }) => {
+export const ExamBoardPage: React.FC<ExamBoardPageProps> = ({ examBoardPageData, currentSubject, sidebarData }) => {
   const generateExamBoardUrl = (board: ExamBoard): string => {
     if (!currentSubject) {
       return '#'
@@ -52,39 +76,113 @@ export const ExamBoardPage: React.FC<ExamBoardPageProps> = ({ examBoardPageData,
           {examBoardPageData.description}
         </p>
       </div>
+
+      {/* CTA Buttons Section */}
+      {examBoardPageData.ctaButtons?.isActive && (
+        <div className="flex justify-center gap-4 mb-12">
+          <a 
+            href={examBoardPageData.ctaButtons.studyNotesButton.buttonUrl}
+            className="inline-flex items-center px-8 py-3 bg-blue-600 text-white text-lg font-medium rounded-lg hover:bg-blue-700 transition-colors duration-300"
+            style={{ backgroundColor: '#001a96' }}
+          >
+            {examBoardPageData.ctaButtons.studyNotesButton.buttonText}
+          </a>
+          <a 
+            href={examBoardPageData.ctaButtons.practiceQuestionsButton.buttonUrl}
+            className="inline-flex items-center px-8 py-3 bg-orange-500 text-white text-lg font-medium rounded-lg hover:bg-orange-600 transition-colors duration-300"
+            style={{ backgroundColor: '#fb510f' }}
+          >
+            {examBoardPageData.ctaButtons.practiceQuestionsButton.buttonText}
+          </a>
+        </div>
+      )}
+
       {/* Main Section: Exam Boards + Sidebar */}
       <div className="flex flex-col lg:flex-row gap-8">
         {/* Exam Board Blocks */}
         <div className="flex-1 grid grid-cols-1 md:grid-cols-3 gap-8">
           {examBoardPageData.examBoards?.map((board) => (
-            <div key={board.id} className="bg-white rounded-lg shadow p-6 flex flex-col items-center text-center">
+            <div key={board.id} className="bg-white rounded-xl shadow-lg border border-gray-100 p-8 flex flex-col items-center text-center hover:shadow-xl transition-shadow duration-300">
               {board.logo?.asset?.url && (
-                <img src={board.logo.asset.url} alt={board.logo.alt || board.name} className="h-16 mb-4" />
+                <div className="w-32 h-32 flex items-center justify-center mb-6 bg-gray-50 rounded-lg p-4">
+                  <img 
+                    src={board.logo.asset.url} 
+                    alt={board.logo.alt || board.name} 
+                    className="max-w-full max-h-full object-contain" 
+                  />
+                </div>
               )}
-              <h2 className="text-xl font-bold mb-2">{board.customTitle || board.name}</h2>
-              <p className="text-gray-600 mb-4">{board.customDescription}</p>
+              <h2 className="text-2xl font-bold mb-3 text-gray-800">{board.customTitle || board.name}</h2>
+              <p className="text-gray-600 mb-6 leading-relaxed">{board.customDescription}</p>
               <a 
                 href={generateExamBoardUrl(board)} 
-                className="mt-auto px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
+                className="mt-auto px-8 py-3 bg-gray-800 text-white rounded-lg hover:bg-gray-900 transition-colors duration-200 font-medium"
               >
                 {board.buttonLabel}
               </a>
             </div>
           ))}
         </div>
-        {/* Sidebar/Advert Placeholder */}
-        <aside className="w-full lg:w-80 flex-shrink-0">
-          <div className="bg-blue-50 rounded-lg p-6 mb-6">
-            <h3 className="font-bold text-blue-800 mb-2">Premium Study Notes</h3>
-            <p className="text-sm text-blue-900 mb-4">Expert-crafted summaries. Save hours of prep time with structured notes.</p>
-            <a href="#" className="block px-4 py-2 bg-blue-700 text-white rounded hover:bg-blue-800 text-center">Access Notes</a>
-          </div>
-          <div className="bg-orange-50 rounded-lg p-6">
-            <h3 className="font-bold text-orange-800 mb-2">Practice Questions</h3>
-            <p className="text-sm text-orange-900 mb-4">Master exam techniques with targeted practice questions. Get instant feedback and detailed explanations.</p>
-            <a href="#" className="block px-4 py-2 bg-orange-600 text-white rounded hover:bg-orange-700 text-center">Start Practice</a>
-          </div>
-        </aside>
+        {/* Sidebar - Only show if sidebar data is available and active */}
+        {sidebarData && sidebarData.isActive && (
+          <aside className="w-full lg:w-80 flex-shrink-0 space-y-6">
+            {/* Premium Study Notes Card */}
+            <div className="rounded-2xl p-8 text-white" style={{ backgroundColor: '#001a96' }}>
+              <div className="flex items-start gap-4 mb-4">
+                {/* Book Icon */}
+                <div className="w-12 h-12 bg-white bg-opacity-20 rounded-xl flex items-center justify-center flex-shrink-0">
+                  <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                  </svg>
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold mb-1">Premium Study Notes</h3>
+                  <p className="text-blue-100 text-sm">Expert-crafted summaries</p>
+                </div>
+              </div>
+              <p className="text-white mb-6 leading-relaxed">
+                Study notes written by top graduates. Save hours of prep time with structured summaries.
+              </p>
+              <a 
+                href={sidebarData.studyNotesButton.buttonUrl} 
+                className="inline-flex items-center gap-2 bg-white text-blue-900 px-6 py-3 rounded-xl font-medium hover:bg-blue-50 transition-colors duration-200"
+              >
+                {sidebarData.studyNotesButton.buttonText}
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </a>
+            </div>
+
+            {/* Practice Questions Card */}
+            <div className="rounded-2xl p-8 text-white" style={{ backgroundColor: '#fb510f' }}>
+              <div className="flex items-start gap-4 mb-4">
+                {/* Checkmark Icon */}
+                <div className="w-12 h-12 bg-white bg-opacity-20 rounded-xl flex items-center justify-center flex-shrink-0">
+                  <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold mb-1">Practice Questions</h3>
+                  <p className="text-orange-100 text-sm">Test your knowledge</p>
+                </div>
+              </div>
+              <p className="text-white mb-6 leading-relaxed">
+                Master exam techniques with targeted practice questions. Get instant feedback and detailed explanations.
+              </p>
+              <a 
+                href={sidebarData.practiceQuestionsButton.buttonUrl} 
+                className="inline-flex items-center gap-2 bg-white text-orange-900 px-6 py-3 rounded-xl font-medium hover:bg-orange-50 transition-colors duration-200"
+              >
+                {sidebarData.practiceQuestionsButton.buttonText}
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </a>
+            </div>
+          </aside>
+        )}
       </div>
     </div>
   )

@@ -423,6 +423,17 @@ export const examBoardPageQuery = (cloneId: string) => `*[_type == "examBoardPag
   title,
   description,
   isActive,
+  ctaButtons {
+    isActive,
+    studyNotesButton {
+      buttonText,
+      buttonUrl
+    },
+    practiceQuestionsButton {
+      buttonText,
+      buttonUrl
+    }
+  },
   examBoards[] {
     id,
     name,
@@ -440,6 +451,39 @@ export const examBoardPageQuery = (cloneId: string) => `*[_type == "examBoardPag
     buttonLabel
   }
 }`;
+
+// GROQ query to fetch exam board sidebar configuration
+export const examBoardSidebarQuery = (cloneId?: string) => {
+  if (cloneId) {
+    // First try to get clone-specific sidebar, then fall back to global
+    return `*[_type == "examBoardSidebar" && isActive == true && (cloneReference->cloneId.current == "${cloneId}" || cloneReference == null)] | order(cloneReference desc)[0]{
+      _id,
+      practiceQuestionsButton {
+        buttonText,
+        buttonUrl
+      },
+      studyNotesButton {
+        buttonText,
+        buttonUrl
+      },
+      isActive
+    }`
+  } else {
+    // Get global/default sidebar
+    return `*[_type == "examBoardSidebar" && isActive == true && cloneReference == null][0]{
+      _id,
+      practiceQuestionsButton {
+        buttonText,
+        buttonUrl
+      },
+      studyNotesButton {
+        buttonText,
+        buttonUrl
+      },
+      isActive
+    }`
+  }
+}
 
 // Helper function to get the appropriate client based on environment
 function getClient() {
@@ -615,5 +659,18 @@ export async function hasActiveExamBoardPages(cloneId?: string): Promise<{ hasAc
   } catch (error) {
     console.error('Error checking active exam board pages:', error);
     return { hasActive: false };
+  }
+}
+
+// Fetch function for exam board sidebar
+export async function getExamBoardSidebar(cloneId?: string) {
+  const query = examBoardSidebarQuery(cloneId);
+  try {
+    const clientToUse = getClient();
+    const data = await clientToUse.fetch(query);
+    return data;
+  } catch (error) {
+    console.error('Error fetching exam board sidebar:', error);
+    return null;
   }
 }

@@ -8,7 +8,8 @@ import {
   headerQuery, 
   footerQuery, 
   contactFormSectionQuery,
-  hasActiveExamBoardPages
+  hasActiveExamBoardPages,
+  getExamBoardSidebar
 } from '../../../../lib/sanity'
 import { 
   getHeaderWithFallback,
@@ -329,10 +330,11 @@ export default async function ExamBoardPageHandler({ params }: ExamBoardPageProp
     notFound()
   }
 
-  // Fetch layout components
+  // Fetch layout components and sidebar
   const headerData = await getHeaderData(cloneId || undefined);
   const footerData = await getFooterData(cloneId || undefined);
   const contactFormSectionData = await getContactFormSectionData(cloneId || undefined);
+  const sidebarData = await getExamBoardSidebar(cloneId || undefined);
 
   // Check if contact form is active
   const isContactFormActive = contactFormSectionData?.isActive ?? false;
@@ -344,7 +346,7 @@ export default async function ExamBoardPageHandler({ params }: ExamBoardPageProp
       <div className="min-h-screen bg-white">
         <Header headerData={headerData} isContactFormActive={shouldShowContactForm} homepageUrl="/" />
         <main>
-          <ExamBoardPage examBoardPageData={examBoardPageData} currentSubject={subject} />
+          <ExamBoardPage examBoardPageData={examBoardPageData} currentSubject={subject} sidebarData={sidebarData} />
         </main>
         <Footer footerData={footerData} isContactFormActive={shouldShowContactForm} />
       </div>

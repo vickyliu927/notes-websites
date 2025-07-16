@@ -38,6 +38,61 @@ export default defineType({
       initialValue: false
     }),
     defineField({
+      name: 'ctaButtons',
+      title: 'CTA Buttons Section',
+      type: 'object',
+      fields: [
+        {
+          name: 'isActive',
+          title: 'Show CTA Buttons',
+          type: 'boolean',
+          description: 'Toggle to show/hide the CTA buttons section under the description',
+          initialValue: false
+        },
+        {
+          name: 'studyNotesButton',
+          title: 'Study Notes Button',
+          type: 'object',
+          fields: [
+            {
+              name: 'buttonText',
+              title: 'Button Text',
+              type: 'string',
+              description: 'Text for the study notes button (e.g., "Study Notes")',
+              initialValue: 'Study Notes'
+            },
+            {
+              name: 'buttonUrl',
+              title: 'Button URL',
+              type: 'string',
+              description: 'URL for the study notes button'
+            }
+          ]
+        },
+        {
+          name: 'practiceQuestionsButton',
+          title: 'Practice Questions Button',
+          type: 'object',
+          fields: [
+            {
+              name: 'buttonText',
+              title: 'Button Text',
+              type: 'string',
+              description: 'Text for the practice questions button (e.g., "Practice Questions")',
+              initialValue: 'Practice Questions'
+            },
+            {
+              name: 'buttonUrl',
+              title: 'Button URL',
+              type: 'string',
+              description: 'URL for the practice questions button'
+            }
+          ]
+        }
+      ],
+      description: 'Configure the CTA buttons that appear under the exam board page description'
+    }),
+    defineField({
       name: 'examBoards',
       title: 'Exam Boards',
       type: 'array',
