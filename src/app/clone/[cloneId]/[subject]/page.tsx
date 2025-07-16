@@ -5,9 +5,11 @@ import {
   Footer, 
   SubjectTopicGrid,
   ContactForm,
-  MoreResources 
+  MoreResources,
+  ExamBoardPage
 } from '@/components'
 import { validateCloneId, getCompleteCloneData, getSubjectPageForClone } from '../../../../../lib/cloneUtils'
+import { getExamBoardPage } from '../../../../../lib/sanity'
 import { generateSEOMetadata } from '../../../../../components/SEOHead'
 import { SEOProvider } from '../../../../../contexts/SEOContext'
 import { HeaderData, FooterData, ContactFormSectionData, SubjectPageData } from '../../../../../types/sanity'
@@ -99,6 +101,9 @@ export default async function CloneSubjectPage({ params }: CloneSubjectPageProps
   const contactFormData = cloneComponents?.components?.contactForm?.data as ContactFormSectionData | undefined
   const footerData = cloneComponents?.components?.footer?.data as FooterData | undefined
 
+  // Fetch exam board page for this clone (applies to all subjects)
+  const examBoardPageData = await getExamBoardPage(cloneId)
+
   // Ensure topicBlockBackgroundColor has a default value if not set
   const backgroundColorClass = subjectData.topicBlockBackgroundColor || 'bg-blue-500'
 
@@ -106,6 +111,24 @@ export default async function CloneSubjectPage({ params }: CloneSubjectPageProps
   const isContactFormActive = contactFormData?.isActive ?? false
   const showContactFormOnThisPage = subjectData.showContactForm ?? true
   const shouldShowContactForm = isContactFormActive && showContactFormOnThisPage
+
+  // If exam board page exists, render it instead of the default subject page UI
+  if (examBoardPageData) {
+    return (
+      <SEOProvider seoData={subjectData.seo}>
+        <div className="min-h-screen bg-white">
+          <Header headerData={headerData} isContactFormActive={shouldShowContactForm} homepageUrl={`/clone/${cloneId}/homepage`} />
+          <main>
+            <ExamBoardPage examBoardPageData={examBoardPageData} />
+          </main>
+          {shouldShowContactForm && contactFormData && (
+            <ContactForm contactFormData={contactFormData} />
+          )}
+          <Footer footerData={footerData} isContactFormActive={shouldShowContactForm} />
+        </div>
+      </SEOProvider>
+    )
+  }
 
   return (
     <SEOProvider seoData={subjectData.seo}>

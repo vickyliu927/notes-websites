@@ -417,8 +417,8 @@ export const mathsPageQuery = `*[_type == "mathsPage"][0]{
   }
 }`
 
-// GROQ query to fetch exam board page for a given clone and subject
-export const examBoardPageQuery = (cloneId: string, subjectPageId: string) => `*[_type == "examBoardPage" && cloneReference->cloneId.current == "${cloneId}" && subjectPageReference._ref == "${subjectPageId}" && isActive == true][0]{
+// GROQ query to fetch exam board page for a given clone (applies to all subjects)
+export const examBoardPageQuery = (cloneId: string) => `*[_type == "examBoardPage" && cloneReference->cloneId.current == "${cloneId}" && isActive == true][0]{
   _id,
   title,
   description,
@@ -575,9 +575,9 @@ export async function getSubjectPageData(slug: string) {
   }
 }
 
-// Fetch function for exam board page
-export async function getExamBoardPage(cloneId: string, subjectPageId: string) {
-  const query = examBoardPageQuery(cloneId, subjectPageId);
+// Fetch function for exam board page (applies to all subjects for a clone)
+export async function getExamBoardPage(cloneId: string) {
+  const query = examBoardPageQuery(cloneId);
   try {
     const clientToUse = getClient();
     const data = await clientToUse.fetch(query);

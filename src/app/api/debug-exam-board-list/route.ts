@@ -6,8 +6,7 @@ export async function GET(req: NextRequest) {
     _id,
     title,
     isActive,
-    cloneReference->{_id, cloneId, cloneName},
-    subjectPageReference->{_id, title, subjectSlug, subjectName}
+    cloneReference->{_id, cloneId, cloneName}
   }`
   try {
     const data = await client.fetch(query)

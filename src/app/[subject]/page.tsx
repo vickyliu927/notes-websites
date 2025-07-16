@@ -247,8 +247,8 @@ export default async function SubjectPage({ params }: SubjectPageProps) {
     notFound()
   }
 
-  // Fetch exam board page for this subject and clone
-  const examBoardPageData = await getExamBoardPage(cloneId || '', subjectPageData._id);
+  // Fetch exam board page for this clone (applies to all subjects)
+  const examBoardPageData = await getExamBoardPage(cloneId || '');
 
   // Debug log to check the data
   console.log('📍 [SUBJECT_PAGE] Subject page data:', {

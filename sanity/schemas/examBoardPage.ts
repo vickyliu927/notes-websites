@@ -27,22 +27,14 @@ export default defineType({
       title: 'Clone Version',
       type: 'reference',
       to: [{ type: 'clone' }],
-      description: 'Select which clone version this exam board page belongs to',
-      validation: Rule => Rule.required()
-    }),
-    defineField({
-      name: 'subjectPageReference',
-      title: 'Subject Page',
-      type: 'reference',
-      to: [{ type: 'subjectPage' }],
-      description: 'Select the subject page this exam board page is for',
+      description: 'Select which clone version this exam board page belongs to. When active, this will apply to ALL subjects for this clone.',
       validation: Rule => Rule.required()
     }),
     defineField({
       name: 'isActive',
       title: 'Is Active',
       type: 'boolean',
-      description: 'Toggle to control whether this page is visible on the frontend',
+      description: 'Toggle to control whether this exam board page is visible on ALL subject pages for this clone',
       initialValue: false
     }),
     defineField({
@@ -125,15 +117,14 @@ export default defineType({
   preview: {
     select: {
       title: 'title',
-      subject: 'subjectPageReference.subjectName',
       clone: 'cloneReference.cloneName',
       isActive: 'isActive'
     },
     prepare(selection) {
-      const { title, subject, clone, isActive } = selection
+      const { title, clone, isActive } = selection
       return {
         title: title,
-        subtitle: `${subject ? subject : ''}${clone ? ' | ' + clone : ''}${isActive ? ' (Active)' : ' (Inactive)'}`,
+        subtitle: `${clone ? clone : 'No Clone'}${isActive ? ' (Active)' : ' (Inactive)'}`,
         media: () => '📚'
       }
     }
