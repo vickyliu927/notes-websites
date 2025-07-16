@@ -1,8 +1,11 @@
 import { defineField, defineType } from 'sanity'
 
+// DEPRECATED: This schema is being phased out in favor of dynamic exam board routing.
+// New exam board pages should use the dynamic /[subject]/[examBoard] routes with the 'examBoard' schema.
+// This schema is kept for backward compatibility with existing exam board page documents.
 export default defineType({
   name: 'examBoardPage',
-  title: 'Exam Board Page',
+  title: 'Exam Board Page (DEPRECATED)',
   type: 'document',
   fields: [
     defineField({

@@ -1,0 +1,276 @@
+import { Metadata } from 'next'
+import { headers } from 'next/headers'
+import { notFound } from 'next/navigation'
+import { Header, Footer } from '@/components'
+import ExamBoardPage from '@/components/ExamBoardPage'
+import { 
+  client, 
+  headerQuery, 
+  footerQuery, 
+  contactFormSectionQuery
+} from '../../../../lib/sanity'
+import { 
+  getHeaderWithFallback,
+  getFooterWithFallback,
+  getContactFormWithFallback
+} from '../../../../lib/cloneQueries'
+import { getSubjectPageForClone } from '../../../../lib/cloneUtils'
+import { HeaderData, FooterData, ContactFormSectionData, SubjectPageData } from '../../../../types/sanity'
+import { SEOProvider } from '../../../../contexts/SEOContext'
+
+export const revalidate = 10;
+
+interface ExamBoardPageProps {
+  params: Promise<{ subject: string; examBoard: string }>
+}
+
+// Generate metadata for SEO
+export async function generateMetadata({ params }: ExamBoardPageProps): Promise<Metadata> {
+  const { subject, examBoard } = await params
+  
+  // Capitalize subject and exam board for display
+  const subjectName = subject.charAt(0).toUpperCase() + subject.slice(1)
+  const examBoardName = examBoard.toUpperCase()
+  
+  const title = `${subjectName} ${examBoardName} Exam Board | Study Resources`
+  const description = `Comprehensive ${subjectName} study resources and practice questions for ${examBoardName} exam board. Access notes, papers, and more.`
+
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+    },
+  }
+}
+
+// Helper function to get clone ID by domain
+async function getCloneIdByDomain(hostname: string): Promise<string | null> {
+  try {
+    console.log(`[EXAM_BOARD_DOMAIN_LOOKUP] Looking up hostname: ${hostname}`)
+    
+    const query = `*[_type == "clone" && customDomain == "${hostname}" && isActive == true][0] {
+      cloneId
+    }`
+    
+    const result = await client.fetch(query)
+    console.log(`[EXAM_BOARD_DOMAIN_LOOKUP] Query result:`, result)
+    
+    if (result?.cloneId?.current) {
+      console.log(`[EXAM_BOARD_DOMAIN_LOOKUP] Found clone: ${result.cloneId.current}`)
+      return result.cloneId.current
+    }
+    
+    console.log(`[EXAM_BOARD_DOMAIN_LOOKUP] No clone found for hostname: ${hostname}`)
+    return null
+  } catch (error) {
+    console.error('[EXAM_BOARD_DOMAIN_LOOKUP] Error:', error instanceof Error ? error.message : String(error))
+    return null
+  }
+}
+
+// Helper function to select best data from fallback query
+function selectBestData<T>(fallbackResult: { cloneSpecific?: T; baseline?: T; default?: T }): T | undefined {
+  return fallbackResult?.cloneSpecific || fallbackResult?.baseline || fallbackResult?.default
+}
+
+async function getHeaderData(cloneId?: string): Promise<HeaderData | undefined> {
+  try {
+    console.log(`[EXAM_BOARD] Fetching header data${cloneId ? ` for clone: ${cloneId}` : ' (default)'}...`);
+    
+    if (cloneId) {
+      const fallbackResult = await client.fetch(getHeaderWithFallback(cloneId));
+      const headerData = selectBestData(fallbackResult) as HeaderData;
+      console.log(`[EXAM_BOARD] Fetched header data:`, headerData);
+      return headerData;
+    } else {
+      const headerData = await client.fetch(headerQuery);
+      console.log('[EXAM_BOARD] Fetched header data:', headerData);
+      return headerData;
+    }
+  } catch (error) {
+    console.error('[EXAM_BOARD] Error fetching header data:', error);
+    return undefined;
+  }
+}
+
+async function getFooterData(cloneId?: string): Promise<FooterData | undefined> {
+  try {
+    console.log(`[EXAM_BOARD] Fetching footer data${cloneId ? ` for clone: ${cloneId}` : ' (default)'}...`);
+    
+    if (cloneId) {
+      const fallbackResult = await client.fetch(getFooterWithFallback(cloneId));
+      const footerData = selectBestData(fallbackResult) as FooterData;
+      console.log(`[EXAM_BOARD] Fetched footer data:`, footerData);
+      return footerData;
+    } else {
+      const footerData = await client.fetch(footerQuery);
+      console.log('[EXAM_BOARD] Fetched footer data:', footerData);
+      return footerData;
+    }
+  } catch (error) {
+    console.error('[EXAM_BOARD] Error fetching footer data:', error);
+    return undefined;
+  }
+}
+
+async function getContactFormSectionData(cloneId?: string): Promise<ContactFormSectionData | undefined> {
+  try {
+    console.log(`[EXAM_BOARD] Fetching contact form section data${cloneId ? ` for clone: ${cloneId}` : ' (default)'}...`);
+    
+    if (cloneId) {
+      const fallbackResult = await client.fetch(getContactFormWithFallback(cloneId));
+      const contactFormSectionData = selectBestData(fallbackResult) as ContactFormSectionData;
+      console.log(`[EXAM_BOARD] Fetched contact form section data:`, contactFormSectionData);
+      return contactFormSectionData;
+    } else {
+      const contactFormSectionData = await client.fetch(contactFormSectionQuery);
+      console.log('[EXAM_BOARD] Fetched contact form section data:', contactFormSectionData);
+      return contactFormSectionData;
+    }
+  } catch (error) {
+    console.error('[EXAM_BOARD] Error fetching contact form section data:', error);
+    return undefined;
+  }
+}
+
+// Helper function to get exam board data
+async function getExamBoardData(subject: string, examBoard: string, cloneId?: string) {
+  // Get the subject page data first
+  const subjectPageResult = await getSubjectPageForClone(cloneId || '', subject)
+  const subjectPageData = subjectPageResult.data as SubjectPageData | null
+  
+  if (!subjectPageData) {
+    return null
+  }
+
+  // Create dynamic exam board page data
+  const subjectName = subjectPageData.subjectName || subject.charAt(0).toUpperCase() + subject.slice(1)
+  const examBoardDisplay = examBoard.toUpperCase()
+  
+  // Generate dynamic title and description
+  const title = `${subjectName} ${examBoardDisplay} Resources`
+  const description = `Access comprehensive ${subjectName} study materials specifically tailored for ${examBoardDisplay} exam board requirements.`
+  
+  // Create exam board blocks with dynamic links
+  const examBoards = [
+    {
+      id: 'practice-questions',
+      name: 'Practice Questions',
+      customTitle: `${examBoardDisplay} Practice Questions`,
+      customDescription: `Exam-style questions specifically designed for ${examBoardDisplay} ${subjectName} syllabus.`,
+      logo: {
+        asset: {
+          _id: 'practice-icon',
+          url: '/file.svg'
+        },
+        alt: 'Practice Questions'
+      },
+      buttonLabel: 'Start Practice',
+      buttonUrl: `/${subject}?examBoard=${examBoard}&type=practice`
+    },
+    {
+      id: 'study-notes',
+      name: 'Study Notes',
+      customTitle: `${examBoardDisplay} Study Notes`,
+      customDescription: `Comprehensive revision notes aligned with ${examBoardDisplay} ${subjectName} specification.`,
+      logo: {
+        asset: {
+          _id: 'notes-icon',
+          url: '/globe.svg'
+        },
+        alt: 'Study Notes'
+      },
+      buttonLabel: 'Access Notes',
+      buttonUrl: `/${subject}?examBoard=${examBoard}&type=notes`
+    },
+    {
+      id: 'past-papers',
+      name: 'Past Papers',
+      customTitle: `${examBoardDisplay} Past Papers`,
+      customDescription: `Previous examination papers and mark schemes for ${examBoardDisplay} ${subjectName}.`,
+      logo: {
+        asset: {
+          _id: 'papers-icon',
+          url: '/next.svg'
+        },
+        alt: 'Past Papers'
+      },
+      buttonLabel: 'View Papers',
+      buttonUrl: `/${subject}?examBoard=${examBoard}&type=papers`
+    }
+  ]
+
+  return {
+    title,
+    description,
+    examBoards,
+    subjectPageData
+  }
+}
+
+export default async function ExamBoardPageHandler({ params }: ExamBoardPageProps) {
+  const { subject, examBoard } = await params
+  
+  // Validate exam board exists in database
+  const examBoardInfo = await client.fetch(`*[_type == "examBoard" && (shortName == "${examBoard}" || slug.current == "${examBoard}") && isActive == true][0] {
+    _id,
+    name,
+    shortName,
+    slug,
+    logo {
+      asset->{
+        _id,
+        url
+      },
+      alt
+    },
+    description,
+    officialWebsite
+  }`)
+  
+  if (!examBoardInfo) {
+    notFound()
+  }
+
+  // Read headers to get host information for clone detection
+  const headersList = await headers();
+  const host = headersList.get('host');
+  const hostname = host?.split(':')[0] || 'localhost';
+  
+  // Check if this is a custom domain
+  let cloneId = null;
+  if (hostname !== 'localhost' && !hostname.includes('127.0.0.1') && !hostname.includes('.local')) {
+    cloneId = await getCloneIdByDomain(hostname);
+  }
+
+  // Get exam board page data
+  const examBoardPageData = await getExamBoardData(subject, examBoard, cloneId || undefined)
+  
+  if (!examBoardPageData) {
+    notFound()
+  }
+
+  // Fetch layout components
+  const headerData = await getHeaderData(cloneId || undefined);
+  const footerData = await getFooterData(cloneId || undefined);
+  const contactFormSectionData = await getContactFormSectionData(cloneId || undefined);
+
+  // Check if contact form is active
+  const isContactFormActive = contactFormSectionData?.isActive ?? false;
+  const showContactFormOnThisPage = examBoardPageData.subjectPageData.showContactForm ?? true;
+  const shouldShowContactForm = isContactFormActive && showContactFormOnThisPage;
+
+  return (
+    <SEOProvider seoData={examBoardPageData.subjectPageData.seo}>
+      <div className="min-h-screen bg-white">
+        <Header headerData={headerData} isContactFormActive={shouldShowContactForm} homepageUrl="/" />
+        <main>
+          <ExamBoardPage examBoardPageData={examBoardPageData} />
+        </main>
+        <Footer footerData={footerData} isContactFormActive={shouldShowContactForm} />
+      </div>
+    </SEOProvider>
+  )
+} 

@@ -333,10 +333,17 @@ export const structure = (S: StructureBuilder) =>
                                     .filter('_type == "contactFormSection" && defined(cloneReference)')
                                 ),
                               S.listItem()
-                                .title('📖 All Clone Exam Board Pages')
+                                .title('📋 Exam Boards')
+                                .child(
+                                  S.documentTypeList('examBoard')
+                                    .title('Exam Boards')
+                                    .filter('_type == "examBoard"')
+                                ),
+                              S.listItem()
+                                .title('📖 All Clone Exam Board Pages (DEPRECATED)')
                                 .child(
                                   S.documentTypeList('examBoardPage')
-                                    .title('All Clone Exam Board Pages')
+                                    .title('All Clone Exam Board Pages (DEPRECATED)')
                                     .filter('_type == "examBoardPage" && defined(cloneReference)')
                                 ),
                             ])

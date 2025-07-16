@@ -339,6 +339,13 @@ export default defineType({
       initialValue: true
     }),
     defineField({
+      name: 'examBoard',
+      title: 'Associated Exam Board',
+      type: 'reference',
+      to: [{ type: 'examBoard' }],
+      description: 'Optional: Select which exam board this subject page is associated with for dynamic routing'
+    }),
+    defineField({
       name: 'moreResources',
       title: 'More Resources Section',
       type: 'object',
