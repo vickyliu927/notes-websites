@@ -8,7 +8,7 @@ import {
   FAQ, 
   ContactForm,
   Footer,
-
+  SubjectTopicGrid
 } from '@/components'
 import { 
   headerQuery, 
@@ -40,7 +40,8 @@ import {
   WhyChooseUsData, 
   FAQData, 
   FooterData,
-  ContactFormSectionData 
+  ContactFormSectionData,
+  HomepageData
 } from '../../types/sanity'
 
 // Revalidate every 10 seconds for fresh content during development
@@ -291,16 +292,67 @@ async function getContactFormSectionData(cloneId?: string): Promise<ContactFormS
     
     if (cloneId) {
       const fallbackResult = await client.fetch(getContactFormWithFallback(cloneId));
-      const contactFormSectionData = selectBestData(fallbackResult) as ContactFormSectionData;
-      console.log(`Fetched contact form section data:`, contactFormSectionData);
-      return contactFormSectionData;
+      const contactFormData = selectBestData(fallbackResult) as ContactFormSectionData;
+      console.log(`Fetched contact form data:`, contactFormData);
+      return contactFormData;
     } else {
-    const contactFormSectionData = await client.fetch(contactFormSectionQuery);
-    console.log('Fetched contact form section data:', contactFormSectionData);
-    return contactFormSectionData;
+      const contactFormData = await client.fetch(contactFormSectionQuery);
+      console.log('Fetched contact form data:', contactFormData);
+      return contactFormData;
     }
   } catch (error) {
-    console.error('Error fetching contact form section data:', error);
+    console.error('Error fetching contact form data:', error);
+    return undefined;
+  }
+}
+
+async function getHomepageData(): Promise<HomepageData | undefined> {
+  try {
+    console.log('Fetching homepage data...');
+    
+    const query = `
+      *[_type == "homepage" && isActive == true][0] {
+        _id,
+        title,
+        pageTitle,
+        pageDescription,
+        sections,
+        topicBlocksSubject->{
+          _id,
+          title,
+          subjectSlug,
+          subjectName,
+          pageTitle,
+          pageDescription,
+          topicBlockBackgroundColor,
+          topics[] {
+            topicName,
+            topicDescription,
+            color,
+            displayOrder,
+            subtopics[] {
+              subtopicName,
+              subtopicUrl,
+              isComingSoon,
+              subSubtopics[] {
+                subSubtopicName,
+                subSubtopicUrl,
+                isComingSoon
+              }
+            }
+          },
+          isPublished,
+          showContactForm,
+          displayTopicsOnHomepage
+        }
+      }
+    `;
+    
+    const homepageData = await client.fetch(query);
+    console.log('Fetched homepage data:', homepageData);
+    return homepageData;
+  } catch (error) {
+    console.error('Error fetching homepage data:', error);
     return undefined;
   }
 }
@@ -368,6 +420,7 @@ export default async function Home() {
   const footerData = await getFooterData(cloneId || undefined);
   const seoSettings = await getSEOSettings();
   const contactFormSectionData = await getContactFormSectionData(cloneId || undefined);
+  const homepageData = await getHomepageData();
 
   // Create SEO data object
   const seoData = {
@@ -385,6 +438,39 @@ export default async function Home() {
         <Header headerData={headerData} isContactFormActive={isContactFormActive} />
         <main>
           <Hero heroData={heroData} />
+          
+          {/* Debug logging for topic blocks */}
+          {(() => {
+            console.log('🐛 [DEBUG] Homepage Data:', {
+              hasHomepageData: !!homepageData,
+              showTopicBlocks: homepageData?.sections?.showTopicBlocks,
+              hasTopicBlocksSubject: !!homepageData?.topicBlocksSubject,
+              topicBlocksSubjectTitle: homepageData?.topicBlocksSubject?.pageTitle,
+              topicCount: homepageData?.topicBlocksSubject?.topics?.length
+            });
+            return null;
+          })()}
+          
+          {/* Topic Blocks Section - conditionally displayed after Hero */}
+          {homepageData?.sections?.showTopicBlocks && homepageData?.topicBlocksSubject && (
+            <section className="py-16 bg-gray-50">
+              <div className="container mx-auto px-4">
+                <div className="text-center max-w-4xl mx-auto mb-12">
+                  <h2 className="font-serif font-bold mb-6" style={{fontSize: '45px', color: '#243b53', letterSpacing: '-0.01em', fontWeight: '600'}}>
+                    {homepageData.topicBlocksSubject.pageTitle}
+                  </h2>
+                  <p className="text-lg md:text-xl text-gray-600 leading-relaxed">
+                    {homepageData.topicBlocksSubject.pageDescription}
+                  </p>
+                </div>
+                <SubjectTopicGrid 
+                  topics={homepageData.topicBlocksSubject.topics || []} 
+                  topicBlockBackgroundColor={homepageData.topicBlocksSubject.topicBlockBackgroundColor || 'bg-blue-500'}
+                />
+              </div>
+            </section>
+          )}
+          
           <SubjectGrid subjectGridData={subjectGridData} publishedSubjects={publishedSubjects} cloneId={cloneId || undefined} hasActiveExamBoards={hasActiveExamBoards} />
           <WhyChooseUs whyChooseUsData={whyChooseUsData} />
           <FAQ faqData={faqData} />

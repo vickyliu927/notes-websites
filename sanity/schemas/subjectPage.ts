@@ -339,6 +339,13 @@ export default defineType({
       initialValue: true
     }),
     defineField({
+      name: 'displayTopicsOnHomepage',
+      title: 'Display Topics on Homepage',
+      type: 'boolean',
+      description: 'When enabled, the topic blocks from this subject will appear on the homepage instead of a separate subject page',
+      initialValue: false
+    }),
+    defineField({
       name: 'examBoard',
       title: 'Associated Exam Board',
       type: 'reference',

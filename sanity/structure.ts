@@ -188,63 +188,62 @@ export const structure = (S: StructureBuilder) =>
                               S.list()
                                 .title('Clone Content')
                                 .items([
-                                  // Homepage Content for this specific clone
+                                  // Homepage Configuration for this specific clone
                                   S.listItem()
-                                    .title('📄 Homepage')
+                                    .title('📋 Homepage Configuration')
                                     .child(
-                                      S.list()
-                                        .title('Homepage Content')
-                                        .items([
-                                          S.listItem()
-                                            .title('🔝 Header')
-                                            .child(
-                                              S.documentTypeList('header')
-                                                .title('Headers')
-                                                .filter(`_type == "header" && cloneReference._ref == "${cloneId}"`)
-                                            ),
-                                          S.listItem()
-                                            .title('🎯 Hero Section')
-                                            .child(
-                                              S.documentTypeList('hero')
-                                                .title('Hero Sections')
-                                                .filter(`_type == "hero" && cloneReference._ref == "${cloneId}"`)
-                                            ),
-                                          S.listItem()
-                                            .title('📊 Subject Grid')
-                                            .child(
-                                              S.documentTypeList('subjectGrid')
-                                                .title('Subject Grids')
-                                                .filter(`_type == "subjectGrid" && cloneReference._ref == "${cloneId}"`)
-                                            ),
-                                          S.listItem()
-                                            .title('⭐ Why Choose Us')
-                                            .child(
-                                              S.documentTypeList('whyChooseUs')
-                                                .title('Why Choose Us')
-                                                .filter(`_type == "whyChooseUs" && cloneReference._ref == "${cloneId}"`)
-                                            ),
-                                          S.listItem()
-                                            .title('❓ FAQ Section')
-                                            .child(
-                                              S.documentTypeList('faq')
-                                                .title('FAQ Sections')
-                                                .filter(`_type == "faq" && cloneReference._ref == "${cloneId}"`)
-                                            ),
-                                          S.listItem()
-                                            .title('📞 Contact Form')
-                                            .child(
-                                              S.documentTypeList('contactFormSection')
-                                                .title('Contact Forms')
-                                                .filter(`_type == "contactFormSection" && cloneReference._ref == "${cloneId}"`)
-                                            ),
-                                          S.listItem()
-                                            .title('🔽 Footer')
-                                            .child(
-                                              S.documentTypeList('footer')
-                                                .title('Footers')
-                                                .filter(`_type == "footer" && cloneReference._ref == "${cloneId}"`)
-                                            ),
-                                        ])
+                                      S.documentTypeList('homepage')
+                                        .title('Homepage Configuration')
+                                        .filter(`_type == "homepage" && cloneReference._ref == "${cloneId}"`)
+                                    ),
+                                  S.listItem()
+                                    .title('🔝 Header')
+                                    .child(
+                                      S.documentTypeList('header')
+                                        .title('Headers')
+                                        .filter(`_type == "header" && cloneReference._ref == "${cloneId}"`)
+                                    ),
+                                  S.listItem()
+                                    .title('🎯 Hero Section')
+                                    .child(
+                                      S.documentTypeList('hero')
+                                        .title('Hero Sections')
+                                        .filter(`_type == "hero" && cloneReference._ref == "${cloneId}"`)
+                                    ),
+                                  S.listItem()
+                                    .title('📊 Subject Grid')
+                                    .child(
+                                      S.documentTypeList('subjectGrid')
+                                        .title('Subject Grids')
+                                        .filter(`_type == "subjectGrid" && cloneReference._ref == "${cloneId}"`)
+                                    ),
+                                  S.listItem()
+                                    .title('⭐ Why Choose Us')
+                                    .child(
+                                      S.documentTypeList('whyChooseUs')
+                                        .title('Why Choose Us')
+                                        .filter(`_type == "whyChooseUs" && cloneReference._ref == "${cloneId}"`)
+                                    ),
+                                  S.listItem()
+                                    .title('❓ FAQ Section')
+                                    .child(
+                                      S.documentTypeList('faq')
+                                        .title('FAQ Sections')
+                                        .filter(`_type == "faq" && cloneReference._ref == "${cloneId}"`)
+                                    ),
+                                  S.listItem()
+                                    .title('📞 Contact Form')
+                                    .child(
+                                      S.documentTypeList('contactFormSection')
+                                        .title('Contact Forms')
+                                        .filter(`_type == "contactFormSection" && cloneReference._ref == "${cloneId}"`)
+                                    ),
+                                  S.listItem()
+                                    .title('🔽 Footer')
+                                    .child(
+                                      S.documentTypeList('footer')
+                                        .title('Footers')
+                                        .filter(`_type == "footer" && cloneReference._ref == "${cloneId}"`)
                                     ),
 
                                   // Subject Pages for this specific clone

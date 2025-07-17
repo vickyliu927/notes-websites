@@ -10,9 +10,9 @@ import {
   FAQ, 
   ContactForm,
   Footer,
-
+  SubjectTopicGrid
 } from '@/components'
-import { HeaderData, HeroData, SubjectGridData, WhyChooseUsData, FAQData, ContactFormSectionData, FooterData, SubjectPageData } from '../../../../../types/sanity'
+import { HeaderData, HeroData, SubjectGridData, WhyChooseUsData, FAQData, ContactFormSectionData, FooterData, SubjectPageData, HomepageData } from '../../../../../types/sanity'
 import Link from 'next/link'
 
 // ===== TYPES =====
@@ -43,6 +43,58 @@ async function getPublishedSubjectsForClone(cloneId: string): Promise<SubjectPag
   } catch (error) {
     console.error('Error fetching published subjects for clone:', error)
     return []
+  }
+}
+
+// Helper function to fetch homepage data for clone
+async function getHomepageDataForClone(cloneId: string): Promise<HomepageData | undefined> {
+  try {
+    console.log(`Fetching homepage data for clone: ${cloneId}...`);
+    
+    const query = `
+      *[_type == "homepage" && cloneReference._ref == $cloneId && isActive == true][0] {
+        _id,
+        title,
+        pageTitle,
+        pageDescription,
+        sections,
+        topicBlocksSubject->{
+          _id,
+          title,
+          subjectSlug,
+          subjectName,
+          pageTitle,
+          pageDescription,
+          topicBlockBackgroundColor,
+          topics[] {
+            topicName,
+            topicDescription,
+            color,
+            displayOrder,
+            subtopics[] {
+              subtopicName,
+              subtopicUrl,
+              isComingSoon,
+              subSubtopics[] {
+                subSubtopicName,
+                subSubtopicUrl,
+                isComingSoon
+              }
+            }
+          },
+          isPublished,
+          showContactForm,
+          displayTopicsOnHomepage
+        }
+      }
+    `;
+    
+    const homepageData = await client.fetch(query, { cloneId });
+    console.log(`Fetched homepage data for clone ${cloneId}:`, homepageData);
+    return homepageData;
+  } catch (error) {
+    console.error(`Error fetching homepage data for clone ${cloneId}:`, error);
+    return undefined;
   }
 }
 
@@ -88,6 +140,9 @@ export default async function CloneHomepage({ params }: CloneHomepageProps) {
   // Check if there are active exam board pages for URL structure (for this specific clone)
   const { hasActive: hasActiveExamBoards } = await hasActiveExamBoardPages(cloneId);
 
+  // Fetch homepage data for this clone
+  const homepageData = await getHomepageDataForClone(cloneId);
+
   // Extract component data with fallbacks
   const headerData = components.header?.data as HeaderData | undefined
   const heroData = components.hero?.data as HeroData | undefined
@@ -131,6 +186,26 @@ export default async function CloneHomepage({ params }: CloneHomepageProps) {
       <main>
         {/* Hero Section */}
         <Hero heroData={heroData} />
+        
+        {/* Topic Blocks Section - conditionally displayed after Hero */}
+        {homepageData?.sections?.showTopicBlocks && homepageData?.topicBlocksSubject && (
+          <section className="py-16 bg-gray-50">
+            <div className="container mx-auto px-4">
+              <div className="text-center max-w-4xl mx-auto mb-12">
+                <h2 className="font-serif font-bold mb-6" style={{fontSize: '45px', color: '#243b53', letterSpacing: '-0.01em', fontWeight: '600'}}>
+                  {homepageData.topicBlocksSubject.pageTitle}
+                </h2>
+                <p className="text-lg md:text-xl text-gray-600 leading-relaxed">
+                  {homepageData.topicBlocksSubject.pageDescription}
+                </p>
+              </div>
+              <SubjectTopicGrid 
+                topics={homepageData.topicBlocksSubject.topics || []} 
+                topicBlockBackgroundColor={homepageData.topicBlocksSubject.topicBlockBackgroundColor || 'bg-blue-500'}
+              />
+            </div>
+          </section>
+        )}
         
         {/* Subject Grid with Clone Context */}
         <SubjectGrid 

@@ -290,6 +290,7 @@ export interface SubjectPageData {
   topics: SubjectTopic[]
   isPublished: boolean
   showContactForm?: boolean
+  displayTopicsOnHomepage?: boolean
   moreResources?: MoreResourcesSection
   seo?: SubjectPageSEO
 }
@@ -333,10 +334,12 @@ export interface HomepageData {
     showHeader?: boolean
     showHero?: boolean
     showSubjectGrid?: boolean
+    showTopicBlocks?: boolean
     showWhyChooseUs?: boolean
     showFAQ?: boolean
     showFooter?: boolean
   }
+  topicBlocksSubject?: SubjectPageData
 }
 
 export interface ContactFormData {

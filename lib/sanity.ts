@@ -364,6 +364,7 @@ export const subjectPageBySlugQuery = (slug: string) => `*[_type == "subjectPage
   },
   isPublished,
   showContactForm,
+  displayTopicsOnHomepage,
   moreResources{
     isActive,
     sectionTitle,
@@ -516,7 +517,35 @@ export async function getHomepageData() {
       title,
       pageTitle,
       pageDescription,
-      sections
+      sections,
+      topicBlocksSubject->{
+        _id,
+        title,
+        subjectSlug,
+        subjectName,
+        pageTitle,
+        pageDescription,
+        topicBlockBackgroundColor,
+        topics[] {
+          topicName,
+          topicDescription,
+          color,
+          displayOrder,
+          subtopics[] {
+            subtopicName,
+            subtopicUrl,
+            isComingSoon,
+            subSubtopics[] {
+              subSubtopicName,
+              subSubtopicUrl,
+              isComingSoon
+            }
+          }
+        },
+        isPublished,
+        showContactForm,
+        displayTopicsOnHomepage
+      }
     }
   `
   
@@ -587,6 +616,7 @@ export async function getSubjectPageData(slug: string) {
       topicBlockBackgroundColor,
       isPublished,
       showContactForm,
+      displayTopicsOnHomepage,
       moreResources{
         isActive,
         sectionTitle,

@@ -94,6 +94,13 @@ export default defineType({
           initialValue: true
         },
         {
+          name: 'showTopicBlocks',
+          title: 'Show Topic Blocks Section',
+          type: 'boolean',
+          description: 'Display topic blocks from a selected subject on the homepage',
+          initialValue: false
+        },
+        {
           name: 'showWhyChooseUs',
           title: 'Show Why Choose Us',
           type: 'boolean',
@@ -112,6 +119,14 @@ export default defineType({
           initialValue: true
         }
       ]
+    }),
+    defineField({
+      name: 'topicBlocksSubject',
+      title: 'Topic Blocks Subject',
+      type: 'reference',
+      to: [{ type: 'subjectPage' }],
+      description: 'Select which subject page\'s topic blocks to display on the homepage (only shows if "Show Topic Blocks Section" is enabled)',
+      hidden: ({ parent }) => !parent?.sections?.showTopicBlocks
     }),
     defineField({
       name: 'isActive',

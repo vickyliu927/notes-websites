@@ -436,6 +436,7 @@ export const getSubjectPageWithFallback = (cloneId: string, slug: string) => gro
       topicBlockBackgroundColor,
       isPublished,
       showContactForm,
+      displayTopicsOnHomepage,
       "cloneName": cloneReference->cloneName,
       "cloneId": cloneReference->cloneId.current,
       moreResources{
@@ -479,6 +480,7 @@ export const getSubjectPageWithFallback = (cloneId: string, slug: string) => gro
       topicBlockBackgroundColor,
       isPublished,
       showContactForm,
+      displayTopicsOnHomepage,
       "cloneName": cloneReference->cloneName,
       "cloneId": cloneReference->cloneId.current,
       moreResources{
@@ -522,6 +524,7 @@ export const getSubjectPageWithFallback = (cloneId: string, slug: string) => gro
       topicBlockBackgroundColor,
       isPublished,
       showContactForm,
+      displayTopicsOnHomepage,
       moreResources{
         isActive,
         sectionTitle,
