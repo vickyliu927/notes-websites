@@ -10,7 +10,7 @@ import {
   FAQ, 
   ContactForm,
   Footer,
-  SubjectRequestBanner
+
 } from '@/components'
 import { HeaderData, HeroData, SubjectGridData, WhyChooseUsData, FAQData, ContactFormSectionData, FooterData, SubjectPageData } from '../../../../../types/sanity'
 import Link from 'next/link'
@@ -141,7 +141,7 @@ export default async function CloneHomepage({ params }: CloneHomepageProps) {
         />
         
         {/* Subject Request Banner */}
-        <SubjectRequestBanner />
+
         
         {/* Why Choose Us */}
         <WhyChooseUs whyChooseUsData={whyChooseUsData} />

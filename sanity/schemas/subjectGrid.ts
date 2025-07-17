@@ -157,6 +157,13 @@ export default defineType({
       description: 'Enable or disable this subject grid configuration',
       initialValue: true
     }),
+    defineField({
+      name: 'showSection',
+      title: 'Show Section',
+      type: 'boolean',
+      description: 'Show or hide the entire subject grid section. When toggled off, the section will be completely hidden from the page.',
+      initialValue: true
+    }),
 
     defineField({
       name: 'cloneSpecificStyles',
@@ -208,14 +215,21 @@ export default defineType({
       title: 'title',
       sectionTitle: 'sectionTitleFirstPart',
       isActive: 'isActive',
+      showSection: 'showSection',
       cloneName: 'cloneReference.cloneName'
     },
     prepare(selection) {
-      const { title, sectionTitle, isActive, cloneName } = selection
+      const { title, sectionTitle, isActive, showSection, cloneName } = selection
+      const statusFlags = [
+        cloneName ? `(${cloneName})` : '',
+        isActive ? '(Active)' : '(Inactive)',
+        showSection === false ? '(Hidden)' : ''
+      ].filter(Boolean).join(' ')
+      
       return {
         title: title,
-        subtitle: `${sectionTitle}${cloneName ? ` (${cloneName})` : ''}${isActive ? ' (Active)' : ''}`,
-        media: () => '📚'
+        subtitle: `${sectionTitle} ${statusFlags}`,
+        media: () => showSection === false ? '🙈' : '📚'
       }
     }
   }

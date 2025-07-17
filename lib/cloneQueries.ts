@@ -165,7 +165,8 @@ export const getSubjectGridWithFallback = (cloneId: string) => groq`
       "cloneName": cloneReference->cloneName,
       "cloneId": cloneReference->cloneId.current,
       cloneSpecificStyles,
-      isActive
+      isActive,
+      showSection
     },
     "baseline": *[_type == "subjectGrid" && cloneReference->baselineClone == true && isActive == true][0] {
       _id,
@@ -188,7 +189,8 @@ export const getSubjectGridWithFallback = (cloneId: string) => groq`
       "cloneName": cloneReference->cloneName,
       "cloneId": cloneReference->cloneId.current,
       cloneSpecificStyles,
-      isActive
+      isActive,
+      showSection
     },
     "default": *[_type == "subjectGrid" && !defined(cloneReference) && isActive == true][0] {
       _id,
@@ -208,7 +210,8 @@ export const getSubjectGridWithFallback = (cloneId: string) => groq`
         }
       },
       viewAllButton,
-      isActive
+      isActive,
+      showSection
     }
   }
 `

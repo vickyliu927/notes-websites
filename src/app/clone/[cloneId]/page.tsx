@@ -8,7 +8,7 @@ import {
   FAQ, 
   ContactForm,
   Footer,
-  SubjectRequestBanner
+
 } from '@/components'
 import { validateCloneId, getCompleteCloneData } from '../../../../lib/cloneUtils'
 import { 
@@ -123,7 +123,6 @@ export default async function CloneWebsite({ params }: CloneHomepageProps) {
         <main>
           <Hero heroData={heroData} />
           <SubjectGrid subjectGridData={subjectGridData} publishedSubjects={publishedSubjects} cloneId={cloneId} hasActiveExamBoards={hasActiveExamBoards} />
-          <SubjectRequestBanner />
           <WhyChooseUs whyChooseUsData={whyChooseUsData} />
           <FAQ faqData={faqData} />
           {isContactFormActive && (

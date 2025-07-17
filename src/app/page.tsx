@@ -8,7 +8,7 @@ import {
   FAQ, 
   ContactForm,
   Footer,
-  SubjectRequestBanner
+
 } from '@/components'
 import { 
   headerQuery, 
@@ -386,7 +386,6 @@ export default async function Home() {
         <main>
           <Hero heroData={heroData} />
           <SubjectGrid subjectGridData={subjectGridData} publishedSubjects={publishedSubjects} cloneId={cloneId || undefined} hasActiveExamBoards={hasActiveExamBoards} />
-          <SubjectRequestBanner />
           <WhyChooseUs whyChooseUsData={whyChooseUsData} />
           <FAQ faqData={faqData} />
           {isContactFormActive && (

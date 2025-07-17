@@ -97,6 +97,7 @@ export interface SubjectGridData {
   sectionDescription: string
   subjects: SubjectGridSubject[]
   viewAllButton: CTAButton
+  showSection?: boolean
 
 }
 

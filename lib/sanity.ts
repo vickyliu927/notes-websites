@@ -135,6 +135,7 @@ export const subjectGridQuery = `*[_type == "subjectGrid" && isActive == true &&
     text,
     url
   },
+  showSection
 
 }`
 
