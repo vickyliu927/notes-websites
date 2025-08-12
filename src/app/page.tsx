@@ -317,7 +317,35 @@ async function getHomepageData(): Promise<HomepageData | undefined> {
         pageTitle,
         pageDescription,
         sections,
-        topicBlocksSubjects[] {
+        topicBlocksSubject->{
+          _id,
+          title,
+          subjectSlug,
+          subjectName,
+          pageTitle,
+          pageDescription,
+          topicBlockBackgroundColor,
+          topics[] {
+            topicName,
+            topicDescription,
+            color,
+            displayOrder,
+            subtopics[] {
+              subtopicName,
+              subtopicUrl,
+              isComingSoon,
+              subSubtopics[] {
+                subSubtopicName,
+                subSubtopicUrl,
+                isComingSoon
+              }
+            }
+          },
+          isPublished,
+          showContactForm,
+          displayTopicsOnHomepage
+        },
+        topicBlocksSubjects[]->{
           _id,
           title,
           subjectSlug,

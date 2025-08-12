@@ -86,7 +86,7 @@ async function getHomepageDataForClone(cloneId: string): Promise<HomepageData | 
           showContactForm,
           displayTopicsOnHomepage
         },
-        topicBlocksSubjects[] {
+        topicBlocksSubjects[]->{
           _id,
           title,
           subjectSlug,
