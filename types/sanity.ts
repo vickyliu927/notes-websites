@@ -340,6 +340,7 @@ export interface HomepageData {
     showFooter?: boolean
   }
   topicBlocksSubject?: SubjectPageData
+  topicBlocksSubjects?: SubjectPageData[]
 }
 
 export interface ContactFormData {

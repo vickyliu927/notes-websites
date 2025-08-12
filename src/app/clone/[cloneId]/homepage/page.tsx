@@ -85,6 +85,34 @@ async function getHomepageDataForClone(cloneId: string): Promise<HomepageData | 
           isPublished,
           showContactForm,
           displayTopicsOnHomepage
+        },
+        topicBlocksSubjects[] {
+          _id,
+          title,
+          subjectSlug,
+          subjectName,
+          pageTitle,
+          pageDescription,
+          topicBlockBackgroundColor,
+          topics[] {
+            topicName,
+            topicDescription,
+            color,
+            displayOrder,
+            subtopics[] {
+              subtopicName,
+              subtopicUrl,
+              isComingSoon,
+              subSubtopics[] {
+                subSubtopicName,
+                subSubtopicUrl,
+                isComingSoon
+              }
+            }
+          },
+          isPublished,
+          showContactForm,
+          displayTopicsOnHomepage
         }
       }
     `;
@@ -188,23 +216,48 @@ export default async function CloneHomepage({ params }: CloneHomepageProps) {
         <Hero heroData={heroData} />
         
         {/* Topic Blocks Section - conditionally displayed after Hero */}
-        {homepageData?.sections?.showTopicBlocks && homepageData?.topicBlocksSubject && (
-          <section className="py-16 bg-gray-50">
-            <div className="container mx-auto px-4">
-              <div className="text-center max-w-4xl mx-auto mb-12">
-                <h2 className="font-serif font-bold mb-6" style={{fontSize: '45px', color: '#243b53', letterSpacing: '-0.01em', fontWeight: '600'}}>
-                  {homepageData.topicBlocksSubject.pageTitle}
-                </h2>
-                <p className="text-lg md:text-xl text-gray-600 leading-relaxed">
-                  {homepageData.topicBlocksSubject.pageDescription}
-                </p>
-              </div>
-              <SubjectTopicGrid 
-                topics={homepageData.topicBlocksSubject.topics || []} 
-                topicBlockBackgroundColor={homepageData.topicBlocksSubject.topicBlockBackgroundColor || 'bg-blue-500'}
-              />
-            </div>
-          </section>
+        {homepageData?.sections?.showTopicBlocks && (
+          <>
+            {Array.isArray(homepageData?.topicBlocksSubjects) && homepageData.topicBlocksSubjects.length > 0 ? (
+              homepageData.topicBlocksSubjects.map((subject) => (
+                <section key={subject._id} className="py-16 bg-gray-50">
+                  <div className="container mx-auto px-4">
+                    <div className="text-center max-w-4xl mx-auto mb-12">
+                      <h2 className="font-serif font-bold mb-6" style={{fontSize: '45px', color: '#243b53', letterSpacing: '-0.01em', fontWeight: '600'}}>
+                        {subject.pageTitle}
+                      </h2>
+                      <p className="text-lg md:text-xl text-gray-600 leading-relaxed">
+                        {subject.pageDescription}
+                      </p>
+                    </div>
+                    <SubjectTopicGrid 
+                      topics={subject.topics || []} 
+                      topicBlockBackgroundColor={subject.topicBlockBackgroundColor || 'bg-blue-500'}
+                    />
+                  </div>
+                </section>
+              ))
+            ) : (
+              homepageData?.topicBlocksSubject && (
+                <section className="py-16 bg-gray-50">
+                  <div className="container mx-auto px-4">
+                    <div className="text-center max-w-4xl mx-auto mb-12">
+                      <h2 className="font-serif font-bold mb-6" style={{fontSize: '45px', color: '#243b53', letterSpacing: '-0.01em', fontWeight: '600'}}>
+                        {homepageData.topicBlocksSubject.pageTitle}
+                      </h2>
+                      <p className="text-lg md:text-xl text-gray-600 leading-relaxed">
+                        {homepageData.topicBlocksSubject.pageDescription}
+                      </p>
+                    </div>
+                    <SubjectTopicGrid 
+                      topics={homepageData.topicBlocksSubject.topics || []} 
+                      topicBlockBackgroundColor={homepageData.topicBlocksSubject.topicBlockBackgroundColor || 'bg-blue-500'}
+                    />
+                  </div>
+                </section>
+              )
+            )}
+          </>
         )}
         
         {/* Subject Grid with Clone Context */}

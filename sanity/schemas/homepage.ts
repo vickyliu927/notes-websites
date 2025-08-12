@@ -97,7 +97,7 @@ export default defineType({
           name: 'showTopicBlocks',
           title: 'Show Topic Blocks Section',
           type: 'boolean',
-          description: 'Display topic blocks from a selected subject on the homepage',
+          description: 'Display topic blocks from selected subjects on the homepage',
           initialValue: false
         },
         {
@@ -120,13 +120,23 @@ export default defineType({
         }
       ]
     }),
+    // Backward-compatible single subject field
     defineField({
       name: 'topicBlocksSubject',
-      title: 'Topic Blocks Subject',
+      title: 'Topic Blocks Subject (single)',
       type: 'reference',
       to: [{ type: 'subjectPage' }],
-      description: 'Select which subject page\'s topic blocks to display on the homepage (only shows if "Show Topic Blocks Section" is enabled)',
-      hidden: ({ parent }) => !parent?.sections?.showTopicBlocks
+      description: 'Select a subject page to display its topic blocks on the homepage (legacy single-select)'.concat('\nUse "Topic Blocks Subjects (multiple)" below for multiple subjects.'),
+      hidden: ({ document }) => !(document as any)?.sections?.showTopicBlocks
+    }),
+    // New: multiple subjects field
+    defineField({
+      name: 'topicBlocksSubjects',
+      title: 'Topic Blocks Subjects (multiple)',
+      type: 'array',
+      of: [{ type: 'reference', to: [{ type: 'subjectPage' }] }],
+      description: 'Select one or more subject pages to display their topic blocks on the homepage',
+      hidden: ({ document }) => !(document as any)?.sections?.showTopicBlocks
     }),
     defineField({
       name: 'isActive',
