@@ -1,7 +1,7 @@
 import { Metadata } from 'next'
 import { redirect } from 'next/navigation'
 import { validateCloneId, getCompleteCloneData } from '../../../../../lib/cloneUtils'
-import { client, allSubjectPagesQuery, hasActiveExamBoardPages } from '../../../../../lib/sanity'
+import { client, allSubjectPagesQuery, hasActiveExamBoardPages, getGlobalSEOSettings } from '../../../../../lib/sanity'
 import { 
   Header, 
   Hero, 
@@ -12,6 +12,7 @@ import {
   Footer,
   SubjectTopicGrid
 } from '@/components'
+import { generateSEOMetadata } from '../../../../../components/SEOHead'
 import { HeaderData, HeroData, SubjectGridData, WhyChooseUsData, FAQData, ContactFormSectionData, FooterData, SubjectPageData, HomepageData } from '../../../../../types/sanity'
 import Link from 'next/link'
 
@@ -58,6 +59,11 @@ async function getHomepageDataForClone(cloneId: string): Promise<HomepageData | 
         pageTitle,
         pageDescription,
         sections,
+        seo {
+          metaTitle,
+          metaDescription,
+          noFollowExternal
+        },
         topicBlocksSubject->{
           _id,
           title,
@@ -131,13 +137,39 @@ async function getHomepageDataForClone(cloneId: string): Promise<HomepageData | 
 export async function generateMetadata({ params }: CloneHomepageProps): Promise<Metadata> {
   const { cloneId } = await params
   
-  // Fetch clone data for metadata
-  const cloneData = await getCompleteCloneData(cloneId)
-  const cloneName = cloneData?.clone?.cloneName || cloneId
-  
-  return {
-    title: `${cloneName} - Homepage | CIE IGCSE Study Notes`,
-    description: `Access ${cloneName} variant of comprehensive CIE IGCSE study notes and revision materials.`,
+  try {
+    // Fetch clone data and homepage data for metadata
+    const cloneData = await getCompleteCloneData(cloneId)
+    const homepageData = await getHomepageDataForClone(cloneId)
+    const globalSEO = await getGlobalSEOSettings()
+    
+    const cloneName = cloneData?.clone?.cloneName || cloneId.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())
+    
+    // Build robust title and description with proper fallbacks
+    const pageTitle = homepageData?.pageTitle || 
+                     `${cloneName} - Study Notes` ||
+                     globalSEO?.metaTitle ||
+                     `${cloneName} | CIE IGCSE Study Notes`;
+                     
+    const pageDescription = homepageData?.pageDescription || 
+                           `Comprehensive study notes and resources for ${cloneName}` ||
+                           globalSEO?.metaDescription ||
+                           `Access ${cloneName} variant of comprehensive CIE IGCSE study notes and revision materials.`;
+    
+    // Use homepage SEO data if available, otherwise fall back to global SEO
+    const seoData = homepageData?.seo || globalSEO;
+
+    return generateSEOMetadata({
+      title: pageTitle,
+      description: pageDescription,
+      seoData,
+    });
+  } catch (error) {
+    console.error('Error generating clone homepage metadata:', error)
+    return generateSEOMetadata({
+      title: 'CIE IGCSE Study Notes',
+      description: 'Comprehensive study notes and resources for CIE IGCSE students.',
+    });
   }
 }
 
@@ -266,6 +298,7 @@ export default async function CloneHomepage({ params }: CloneHomepageProps) {
           publishedSubjects={publishedSubjects}
           cloneId={cloneId}
           hasActiveExamBoards={hasActiveExamBoards}
+          isCustomDomain={false}
         />
         
         {/* Subject Request Banner */}

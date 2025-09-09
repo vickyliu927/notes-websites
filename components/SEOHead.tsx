@@ -12,18 +12,37 @@ export function generateSEOMetadata({
   description,
   seoData,
 }: SEOHeadProps): Metadata {
-  // Use SEO data if available, otherwise fall back to props
-  const metaTitle = seoData?.metaTitle || title || 'CIE IGCSE Notes'
-  const metaDescription = seoData?.metaDescription || description || 'Comprehensive IGCSE study notes and resources'
+  // Robust fallback system with multiple layers of safety
+  const metaTitle = (seoData?.metaTitle && seoData.metaTitle.trim()) || 
+                   (title && title.trim()) || 
+                   'CIE IGCSE Study Notes';
+  
+  const metaDescription = (seoData?.metaDescription && seoData.metaDescription.trim()) || 
+                         (description && description.trim()) || 
+                         'Expert study notes and resources to help you excel in your CIE IGCSE exams with confidence.';
+  
+  // Ensure titles are reasonable length (avoid too long titles)
+  const finalTitle = metaTitle.length > 60 ? metaTitle.substring(0, 57) + '...' : metaTitle;
+  const finalDescription = metaDescription.length > 160 ? metaDescription.substring(0, 157) + '...' : metaDescription;
   
   const metadata: Metadata = {
-    title: metaTitle,
-    description: metaDescription,
+    title: finalTitle,
+    description: finalDescription,
     robots: {
       index: true,
-      follow: true, // Always allow following since we handle nofollow at link level
+      follow: !seoData?.noFollowExternal, // Use noFollowExternal setting if available
     },
   }
+
+  // Add debug logging to track SEO generation
+  console.log('🔍 [SEO] Generated metadata:', {
+    finalTitle,
+    finalDescription,
+    usedSeoData: !!seoData,
+    seoTitle: seoData?.metaTitle,
+    seoDescription: seoData?.metaDescription,
+    noFollow: !!seoData?.noFollowExternal
+  });
 
   return metadata
 } 

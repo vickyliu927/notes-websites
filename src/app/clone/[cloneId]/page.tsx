@@ -122,7 +122,7 @@ export default async function CloneWebsite({ params }: CloneHomepageProps) {
         <Header headerData={headerData} isContactFormActive={isContactFormActive} homepageUrl={`/clone/${cloneId}/homepage`} />
         <main>
           <Hero heroData={heroData} />
-          <SubjectGrid subjectGridData={subjectGridData} publishedSubjects={publishedSubjects} cloneId={cloneId} hasActiveExamBoards={hasActiveExamBoards} />
+          <SubjectGrid subjectGridData={subjectGridData} publishedSubjects={publishedSubjects} cloneId={cloneId} hasActiveExamBoards={hasActiveExamBoards} isCustomDomain={false} />
           <WhyChooseUs whyChooseUsData={whyChooseUsData} />
           <FAQ faqData={faqData} />
           {isContactFormActive && (

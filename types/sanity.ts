@@ -41,6 +41,7 @@ export interface HeaderData {
   logo: SanityImage
   navigation: NavigationLink[]
   ctaButton: CTAButton
+  cloneName?: string  // Optional clone name from clone reference
 }
 
 export interface HeroStatistic {
@@ -341,6 +342,7 @@ export interface HomepageData {
   }
   topicBlocksSubject?: SubjectPageData
   topicBlocksSubjects?: SubjectPageData[]
+  seo?: SEOData  // Optional SEO settings for homepage
 }
 
 export interface ContactFormData {

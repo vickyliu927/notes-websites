@@ -10,6 +10,7 @@ import {
   Footer,
   SubjectTopicGrid
 } from '@/components'
+import { generateSEOMetadata } from '../../components/SEOHead'
 import { 
   headerQuery, 
   heroQuery, 
@@ -19,7 +20,8 @@ import {
   faqQuery, 
   footerQuery,
   contactFormSectionQuery,
-  hasActiveExamBoardPages
+  hasActiveExamBoardPages,
+  getGlobalSEOSettings
 } from '../../lib/sanity'
 import { 
   getHeaderWithFallback,
@@ -103,21 +105,50 @@ export async function generateMetadata(): Promise<Metadata> {
     
     // Check if this is a clone request
     let cloneId = null;
-    if (hostname !== 'localhost' && !hostname.includes('127.0.0.1') && !hostname.includes('.local')) {
+    const isLocalDevelopment = hostname === 'localhost' || hostname.includes('127.0.0.1') || hostname.includes('.local');
+    
+    if (!isLocalDevelopment) {
       cloneId = await getCloneIdByDomain(hostname);
     }
 
-    // For now, return default metadata (can be enhanced later with clone-specific SEO)
-    return {
-      title: 'CIE IGCSE Notes',
-      description: 'CIE IGCSE Notes'
+    // Fetch homepage and SEO data with clone awareness
+    const homepageData = await getHomepageData();
+    const globalSEO = await getGlobalSEOSettings();
+    let headerData = null;
+    
+    // If we have a clone, get clone-specific header data for site branding
+    if (cloneId) {
+      headerData = await getHeaderData(cloneId);
     }
+
+    // Build clone-aware title and description
+    const cloneName = headerData?.cloneName || (cloneId ? cloneId.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase()) : null);
+    
+    // Prioritize homepage data, then clone data, then global SEO, then fallbacks
+    const pageTitle = homepageData?.pageTitle || 
+                     (cloneName ? `${cloneName} - Study Notes` : null) ||
+                     globalSEO?.metaTitle ||
+                     'CIE IGCSE Study Notes';
+                     
+    const pageDescription = homepageData?.pageDescription || 
+                           (cloneName ? `Comprehensive study notes and resources for ${cloneName}` : null) ||
+                           globalSEO?.metaDescription ||
+                           'Expert study notes and resources to help you excel in your CIE IGCSE exams with confidence.';
+
+    // Use homepage SEO data if available, otherwise fall back to global SEO
+    const seoData = homepageData?.seo || globalSEO;
+
+    return generateSEOMetadata({
+      title: pageTitle,
+      description: pageDescription,
+      seoData,
+    });
   } catch (error) {
-    console.error('Error generating metadata:', error)
-    return {
-      title: 'CIE IGCSE Notes',
-      description: 'CIE IGCSE Notes'
-    }
+    console.error('Error generating homepage metadata:', error)
+    return generateSEOMetadata({
+      title: 'CIE IGCSE Study Notes',
+      description: 'Expert study notes and resources to help you excel in your CIE IGCSE exams with confidence.',
+    });
   }
 }
 
@@ -317,6 +348,11 @@ async function getHomepageData(): Promise<HomepageData | undefined> {
         pageTitle,
         pageDescription,
         sections,
+        seo {
+          metaTitle,
+          metaDescription,
+          noFollowExternal
+        },
         topicBlocksSubject->{
           _id,
           title,
@@ -526,7 +562,7 @@ export default async function Home() {
             </>
           )}
           
-          <SubjectGrid subjectGridData={subjectGridData} publishedSubjects={publishedSubjects} cloneId={cloneId || undefined} hasActiveExamBoards={hasActiveExamBoards} />
+          <SubjectGrid subjectGridData={subjectGridData} publishedSubjects={publishedSubjects} cloneId={cloneId || undefined} hasActiveExamBoards={hasActiveExamBoards} isCustomDomain={!isLocalDevelopment && !!cloneId} />
           <WhyChooseUs whyChooseUsData={whyChooseUsData} />
           <FAQ faqData={faqData} />
           {isContactFormActive && (

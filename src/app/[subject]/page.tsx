@@ -203,9 +203,27 @@ export async function generateMetadata({ params }: SubjectPageProps): Promise<Me
     // Use subject page SEO data if available, otherwise fall back to global SEO
     const seoData = subjectPageData.seo || globalSEO
 
+    // Get clone-specific header data for better branding
+    let headerData = null;
+    let cloneName = null;
+    
+    if (cloneId) {
+      headerData = await getHeaderData(cloneId);
+      cloneName = headerData?.cloneName || cloneId.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+    }
+    
+    // Build robust title with proper fallbacks
+    const baseTitle = subjectPageData.pageTitle || subjectPageData.title || subjectPageData.subjectName;
+    const siteBranding = cloneName || 'CIE IGCSE Notes';
+    const finalTitle = `${baseTitle} - ${siteBranding}`;
+    
+    // Build robust description with fallbacks
+    const finalDescription = subjectPageData.pageDescription || 
+                            `Comprehensive ${subjectPageData.subjectName || 'study'} notes and resources for ${siteBranding}.`;
+
     return generateSEOMetadata({
-      title: `${subjectPageData.pageTitle} - CIE IGCSE Notes`,
-      description: subjectPageData.pageDescription,
+      title: finalTitle,
+      description: finalDescription,
       seoData,
     })
   } catch (error) {
@@ -213,8 +231,8 @@ export async function generateMetadata({ params }: SubjectPageProps): Promise<Me
     
     // Return basic metadata if there's an error
     return generateSEOMetadata({
-      title: 'IGCSE Notes - CIE Study Materials',
-      description: 'Access comprehensive IGCSE study notes and revision materials.',
+      title: 'Study Notes - CIE IGCSE Materials',
+      description: 'Access comprehensive IGCSE study notes and revision materials for all subjects.',
     })
   }
 }
