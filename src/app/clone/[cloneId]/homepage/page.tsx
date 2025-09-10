@@ -53,7 +53,7 @@ async function getHomepageDataForClone(cloneId: string): Promise<HomepageData | 
     console.log(`Fetching homepage data for clone: ${cloneId}...`);
     
     const query = `
-      *[_type == "homepage" && cloneReference._ref == $cloneId && isActive == true][0] {
+      *[_type == "homepage" && cloneReference->cloneId.current == $cloneId && isActive == true][0] {
         _id,
         title,
         pageTitle,

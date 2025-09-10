@@ -112,14 +112,22 @@ export async function generateMetadata(): Promise<Metadata> {
     }
 
     // Fetch homepage and SEO data with clone awareness
-    const homepageData = await getHomepageData();
-    const globalSEO = await getGlobalSEOSettings();
+    let homepageData = null;
     let headerData = null;
     
-    // If we have a clone, get clone-specific header data for site branding
+    // If we have a clone, get clone-specific data
     if (cloneId) {
       headerData = await getHeaderData(cloneId);
+      // Try to get clone-specific homepage data first
+      homepageData = await getHomepageDataForClone(cloneId);
     }
+    
+    // If no clone-specific homepage data, fall back to global homepage
+    if (!homepageData) {
+      homepageData = await getHomepageData();
+    }
+    
+    const globalSEO = await getGlobalSEOSettings();
 
     // Build clone-aware title and description
     const cloneName = headerData?.cloneName || (cloneId ? cloneId.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase()) : null);
@@ -137,6 +145,17 @@ export async function generateMetadata(): Promise<Metadata> {
 
     // Use homepage SEO data if available, otherwise fall back to global SEO
     const seoData = homepageData?.seo || globalSEO;
+
+    console.log('🔍 [HOMEPAGE_SEO] SEO Title Generation:', {
+      hostname,
+      cloneId,
+      cloneName,
+      homepagePageTitle: homepageData?.pageTitle,
+      homepageMetaTitle: homepageData?.seo?.metaTitle,
+      globalMetaTitle: globalSEO?.metaTitle,
+      finalPageTitle: pageTitle,
+      hasCloneSpecificHomepage: !!homepageData && !!cloneId
+    });
 
     return generateSEOMetadata({
       title: pageTitle,
@@ -333,6 +352,91 @@ async function getContactFormSectionData(cloneId?: string): Promise<ContactFormS
     }
   } catch (error) {
     console.error('Error fetching contact form data:', error);
+    return undefined;
+  }
+}
+
+// Helper function to fetch homepage data for clone
+async function getHomepageDataForClone(cloneId: string): Promise<HomepageData | undefined> {
+  try {
+    console.log(`Fetching homepage data for clone: ${cloneId}...`);
+    
+    const query = `
+      *[_type == "homepage" && cloneReference->cloneId.current == $cloneId && isActive == true][0] {
+        _id,
+        title,
+        pageTitle,
+        pageDescription,
+        sections,
+        seo {
+          metaTitle,
+          metaDescription,
+          noFollowExternal
+        },
+        topicBlocksSubject->{
+          _id,
+          title,
+          subjectSlug,
+          subjectName,
+          pageTitle,
+          pageDescription,
+          topicBlockBackgroundColor,
+          topics[] {
+            topicName,
+            topicDescription,
+            color,
+            displayOrder,
+            subtopics[] {
+              subtopicName,
+              subtopicUrl,
+              isComingSoon,
+              subSubtopics[] {
+                subSubtopicName,
+                subSubtopicUrl,
+                isComingSoon
+              }
+            }
+          },
+          isPublished,
+          showContactForm,
+          displayTopicsOnHomepage
+        },
+        topicBlocksSubjects[]->{
+          _id,
+          title,
+          subjectSlug,
+          subjectName,
+          pageTitle,
+          pageDescription,
+          topicBlockBackgroundColor,
+          topics[] {
+            topicName,
+            topicDescription,
+            color,
+            displayOrder,
+            subtopics[] {
+              subtopicName,
+              subtopicUrl,
+              isComingSoon,
+              subSubtopics[] {
+                subSubtopicName,
+                subSubtopicUrl,
+                isComingSoon
+              }
+            }
+          },
+          isPublished,
+          showContactForm,
+          displayTopicsOnHomepage
+        }
+      }
+    `;
+    
+    const homepageData = await client.fetch(query, { cloneId });
+    console.log(`Fetched homepage data for clone ${cloneId}:`, homepageData);
+    return homepageData;
+  } catch (error) {
+    console.error(`Error fetching homepage data for clone ${cloneId}:`, error);
     return undefined;
   }
 }
