@@ -35,7 +35,7 @@ const fallbackFooterData: FooterData = {
     sectionTitle: 'Support',
     links: [
       { label: 'FAQs', href: '#faqs' },
-      { label: 'Contact Us', href: '/contact' },
+      { label: 'Contact Us', href: '#contact' },
       { label: 'Help Center', href: '#' },
       { label: 'Privacy Policy', href: '#' },
       { label: 'Terms of Service', href: '#' },
@@ -326,7 +326,7 @@ export default function Footer({ footerData, isContactFormActive }: FooterProps)
               <ul className="space-y-3">
                 {(data.support!.links || []).map((link, index) => (
                   <li key={index}>
-                    {link.href === '/contact' ? (
+                    {link.href === '#contact' ? (
                       <button 
                         onClick={handleContactNavigation}
                         className="text-white/80 hover:text-coral-400 transition-colors flex items-center"

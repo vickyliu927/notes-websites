@@ -50,7 +50,6 @@ Canonical: https://www.ibchemistry-notes.com
 
 Sitemap URLs:
 - https://www.ibchemistry-notes.com/
-- https://www.ibchemistry-notes.com/contact
 - https://www.ibchemistry-notes.com/hl
 - https://www.ibchemistry-notes.com/sl
 ```
@@ -62,10 +61,11 @@ Canonical: https://igcse-notes.com
 
 Sitemap URLs:
 - https://igcse-notes.com/
-- https://igcse-notes.com/contact
 - https://igcse-notes.com/maths
 - https://igcse-notes.com/physics
 ```
+
+**Note**: Contact pages have been removed - contact functionality is now handled via internal anchors (`#contact`) that scroll to contact forms embedded on pages.
 
 ## Key Functions
 

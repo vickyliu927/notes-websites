@@ -36,7 +36,7 @@ export default function Header({ headerData, isContactFormActive, homepageUrl = 
       { label: "Past Papers", href: "#" },
       { label: "Resources", href: "#" },
       { label: "About", href: "#" },
-      { label: "Contact", href: "/contact" }
+      { label: "Contact", href: "#contact" }
     ],
     ctaButton: {
       text: "View all CIE IGCSE Study Notes on TutorChase",
@@ -110,7 +110,7 @@ export default function Header({ headerData, isContactFormActive, homepageUrl = 
           <nav className={`hidden md:flex space-x-12 ${!hasLogo ? 'ml-0' : ''}`}>
             {navigation.map((link, index) => {
               // Use contact navigation for contact links
-              if (link.href === '/contact') {
+              if (link.href === '#contact') {
                 return (
                   <button 
                     key={index}
@@ -178,7 +178,7 @@ export default function Header({ headerData, isContactFormActive, homepageUrl = 
             <nav className="flex flex-col space-y-4">
               {navigation.map((link, index) => {
                 // Use contact navigation for contact links
-                if (link.href === '/contact') {
+                if (link.href === '#contact') {
                   return (
                     <button 
                       key={index}

@@ -144,12 +144,6 @@ export async function GET() {
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
-  <url>
-    <loc>${baseUrl}/contact</loc>
-    <lastmod>${now}</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
 ${uniqueSubjects.map((subject: SubjectData) => `  <url>
     <loc>${baseUrl}/${subject.slug}</loc>
     <lastmod>${subject._updatedAt || now}</lastmod>
@@ -181,12 +175,6 @@ ${uniqueSubjects.map((subject: SubjectData) => `  <url>
     <lastmod>${now}</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
-  </url>
-  <url>
-    <loc>${baseUrl}/contact</loc>
-    <lastmod>${now}</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
   </url>
 </urlset>`
 
