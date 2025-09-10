@@ -65,14 +65,24 @@ npm run sanity:deploy
 - Handles errors gracefully
 
 ### Data Storage
-- Form submissions are stored in Sanity as `contactForm` documents
+- Form submissions are stored in Sanity as `contactFormSubmission` documents
 - Each submission includes all form fields plus a timestamp
-- You can view submissions in your Sanity Studio
+- **NEW**: Domain tracking information (source domain, clone ID, clone name)
+- You can view submissions in your Sanity Studio under "📧 Contact Form Submissions"
 
 ### Email Notifications
 - Automatic email notifications sent to `NOTIFICATION_EMAIL`
-- Includes all form data in a formatted HTML email
+- **NEW**: Enhanced email format with domain source information
+- **NEW**: Subject line includes domain/clone information
+- Includes all form data in a formatted HTML email with source tracking
 - Continues to work even if Sanity storage fails
+
+### Domain Tracking Features (NEW)
+- **Source Domain**: Captures the domain from which the form was submitted
+- **Clone Detection**: Automatically identifies which clone website the submission came from
+- **Enhanced Subject Lines**: Email subjects now include domain info (e.g., "New Tutoring Request from John Doe - from IB Chemistry Notes (ibchemistry-notes.com)")
+- **Comprehensive Source Data**: Stores source URL, clone ID, and clone name for analytics
+- **Sanity Studio Integration**: View submissions organized by source domain in the admin panel
 
 ## Testing
 1. Make sure your environment variables are configured
@@ -87,12 +97,39 @@ npm run sanity:deploy
 - Form submissions will still work even if one service fails (graceful degradation)
 
 ## Files Modified/Created
-- `sanity/schemas/contactForm.ts` - New Sanity schema
-- `sanity/schemas/index.ts` - Added contact form to exports
-- `src/components/ContactForm.tsx` - New contact form component
+- `sanity/schemas/contactForm.ts` - Contact form configuration schema
+- `sanity/schemas/contactFormSubmission.ts` - **NEW**: Form submission storage schema with domain tracking
+- `sanity/schemas/index.ts` - Added contact form schemas to exports
+- `sanity/structure.ts` - **UPDATED**: Added contact form submissions section
+- `src/components/ContactForm.tsx` - Contact form component
 - `src/components/index.ts` - Added ContactForm export
-- `src/app/api/contact/route.ts` - New API endpoint
+- `src/app/api/contact/route.ts` - **ENHANCED**: API endpoint with domain tracking and enhanced emails
 - `src/app/page.tsx` - Added ContactForm to homepage
 - `types/sanity.ts` - Added ContactFormData interface
 - `env.template` - Added email configuration variables
-- `package.json` - Added Resend dependency 
+- `package.json` - Added Resend dependency
+
+## Example Enhanced Email Notification
+
+When a form is submitted, you'll now receive emails like this:
+
+**Subject**: `New Tutoring Request from John Doe - from IB Chemistry Notes (ibchemistry-notes.com)`
+
+**Content**:
+```
+📍 Submission Source
+Domain: ibchemistry-notes.com
+Clone ID: ib-chemistry-notes
+Website: IB Chemistry Notes
+Source URL: https://ibchemistry-notes.com/
+
+👤 Contact Information
+Name: John Doe
+Country: United Kingdom
+Phone: +44 123 456 7890
+Email: john.doe@example.com
+
+💰 Budget & Requirements
+Hourly Budget: £50-60 per hour
+Tutoring Details: Need help with organic chemistry for IB HL...
+``` 

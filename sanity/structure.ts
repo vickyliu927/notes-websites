@@ -81,13 +81,23 @@ export const structure = (S: StructureBuilder) =>
                             .filter('_type == "contactFormSection" && !defined(cloneReference)')
                         ),
                       
-                      // Contact Form Submissions
+                      // Contact Form Configuration
                       S.listItem()
-                        .title('Contact Form Submissions')
+                        .title('Contact Form Configuration')
                         .child(
                           S.documentTypeList('contactForm')
+                            .title('Contact Form Configuration')
+                            .filter('_type == "contactForm" && !defined(cloneReference)')
+                        ),
+                      
+                      // Contact Form Submissions
+                      S.listItem()
+                        .title('📧 Contact Form Submissions')
+                        .child(
+                          S.documentTypeList('contactFormSubmission')
                             .title('Contact Form Submissions')
-                            .filter('_type == "contactForm"')
+                            .filter('_type == "contactFormSubmission"')
+                            .defaultOrdering([{field: 'submissionDate', direction: 'desc'}])
                         ),
                       
                       // SEO Settings

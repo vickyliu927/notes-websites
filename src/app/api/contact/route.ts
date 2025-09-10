@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { headers } from 'next/headers'
 import { client } from '../../../../lib/sanity'
 import { Resend } from 'resend'
 
@@ -11,15 +12,59 @@ interface ContactFormData {
   hourlyBudget: string
 }
 
+// Function to get clone ID and name by domain
+async function getCloneInfoByDomain(hostname: string): Promise<{cloneId: string | null, cloneName: string | null}> {
+  try {
+    const query = `
+      *[_type == "clone" && $hostname in metadata.domains && isActive == true][0] {
+        cloneId,
+        cloneName,
+        metadata
+      }
+    `
+    
+    const result = await client.fetch(query, { hostname })
+    
+    if (result?.cloneId?.current) {
+      return {
+        cloneId: result.cloneId.current,
+        cloneName: result.cloneName || null
+      }
+    }
+    
+    return { cloneId: null, cloneName: null }
+  } catch (error) {
+    console.error('Error getting clone info by domain:', error)
+    return { cloneId: null, cloneName: null }
+  }
+}
+
 export async function POST(request: NextRequest) {
   console.log('=== CONTACT FORM API CALLED ===')
   
   try {
+    // Get domain information from headers
+    const headersList = await headers()
+    const host = headersList.get('host')
+    const hostname = host?.split(':')[0] || 'localhost'
+    const referer = headersList.get('referer') || ''
+    
+    console.log('📍 [CONTACT] Request from:', { hostname, referer })
+    
+    // Get clone information
+    const { cloneId, cloneName } = await getCloneInfoByDomain(hostname)
+    const sourceDomain = hostname
+    const sourceUrl = referer
+    
+    console.log('📍 [CONTACT] Clone info:', { cloneId, cloneName, sourceDomain })
+    
     const body: ContactFormData = await request.json()
     console.log('Received form data:', {
       fullName: body.fullName,
       country: body.country,
       email: body.email,
+      sourceDomain,
+      cloneId,
       // Don't log sensitive data like phone/details in production
     })
     
@@ -56,14 +101,19 @@ export async function POST(request: NextRequest) {
       console.log('Sanity Token available:', !!process.env.SANITY_API_TOKEN)
       
       const doc = await client.create({
-        _type: 'contactForm',
+        _type: 'contactFormSubmission',
         fullName: body.fullName,
         country: body.country,
         phone: body.phone,
         email: body.email,
         tutoringDetails: body.tutoringDetails,
         hourlyBudget: body.hourlyBudget,
-        submissionDate: new Date().toISOString()
+        submissionDate: new Date().toISOString(),
+        // Add domain tracking information
+        sourceDomain: sourceDomain,
+        sourceUrl: sourceUrl,
+        cloneId: cloneId,
+        cloneName: cloneName
       })
       console.log('✅ Successfully saved to Sanity:', doc._id)
       sanitySuccess = true
@@ -83,20 +133,40 @@ export async function POST(request: NextRequest) {
       try {
         console.log('Attempting to send email...')
         const resend = new Resend(process.env.RESEND_API_KEY)
+        // Create enhanced subject line with domain/clone info
+        const domainInfo = cloneName ? `from ${cloneName} (${sourceDomain})` : `from ${sourceDomain}`
+        const subject = `New Tutoring Request from ${body.fullName} - ${domainInfo}`
+        
         const result = await resend.emails.send({
           from: process.env.FROM_EMAIL || 'notifications@yourdomain.com',
           to: process.env.NOTIFICATION_EMAIL,
-          subject: `New Tutoring Request from ${body.fullName}`,
+          subject: subject,
           html: `
             <h2>New Tutoring Request</h2>
+            
+            <div style="background-color: #f0f9ff; border: 1px solid #0ea5e9; border-radius: 8px; padding: 16px; margin-bottom: 20px;">
+              <h3 style="margin: 0 0 10px 0; color: #0369a1;">📍 Submission Source</h3>
+              <p style="margin: 5px 0;"><strong>Domain:</strong> ${sourceDomain}</p>
+              ${cloneId ? `<p style="margin: 5px 0;"><strong>Clone ID:</strong> ${cloneId}</p>` : ''}
+              ${cloneName ? `<p style="margin: 5px 0;"><strong>Website:</strong> ${cloneName}</p>` : ''}
+              ${sourceUrl ? `<p style="margin: 5px 0;"><strong>Source URL:</strong> ${sourceUrl}</p>` : ''}
+            </div>
+            
+            <h3>👤 Contact Information</h3>
             <p><strong>Name:</strong> ${body.fullName}</p>
             <p><strong>Country:</strong> ${body.country}</p>
             <p><strong>Phone:</strong> ${body.phone}</p>
             <p><strong>Email:</strong> ${body.email}</p>
+            
+            <h3>💰 Budget & Requirements</h3>
             <p><strong>Hourly Budget:</strong> ${body.hourlyBudget}</p>
-            <p><strong>Details:</strong></p>
-            <p>${body.tutoringDetails.replace(/\n/g, '<br>')}</p>
-            <p><strong>Submitted:</strong> ${new Date().toLocaleString()}</p>
+            <p><strong>Tutoring Details:</strong></p>
+            <div style="background-color: #f9f9f9; border-left: 4px solid #e5e7eb; padding: 12px; margin: 10px 0;">
+              ${body.tutoringDetails.replace(/\n/g, '<br>')}
+            </div>
+            
+            <hr style="margin: 20px 0; border: none; border-top: 1px solid #e5e7eb;">
+            <p style="color: #6b7280; font-size: 14px;"><strong>Submitted:</strong> ${new Date().toLocaleString()}</p>
           `
         })
         console.log('✅ Email sent successfully:', result)
